@@ -27,23 +27,26 @@ MetaENCODE is an interactive web application that helps researchers discover rel
    cd meta-encode
    ```
 
-2. Create and activate a virtual environment:
+2. Run the setup script (recommended):
+   ```bash
+   ./scripts/setup.sh
+   source .venv/bin/activate
+   ```
+
+   Or manually:
    ```bash
    python3 -m venv .venv
    source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+   pip install -r requirements-dev.txt
+   pre-commit install
    ```
 
-3. Install dependencies:
+3. Run the application:
    ```bash
-   make dev  # Or: pip install -r requirements-dev.txt
+   make run
    ```
 
-4. Run the application:
-   ```bash
-   make run  # Or: streamlit run app.py
-   ```
-
-5. Open your browser to `http://localhost:8501`
+4. Open your browser to `http://localhost:8501`
 
 ## Development
 
