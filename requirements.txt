@@ -1,0 +1,24 @@
+# meta-encode/requirements.txt
+# Core dependencies for MetaENCODE
+
+# Core Framework
+streamlit>=1.28.0
+
+# Data Processing
+pandas>=2.0.0
+numpy>=1.24.0
+
+# API Interaction
+requests>=2.31.0
+
+# Machine Learning / Embeddings
+sentence-transformers>=2.2.0
+scikit-learn>=1.3.0
+torch>=2.0.0
+
+# Visualization
+plotly>=5.18.0
+umap-learn>=0.5.4
+
+# Utilities
+python-dotenv>=1.0.0
