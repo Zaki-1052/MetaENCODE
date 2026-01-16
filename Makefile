@@ -1,12 +1,13 @@
 # meta-encode/Makefile
 # Development workflow commands
 
-.PHONY: install dev run test lint format clean help
+.PHONY: install dev setup run test lint format clean help
 
 # Default target
 help:
 	@echo "MetaENCODE Development Commands"
 	@echo "================================"
+	@echo "make setup      - Full setup (venv + deps + hooks)"
 	@echo "make install    - Install production dependencies"
 	@echo "make dev        - Install all dependencies (prod + dev)"
 	@echo "make run        - Run Streamlit application"
@@ -15,6 +16,10 @@ help:
 	@echo "make format     - Auto-format code with black and isort"
 	@echo "make clean      - Remove cache and build artifacts"
 	@echo "make hooks      - Install pre-commit hooks"
+
+# Full setup for new developers
+setup:
+	./scripts/setup.sh
 
 # Install production dependencies
 install:
