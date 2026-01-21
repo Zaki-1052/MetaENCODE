@@ -288,3 +288,73 @@ class TestNumericEncoderEdgeCases:
 
         with pytest.raises(ValueError, match="Unknown normalization method"):
             encoder.fit(series)
+
+
+# ============================================================================
+# Additional Edge Case Tests for Coverage
+# ============================================================================
+
+
+class TestCategoricalEncoderCoverageEdgeCases:
+    """Additional edge case tests for CategoricalEncoder coverage."""
+
+    def test_label_encoding_unknown_error(self) -> None:
+        """Lines 112-113: Label encoding with handle_unknown='error' raises."""
+        encoder = CategoricalEncoder(encoding_type="label", handle_unknown="error")
+        encoder.fit(pd.Series(["A", "B"]))
+        with pytest.raises(ValueError, match="Unknown category"):
+            encoder.transform(pd.Series(["A", "C"]))
+
+    def test_label_encoding_unknown_ignore(self) -> None:
+        """Lines 114-115: Label encoding with unknown category returns -1."""
+        encoder = CategoricalEncoder(encoding_type="label", handle_unknown="ignore")
+        encoder.fit(pd.Series(["A", "B"]))
+        result = encoder.transform(pd.Series(["A", "C"]))
+        assert result[1] == -1  # Unknown category gets -1
+
+    def test_invalid_encoding_type_transform(self) -> None:
+        """Line 120: Invalid encoding_type in transform raises ValueError."""
+        encoder = CategoricalEncoder(encoding_type="onehot")
+        encoder.fit(pd.Series(["A", "B"]))
+        # Manually change encoding type to test the transform error path
+        encoder.encoding_type = "invalid"
+        with pytest.raises(ValueError, match="Unknown encoding type"):
+            encoder.transform(pd.Series(["A"]))
+
+    def test_n_categories_not_fitted(self) -> None:
+        """Line 137: n_categories property before fit raises ValueError."""
+        encoder = CategoricalEncoder()
+        with pytest.raises(ValueError, match="not been fitted"):
+            _ = encoder.n_categories
+
+    def test_categories_not_fitted(self) -> None:
+        """Line 144: categories property before fit raises ValueError."""
+        encoder = CategoricalEncoder()
+        with pytest.raises(ValueError, match="not been fitted"):
+            _ = encoder.categories
+
+
+class TestNumericEncoderCoverageEdgeCases:
+    """Additional edge case tests for NumericEncoder coverage."""
+
+    def test_minmax_transform_constant_values(self) -> None:
+        """Line 241: minmax transform with constant values (range=0) returns zeros."""
+        # Fit on variable data
+        encoder = NumericEncoder(method="minmax")
+        encoder.fit(pd.Series([1.0, 5.0, 10.0]))
+        # Transform with constant values - should handle division by zero
+        # This tests the range_val == 0 path in transform
+        encoder._min = 5.0
+        encoder._max = 5.0  # Simulate constant column scenario
+        result = encoder.transform(pd.Series([5.0, 5.0, 5.0]))
+        assert not np.isnan(result).any()
+        assert (result == 0).all()
+
+    def test_invalid_method_in_transform(self) -> None:
+        """Line 246: Invalid method in transform raises ValueError."""
+        encoder = NumericEncoder(method="standardize")
+        encoder.fit(pd.Series([1, 2, 3]))
+        # Manually change method to test the transform error path
+        encoder.method = "invalid"
+        with pytest.raises(ValueError, match="Unknown normalization method"):
+            encoder.transform(pd.Series([1, 2, 3]))

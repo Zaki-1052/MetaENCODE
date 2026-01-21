@@ -416,3 +416,51 @@ class TestFeatureCombinerEdgeCases:
 
         # Should complete without error
         assert result.shape[0] == 1
+
+
+# ============================================================================
+# Additional Edge Case Tests for Coverage
+# ============================================================================
+
+
+class TestFeatureCombinerCoverageEdgeCases:
+    """Additional edge case tests for FeatureCombiner coverage."""
+
+    def test_transform_no_segments_raises(self) -> None:
+        """Line 201: Transform with no features raises ValueError."""
+        # Create combiner with all weights set to 0
+        combiner = FeatureCombiner(
+            weights={
+                "text_embedding": 0,
+                "assay_type": 0,
+                "organism": 0,
+                "cell_type": 0,
+                "lab": 0,
+                "numeric_features": 0,
+            }
+        )
+        # Fit with minimal data (no columns that match defaults)
+        df = pd.DataFrame({"accession": ["A", "B"]})
+        combiner.fit(df, text_embedding_dim=384)
+
+        # Transform should raise because no features to combine
+        with pytest.raises(ValueError, match="No features to combine"):
+            combiner.transform(df, text_embeddings=None)
+
+    def test_transform_single_without_text_embedding(
+        self, sample_df_for_combiner: pd.DataFrame
+    ) -> None:
+        """Line 258: transform_single with text_embedding=None."""
+        combiner = FeatureCombiner()
+        combiner.fit(sample_df_for_combiner)
+
+        record = sample_df_for_combiner.iloc[0].to_dict()
+        # Call with text_embedding=None (line 258: text_emb = None)
+        result = combiner.transform_single(record, text_embedding=None)
+
+        # Should return combined features without text portion
+        assert result is not None
+        # Result should be 1D vector with categorical + numeric dimensions
+        # 3 (assay) + 2 (organism) + 3 (biosample) + 3 (lab) + 2 (numeric) = 13
+        expected_dim = 3 + 2 + 3 + 3 + 2
+        assert len(result) == expected_dim

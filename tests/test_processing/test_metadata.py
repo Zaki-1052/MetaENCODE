@@ -115,3 +115,30 @@ class TestMetadataProcessor:
         df = pd.DataFrame()
         result = processor.process(df)
         assert result.empty
+
+
+# ============================================================================
+# Additional Edge Case Tests for Coverage
+# ============================================================================
+
+
+class TestMetadataProcessorCoverageEdgeCases:
+    """Additional edge case tests for MetadataProcessor coverage."""
+
+    def test_extract_nested_non_dict_intermediate(self):
+        """Line 163: Nested path hits non-dict intermediate value."""
+        processor = MetadataProcessor()
+        # Path "a.b.c" where "a.b" is a string (not a dict)
+        data = {"a": {"b": "string_value"}}
+        result = processor.extract_nested_field(data, "a.b.c")
+        # Should return None because "string_value" is not a dict
+        assert result is None
+
+    def test_extract_nested_list_intermediate(self):
+        """Line 163: Nested path hits list intermediate value."""
+        processor = MetadataProcessor()
+        # Path "a.b.c" where "a.b" is a list (not a dict)
+        data = {"a": {"b": [1, 2, 3]}}
+        result = processor.extract_nested_field(data, "a.b.c")
+        # Should return None because [1, 2, 3] is not a dict
+        assert result is None

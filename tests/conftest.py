@@ -103,3 +103,47 @@ def sample_categorical_series() -> pd.Series:
 def sample_numeric_series() -> pd.Series:
     """Sample numeric data for encoder tests."""
     return pd.Series([1.0, 2.0, 3.0, np.nan, 5.0])
+
+
+# ============================================================================
+# Visualization Fixtures
+# ============================================================================
+
+
+@pytest.fixture
+def sample_2d_coords() -> np.ndarray:
+    """Sample 2D coordinates for visualization tests."""
+    np.random.seed(42)
+    return np.random.randn(10, 2).astype(np.float32)
+
+
+@pytest.fixture
+def sample_metadata_for_plotting() -> pd.DataFrame:
+    """Sample metadata DataFrame for plot testing with long descriptions."""
+    return pd.DataFrame(
+        {
+            "accession": [f"ENCSR{i:05d}" for i in range(10)],
+            "description": [f"Sample experiment {i} " * 10 for i in range(10)],
+            "assay_term_name": ["ChIP-seq", "RNA-seq", "ATAC-seq"] * 3 + ["ChIP-seq"],
+            "organism": ["human", "mouse"] * 5,
+        }
+    )
+
+
+@pytest.fixture
+def sample_similarity_matrix() -> np.ndarray:
+    """Sample symmetric similarity matrix for heatmap tests."""
+    np.random.seed(42)
+    matrix = np.random.rand(5, 5)
+    # Make symmetric
+    matrix = (matrix + matrix.T) / 2
+    # Set diagonal to 1.0
+    np.fill_diagonal(matrix, 1.0)
+    return matrix.astype(np.float32)
+
+
+@pytest.fixture
+def sample_small_embeddings() -> np.ndarray:
+    """Small embeddings array for testing edge cases (3 samples)."""
+    np.random.seed(42)
+    return np.random.randn(3, 384).astype(np.float32)
