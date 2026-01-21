@@ -14,7 +14,7 @@ htmlcov
 *.egg-info
 dist
 build
-data/cache/*
+#data/cache/*
 .env
 .env.local
 *.md
