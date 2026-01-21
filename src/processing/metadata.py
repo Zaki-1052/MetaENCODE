@@ -5,7 +5,8 @@ This module handles the preprocessing of ENCODE experiment metadata,
 including text normalization, missing value handling, and field extraction.
 """
 
-from typing import Optional
+import re
+from typing import Any, Optional
 
 import pandas as pd
 
@@ -29,10 +30,15 @@ class MetadataProcessor:
     CATEGORICAL_FIELDS = [
         "assay_term_name",
         "organism",
-        "biosample_ontology.term_name",
+        "biosample_term_name",
         "lab",
     ]
     NUMERIC_FIELDS = ["replicate_count", "file_count"]
+
+    # Required fields for a valid record
+    REQUIRED_FIELDS = ["accession"]
+    # At least one of these must be present
+    REQUIRED_ONE_OF = ["description", "title", "assay_term_name"]
 
     def __init__(self, fill_missing: bool = True) -> None:
         """Initialize the metadata processor.
@@ -51,10 +57,61 @@ class MetadataProcessor:
         Returns:
             Processed DataFrame with cleaned and normalized fields.
         """
-        raise NotImplementedError("process not yet implemented")
+        if df.empty:
+            return df.copy()
+
+        result = df.copy()
+
+        # Clean text fields
+        for field in self.TEXT_FIELDS:
+            if field in result.columns:
+                result[f"{field}_clean"] = result[field].apply(self.clean_text)
+
+        # Create combined text field for embedding
+        text_cols = [
+            f"{f}_clean" for f in self.TEXT_FIELDS if f"{f}_clean" in result.columns
+        ]
+        if text_cols:
+            result["combined_text"] = result[text_cols].apply(
+                lambda row: " ".join(str(v) for v in row if v), axis=1
+            )
+
+        # Fill missing values if requested
+        if self.fill_missing:
+            # Fill text fields with empty string
+            for field in self.TEXT_FIELDS:
+                if field in result.columns:
+                    result[field] = result[field].fillna("")
+                clean_field = f"{field}_clean"
+                if clean_field in result.columns:
+                    result[clean_field] = result[clean_field].fillna("")
+
+            # Fill categorical fields with "unknown"
+            for field in self.CATEGORICAL_FIELDS:
+                if field in result.columns:
+                    result[field] = result[field].fillna("unknown")
+
+            # Fill numeric fields with 0
+            for field in self.NUMERIC_FIELDS:
+                if field in result.columns:
+                    result[field] = pd.to_numeric(
+                        result[field], errors="coerce"
+                    ).fillna(0)
+
+            # Fill combined_text if it exists
+            if "combined_text" in result.columns:
+                result["combined_text"] = result["combined_text"].fillna("")
+
+        return result
 
     def clean_text(self, text: Optional[str]) -> str:
         """Clean and normalize text field.
+
+        Applies the following transformations:
+        - Convert to lowercase
+        - Remove special characters (keep alphanumeric and whitespace)
+        - Normalize whitespace (collapse multiple spaces to one)
+        - Strip leading/trailing whitespace
 
         Args:
             text: Raw text string (may be None).
@@ -62,9 +119,26 @@ class MetadataProcessor:
         Returns:
             Cleaned text (lowercase, stripped, special chars removed).
         """
-        raise NotImplementedError("clean_text not yet implemented")
+        if text is None or pd.isna(text):
+            return ""
 
-    def extract_nested_field(self, data: dict, field_path: str) -> Optional[str]:
+        text = str(text)
+
+        # Convert to lowercase
+        text = text.lower()
+
+        # Remove special characters, keep alphanumeric and whitespace
+        text = re.sub(r"[^\w\s]", " ", text)
+
+        # Normalize whitespace
+        text = re.sub(r"\s+", " ", text)
+
+        # Strip leading/trailing whitespace
+        text = text.strip()
+
+        return text
+
+    def extract_nested_field(self, data: dict, field_path: str) -> Optional[Any]:
         """Extract a value from nested dictionary using dot notation.
 
         Args:
@@ -74,10 +148,28 @@ class MetadataProcessor:
         Returns:
             Extracted value or None if not found.
         """
-        raise NotImplementedError("extract_nested_field not yet implemented")
+        if not data or not field_path:
+            return None
+
+        keys = field_path.split(".")
+        current = data
+
+        for key in keys:
+            if isinstance(current, dict):
+                current = current.get(key)
+                if current is None:
+                    return None
+            else:
+                return None
+
+        return current
 
     def validate_record(self, record: dict) -> bool:
         """Validate that a record has minimum required metadata.
+
+        A record is valid if it has:
+        - All required fields (accession)
+        - At least one of: description, title, or assay_term_name
 
         Args:
             record: Dictionary containing experiment metadata.
@@ -85,4 +177,21 @@ class MetadataProcessor:
         Returns:
             True if record has required fields, False otherwise.
         """
-        raise NotImplementedError("validate_record not yet implemented")
+        if not record:
+            return False
+
+        # Check all required fields are present and non-empty
+        for field in self.REQUIRED_FIELDS:
+            value = record.get(field)
+            if not value or (isinstance(value, str) and not value.strip()):
+                return False
+
+        # Check at least one of the optional required fields is present
+        has_one_of = False
+        for field in self.REQUIRED_ONE_OF:
+            value = record.get(field)
+            if value and (not isinstance(value, str) or value.strip()):
+                has_one_of = True
+                break
+
+        return has_one_of

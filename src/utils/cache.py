@@ -6,8 +6,8 @@ and re-fetching data from the ENCODE API. Supports file-based caching
 with optional expiration.
 """
 
-import pickle  # noqa: F401 - used in implementation
-from datetime import datetime  # noqa: F401 - used in implementation
+import pickle
+import time
 from pathlib import Path
 from typing import Any, Optional
 
@@ -46,6 +46,8 @@ class CacheManager:
     def save(self, key: str, data: Any) -> Path:
         """Save data to cache.
 
+        Uses atomic write pattern to prevent corruption from partial writes.
+
         Args:
             key: Unique identifier for the cached data.
             data: Data to cache (must be picklable).
@@ -53,7 +55,15 @@ class CacheManager:
         Returns:
             Path to the cache file.
         """
-        raise NotImplementedError("save not yet implemented")
+        cache_path = self._get_cache_path(key)
+        tmp_path = cache_path.with_suffix(".tmp")
+
+        with open(tmp_path, "wb") as f:
+            pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
+
+        # Atomic rename (POSIX-compliant)
+        tmp_path.rename(cache_path)
+        return cache_path
 
     def load(self, key: str) -> Optional[Any]:
         """Load data from cache.
@@ -64,7 +74,23 @@ class CacheManager:
         Returns:
             Cached data, or None if not found or expired.
         """
-        raise NotImplementedError("load not yet implemented")
+        cache_path = self._get_cache_path(key)
+
+        if not cache_path.exists():
+            return None
+
+        if self._is_expired(cache_path):
+            self.delete(key)
+            return None
+
+        try:
+            with open(cache_path, "rb") as f:
+                return pickle.load(f)
+        except (pickle.UnpicklingError, EOFError, OSError) as e:
+            # Corrupted cache file - delete and return None
+            print(f"Warning: Corrupted cache file {cache_path}, deleting: {e}")
+            self.delete(key)
+            return None
 
     def exists(self, key: str) -> bool:
         """Check if cache entry exists and is valid.
@@ -75,7 +101,15 @@ class CacheManager:
         Returns:
             True if cache entry exists and is not expired.
         """
-        raise NotImplementedError("exists not yet implemented")
+        cache_path = self._get_cache_path(key)
+
+        if not cache_path.exists():
+            return False
+
+        if self._is_expired(cache_path):
+            return False
+
+        return True
 
     def delete(self, key: str) -> bool:
         """Delete a cache entry.
@@ -86,7 +120,13 @@ class CacheManager:
         Returns:
             True if entry was deleted, False if it didn't exist.
         """
-        raise NotImplementedError("delete not yet implemented")
+        cache_path = self._get_cache_path(key)
+
+        if cache_path.exists():
+            cache_path.unlink()
+            return True
+
+        return False
 
     def clear(self) -> int:
         """Clear all cache entries.
@@ -94,7 +134,11 @@ class CacheManager:
         Returns:
             Number of entries deleted.
         """
-        raise NotImplementedError("clear not yet implemented")
+        count = 0
+        for cache_file in self.cache_dir.glob("*.pkl"):
+            cache_file.unlink()
+            count += 1
+        return count
 
     def _get_cache_path(self, key: str) -> Path:
         """Get the file path for a cache key.
@@ -114,6 +158,15 @@ class CacheManager:
             cache_path: Path to the cache file.
 
         Returns:
-            True if the file is expired.
+            True if the file is expired, False otherwise.
         """
-        raise NotImplementedError("_is_expired not yet implemented")
+        if self.expiry_hours is None:
+            return False
+
+        if not cache_path.exists():
+            return True
+
+        mtime = cache_path.stat().st_mtime
+        age_hours = (time.time() - mtime) / 3600
+
+        return age_hours > self.expiry_hours

@@ -7,11 +7,13 @@ This module provides functionality for:
 - Generating hover tooltips with dataset metadata
 """
 
-from typing import Optional
+from typing import Any, Optional
 
 import numpy as np
 import pandas as pd
+import plotly.express as px
 import plotly.graph_objects as go
+from sklearn.decomposition import PCA
 
 
 class DimensionalityReducer:
@@ -41,7 +43,8 @@ class DimensionalityReducer:
         self.method = method
         self.n_components = n_components
         self.random_state = random_state
-        self._reducer = None
+        self._reducer: Optional[Any] = None
+        self._fitted = False
 
     def fit(self, embeddings: np.ndarray) -> "DimensionalityReducer":
         """Fit the reducer to the embeddings.
@@ -52,7 +55,35 @@ class DimensionalityReducer:
         Returns:
             Self for method chaining.
         """
-        raise NotImplementedError("fit not yet implemented")
+        embeddings = np.asarray(embeddings, dtype=np.float32)
+
+        if self.method == "umap":
+            import umap
+
+            # Adjust n_neighbors based on sample size
+            n_neighbors = min(15, len(embeddings) - 1)
+            n_neighbors = max(2, n_neighbors)  # At least 2
+
+            self._reducer = umap.UMAP(
+                n_components=self.n_components,
+                random_state=self.random_state,
+                n_neighbors=n_neighbors,
+                min_dist=0.1,
+                metric="cosine",
+            )
+
+        elif self.method == "pca":
+            self._reducer = PCA(
+                n_components=self.n_components,
+                random_state=self.random_state,
+            )
+
+        else:
+            raise ValueError(f"Unknown method: {self.method}. Use 'umap' or 'pca'.")
+
+        self._reducer.fit(embeddings)
+        self._fitted = True
+        return self
 
     def transform(self, embeddings: np.ndarray) -> np.ndarray:
         """Transform embeddings to lower dimensions.
@@ -63,7 +94,11 @@ class DimensionalityReducer:
         Returns:
             NumPy array of shape (n_samples, n_components).
         """
-        raise NotImplementedError("transform not yet implemented")
+        if not self._fitted or self._reducer is None:
+            raise ValueError("Reducer has not been fitted. Call fit() first.")
+
+        embeddings = np.asarray(embeddings, dtype=np.float32)
+        return self._reducer.transform(embeddings).astype(np.float32)
 
     def fit_transform(self, embeddings: np.ndarray) -> np.ndarray:
         """Fit and transform in one step.
@@ -74,7 +109,33 @@ class DimensionalityReducer:
         Returns:
             NumPy array of shape (n_samples, n_components).
         """
-        return self.fit(embeddings).transform(embeddings)
+        embeddings = np.asarray(embeddings, dtype=np.float32)
+
+        if self.method == "umap":
+            import umap
+
+            n_neighbors = min(15, len(embeddings) - 1)
+            n_neighbors = max(2, n_neighbors)
+
+            self._reducer = umap.UMAP(
+                n_components=self.n_components,
+                random_state=self.random_state,
+                n_neighbors=n_neighbors,
+                min_dist=0.1,
+                metric="cosine",
+            )
+
+        elif self.method == "pca":
+            self._reducer = PCA(
+                n_components=self.n_components,
+                random_state=self.random_state,
+            )
+
+        else:
+            raise ValueError(f"Unknown method: {self.method}. Use 'umap' or 'pca'.")
+
+        self._fitted = True
+        return self._reducer.fit_transform(embeddings).astype(np.float32)
 
 
 class PlotGenerator:
@@ -90,9 +151,16 @@ class PlotGenerator:
         >>> fig.show()
     """
 
-    def __init__(self) -> None:
-        """Initialize the plot generator."""
-        pass
+    # Default columns for hover tooltips
+    DEFAULT_HOVER_COLS = ["accession", "description", "assay_term_name", "organism"]
+
+    def __init__(self, reduction_method: str = "umap") -> None:
+        """Initialize the plot generator.
+
+        Args:
+            reduction_method: Method used for reduction (for axis labels).
+        """
+        self.reduction_method = reduction_method
 
     def scatter_plot(
         self,
@@ -105,16 +173,80 @@ class PlotGenerator:
         """Create interactive scatter plot of dataset embeddings.
 
         Args:
-            coords: 2D coordinates from dimensionality reduction.
+            coords: 2D coordinates from dimensionality reduction (n_samples, 2).
             metadata: DataFrame with dataset metadata for tooltips.
             color_by: Column name to color points by (categorical).
             title: Plot title.
-            highlight_indices: Indices of points to highlight.
+            highlight_indices: Indices of points to highlight with markers.
 
         Returns:
             Plotly Figure object.
         """
-        raise NotImplementedError("scatter_plot not yet implemented")
+        # Create plot DataFrame
+        plot_df = metadata.copy()
+        plot_df["x"] = coords[:, 0]
+        plot_df["y"] = coords[:, 1]
+
+        # Determine hover columns
+        hover_cols = [c for c in self.DEFAULT_HOVER_COLS if c in plot_df.columns]
+
+        # Truncate long descriptions for hover
+        if "description" in plot_df.columns:
+            plot_df["description_short"] = plot_df["description"].apply(
+                lambda x: (str(x)[:100] + "...") if len(str(x)) > 100 else str(x)
+            )
+            hover_cols = [
+                "description_short" if c == "description" else c for c in hover_cols
+            ]
+
+        # Create scatter plot
+        if color_by and color_by in plot_df.columns:
+            fig = px.scatter(
+                plot_df,
+                x="x",
+                y="y",
+                color=color_by,
+                hover_data=hover_cols,
+                title=title,
+            )
+        else:
+            fig = px.scatter(
+                plot_df,
+                x="x",
+                y="y",
+                hover_data=hover_cols,
+                title=title,
+            )
+
+        # Add highlight markers if specified
+        if highlight_indices:
+            highlight_df = plot_df.iloc[highlight_indices]
+            fig.add_trace(
+                go.Scatter(
+                    x=highlight_df["x"],
+                    y=highlight_df["y"],
+                    mode="markers",
+                    marker=dict(
+                        size=15,
+                        color="red",
+                        symbol="star",
+                        line=dict(width=2, color="black"),
+                    ),
+                    name="Selected",
+                    hoverinfo="skip",
+                )
+            )
+
+        # Update axis labels
+        axis_prefix = "UMAP" if self.reduction_method == "umap" else "PC"
+        fig.update_layout(
+            xaxis_title=f"{axis_prefix}-1",
+            yaxis_title=f"{axis_prefix}-2",
+            legend_title=color_by if color_by else "Dataset",
+            hovermode="closest",
+        )
+
+        return fig
 
     def similarity_heatmap(
         self,
@@ -132,4 +264,22 @@ class PlotGenerator:
         Returns:
             Plotly Figure object.
         """
-        raise NotImplementedError("similarity_heatmap not yet implemented")
+        fig = go.Figure(
+            data=go.Heatmap(
+                z=similarity_matrix,
+                x=labels,
+                y=labels,
+                colorscale="Viridis",
+                colorbar=dict(title="Similarity"),
+                hoverongaps=False,
+            )
+        )
+
+        fig.update_layout(
+            title=title,
+            xaxis_title="Dataset",
+            yaxis_title="Dataset",
+            xaxis=dict(tickangle=45),
+        )
+
+        return fig

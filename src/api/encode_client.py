@@ -8,10 +8,50 @@ JSON responses to pandas DataFrames.
 Reference: https://www.encodeproject.org/help/rest-api/
 """
 
-from typing import Optional
+import time
+from typing import Any, Optional
+from urllib.parse import urlencode
 
 import pandas as pd
 import requests
+
+
+class RateLimiter:
+    """Enforce ENCODE's 10 requests/second limit.
+
+    Tracks request timestamps and sleeps when necessary to avoid
+    exceeding the rate limit.
+
+    Example:
+        >>> limiter = RateLimiter(max_requests=10, window_seconds=1)
+        >>> limiter.wait_if_needed()  # Call before each request
+    """
+
+    def __init__(self, max_requests: int = 10, window_seconds: float = 1.0) -> None:
+        """Initialize the rate limiter.
+
+        Args:
+            max_requests: Maximum requests allowed per window.
+            window_seconds: Time window in seconds.
+        """
+        self.max_requests = max_requests
+        self.window = window_seconds
+        self._request_times: list[float] = []
+
+    def wait_if_needed(self) -> None:
+        """Wait if necessary to stay within rate limits."""
+        now = time.time()
+
+        # Remove requests outside the current window
+        self._request_times = [t for t in self._request_times if now - t < self.window]
+
+        if len(self._request_times) >= self.max_requests:
+            # Need to wait until oldest request exits the window
+            sleep_time = self.window - (now - self._request_times[0])
+            if sleep_time > 0:
+                time.sleep(sleep_time)
+
+        self._request_times.append(time.time())
 
 
 class EncodeClient:
@@ -35,6 +75,7 @@ class EncodeClient:
         """Initialize the ENCODE API client."""
         self._session = requests.Session()
         self._session.headers.update(self.HEADERS)
+        self._rate_limiter = RateLimiter(max_requests=self.RATE_LIMIT)
 
     def fetch_experiments(
         self,
@@ -53,12 +94,44 @@ class EncodeClient:
 
         Returns:
             DataFrame containing experiment metadata with columns:
-            accession, description, assay_term_name, biosample_ontology, lab, status.
+            accession, description, assay_term_name, biosample_term_name,
+            organism, lab, status, replicate_count, file_count.
 
         Raises:
             requests.RequestException: If the API request fails.
         """
-        raise NotImplementedError("fetch_experiments not yet implemented")
+        params: dict[str, Any] = {
+            "type": "Experiment",
+            "frame": "object",
+            "format": "json",
+        }
+
+        if assay_type:
+            params["assay_term_name"] = assay_type
+        if organism:
+            params[
+                "replicates.library.biosample.donor.organism.scientific_name"
+            ] = organism
+        if biosample:
+            params["biosample_ontology.term_name"] = biosample
+        if limit > 0:
+            params["limit"] = limit
+        else:
+            params["limit"] = "all"
+
+        url = self._build_search_url(params)
+        self._rate_limiter.wait_if_needed()
+
+        response = self._session.get(url, timeout=60)
+        response.raise_for_status()
+
+        data = response.json()
+        experiments = data.get("@graph", [])
+
+        # Parse each experiment into standardized format
+        records = [self._parse_experiment(exp) for exp in experiments]
+
+        return pd.DataFrame(records)
 
     def fetch_experiment_by_accession(self, accession: str) -> dict:
         """Fetch a single experiment by its accession number.
@@ -67,13 +140,25 @@ class EncodeClient:
             accession: ENCODE accession number (e.g., "ENCSR000AKS").
 
         Returns:
-            Dictionary containing the full experiment metadata.
+            Dictionary containing the parsed experiment metadata.
 
         Raises:
             requests.RequestException: If the API request fails.
             ValueError: If the accession is not found.
         """
-        raise NotImplementedError("fetch_experiment_by_accession not yet implemented")
+        url = f"{self.BASE_URL}/experiments/{accession}/?frame=object&format=json"
+
+        self._rate_limiter.wait_if_needed()
+
+        response = self._session.get(url, timeout=30)
+
+        if response.status_code == 404:
+            raise ValueError(f"Experiment not found: {accession}")
+
+        response.raise_for_status()
+
+        data = response.json()
+        return self._parse_experiment(data)
 
     def search(
         self,
@@ -91,7 +176,27 @@ class EncodeClient:
         Returns:
             DataFrame containing search results.
         """
-        raise NotImplementedError("search not yet implemented")
+        params: dict[str, Any] = {
+            "searchTerm": search_term,
+            "type": object_type,
+            "frame": "object",
+            "format": "json",
+            "limit": limit,
+        }
+
+        url = self._build_search_url(params)
+        self._rate_limiter.wait_if_needed()
+
+        response = self._session.get(url, timeout=30)
+        response.raise_for_status()
+
+        data = response.json()
+        results = data.get("@graph", [])
+
+        # Parse each result into standardized format
+        records = [self._parse_experiment(exp) for exp in results]
+
+        return pd.DataFrame(records)
 
     def _build_search_url(self, params: dict) -> str:
         """Build a search URL with the given parameters.
@@ -102,10 +207,14 @@ class EncodeClient:
         Returns:
             Fully formed search URL.
         """
-        raise NotImplementedError("_build_search_url not yet implemented")
+        query_string = urlencode(params)
+        return f"{self.BASE_URL}/search/?{query_string}"
 
     def _parse_experiment(self, data: dict) -> dict:
         """Parse raw experiment JSON into standardized format.
+
+        Extracts key fields from the nested ENCODE JSON structure,
+        handling missing fields gracefully.
 
         Args:
             data: Raw JSON data from API response.
@@ -113,4 +222,54 @@ class EncodeClient:
         Returns:
             Dictionary with standardized field names.
         """
-        raise NotImplementedError("_parse_experiment not yet implemented")
+        # Extract lab name from various formats
+        lab_raw = data.get("lab", "")
+        if isinstance(lab_raw, dict):
+            lab = lab_raw.get("title", lab_raw.get("name", ""))
+        elif isinstance(lab_raw, str) and "/" in lab_raw:
+            # Format: "/labs/lab-name/"
+            parts = lab_raw.strip("/").split("/")
+            lab = parts[-1] if parts else ""
+        else:
+            lab = str(lab_raw) if lab_raw else ""
+
+        # Extract biosample term name from nested structure
+        biosample_ontology = data.get("biosample_ontology", {})
+        if isinstance(biosample_ontology, dict):
+            biosample_term_name = biosample_ontology.get("term_name", "")
+        else:
+            biosample_term_name = ""
+
+        # Extract organism - can be in multiple places
+        organism = ""
+        if isinstance(biosample_ontology, dict):
+            organism_data = biosample_ontology.get("organism", {})
+            if isinstance(organism_data, dict):
+                organism = organism_data.get(
+                    "name", organism_data.get("scientific_name", "")
+                )
+            elif isinstance(organism_data, str):
+                organism = organism_data
+
+        # Fallback: check top-level organism field
+        if not organism:
+            organism_top = data.get("organism", {})
+            if isinstance(organism_top, dict):
+                organism = organism_top.get(
+                    "name", organism_top.get("scientific_name", "")
+                )
+            elif isinstance(organism_top, str):
+                organism = organism_top
+
+        return {
+            "accession": data.get("accession", ""),
+            "description": data.get("description", ""),
+            "title": data.get("title", ""),
+            "assay_term_name": data.get("assay_term_name", ""),
+            "biosample_term_name": biosample_term_name,
+            "organism": organism,
+            "lab": lab,
+            "status": data.get("status", ""),
+            "replicate_count": len(data.get("replicates", [])),
+            "file_count": len(data.get("files", [])),
+        }
