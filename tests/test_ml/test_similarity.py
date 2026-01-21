@@ -2,6 +2,7 @@
 """Tests for similarity computation engine."""
 
 import numpy as np
+import pandas as pd
 import pytest
 
 from src.ml.similarity import SimilarityEngine
@@ -19,14 +20,18 @@ class TestSimilarityEngine:
         engine_euclidean = SimilarityEngine(metric="euclidean")
         assert engine_euclidean.metric == "euclidean"
 
-    @pytest.mark.skip(reason="Not implemented yet")
     def test_fit_sets_fitted_flag(self, sample_embeddings):
         """Test that fit() sets the fitted flag."""
         engine = SimilarityEngine()
         engine.fit(sample_embeddings)
         assert engine._fitted is True
 
-    @pytest.mark.skip(reason="Not implemented yet")
+    def test_fit_returns_self(self, sample_embeddings):
+        """Test that fit() returns self for chaining."""
+        engine = SimilarityEngine()
+        result = engine.fit(sample_embeddings)
+        assert result is engine
+
     def test_find_similar_returns_correct_count(
         self, sample_embeddings, sample_embedding_single
     ):
@@ -34,18 +39,39 @@ class TestSimilarityEngine:
         engine = SimilarityEngine()
         engine.fit(sample_embeddings)
         results = engine.find_similar(sample_embedding_single, n=5)
+        assert isinstance(results, pd.DataFrame)
         assert len(results) == 5
+        assert "index" in results.columns
+        assert "similarity_score" in results.columns
 
-    @pytest.mark.skip(reason="Not implemented yet")
+    def test_find_similar_returns_sorted_results(
+        self, sample_embeddings, sample_embedding_single
+    ):
+        """Test that find_similar returns results sorted by similarity."""
+        engine = SimilarityEngine()
+        engine.fit(sample_embeddings)
+        results = engine.find_similar(sample_embedding_single, n=5)
+        scores = results["similarity_score"].tolist()
+        # Results should be sorted in descending order of similarity
+        assert scores == sorted(scores, reverse=True)
+
     def test_compute_similarity_range(self, sample_embeddings):
-        """Test that cosine similarity is between 0 and 1."""
+        """Test that cosine similarity is in valid range."""
         engine = SimilarityEngine()
         similarity = engine.compute_similarity(
             sample_embeddings[0], sample_embeddings[1]
         )
-        assert 0 <= similarity <= 1
+        # Cosine similarity can be negative for random vectors
+        assert -1 <= similarity <= 1
 
-    @pytest.mark.skip(reason="Not implemented yet")
+    def test_compute_similarity_self(self, sample_embeddings):
+        """Test that similarity of vector with itself is 1."""
+        engine = SimilarityEngine()
+        similarity = engine.compute_similarity(
+            sample_embeddings[0], sample_embeddings[0]
+        )
+        assert np.isclose(similarity, 1.0)
+
     def test_similarity_matrix_is_symmetric(self, sample_embeddings):
         """Test that similarity matrix is symmetric."""
         engine = SimilarityEngine()
@@ -53,9 +79,44 @@ class TestSimilarityEngine:
         matrix = engine.compute_similarity_matrix()
         assert np.allclose(matrix, matrix.T)
 
-    @pytest.mark.skip(reason="Not implemented yet")
+    def test_similarity_matrix_diagonal_is_one(self, sample_embeddings):
+        """Test that diagonal of similarity matrix is 1 (self-similarity)."""
+        engine = SimilarityEngine()
+        engine.fit(sample_embeddings)
+        matrix = engine.compute_similarity_matrix()
+        diagonal = np.diag(matrix)
+        assert np.allclose(diagonal, 1.0)
+
     def test_find_similar_raises_if_not_fitted(self, sample_embedding_single):
         """Test that find_similar raises error if not fitted."""
         engine = SimilarityEngine()
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="not been fitted"):
             engine.find_similar(sample_embedding_single, n=5)
+
+    def test_compute_similarity_matrix_raises_if_not_fitted(self):
+        """Test that compute_similarity_matrix raises error if not fitted."""
+        engine = SimilarityEngine()
+        with pytest.raises(ValueError, match="not been fitted"):
+            engine.compute_similarity_matrix()
+
+    def test_get_embedding(self, sample_embeddings):
+        """Test that get_embedding returns correct embedding."""
+        engine = SimilarityEngine()
+        engine.fit(sample_embeddings)
+        embedding = engine.get_embedding(0)
+        # Use allclose for float comparison (fit converts to float32)
+        assert np.allclose(embedding, sample_embeddings[0], rtol=1e-5)
+
+    def test_get_embedding_raises_for_invalid_index(self, sample_embeddings):
+        """Test that get_embedding raises error for invalid index."""
+        engine = SimilarityEngine()
+        engine.fit(sample_embeddings)
+        with pytest.raises(ValueError, match="out of range"):
+            engine.get_embedding(100)
+
+    def test_euclidean_similarity(self, sample_embeddings):
+        """Test euclidean metric works."""
+        engine = SimilarityEngine(metric="euclidean")
+        engine.fit(sample_embeddings)
+        results = engine.find_similar(sample_embeddings[0], n=3)
+        assert len(results) == 3
