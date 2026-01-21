@@ -5,6 +5,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from src.ml.feature_combiner import FeatureCombiner
+
 
 @pytest.fixture
 def sample_experiment_data() -> dict:
@@ -52,3 +54,52 @@ def sample_embedding_single() -> np.ndarray:
     """Single sample embedding for testing."""
     np.random.seed(42)
     return np.random.randn(384)
+
+
+@pytest.fixture
+def sample_combined_df() -> pd.DataFrame:
+    """DataFrame with all required columns for FeatureCombiner testing."""
+    return pd.DataFrame(
+        {
+            "accession": ["ENCSR000AAA", "ENCSR000BBB", "ENCSR000CCC", "ENCSR000DDD"],
+            "combined_text": [
+                "chip seq k562 h3k27ac",
+                "rna seq liver tissue",
+                "atac seq hepg2 cells",
+                "chip seq k562 h3k4me3",
+            ],
+            "assay_term_name": ["ChIP-seq", "RNA-seq", "ATAC-seq", "ChIP-seq"],
+            "organism": ["human", "mouse", "human", "human"],
+            "biosample_term_name": ["K562", "liver", "HepG2", "K562"],
+            "lab": ["lab-a", "lab-b", "lab-a", "lab-c"],
+            "replicate_count": [2, 3, 1, 4],
+            "file_count": [10, 15, 8, 20],
+        }
+    )
+
+
+@pytest.fixture
+def sample_combined_text_embeddings() -> np.ndarray:
+    """Sample text embeddings matching sample_combined_df."""
+    np.random.seed(42)
+    return np.random.randn(4, 384).astype(np.float32)
+
+
+@pytest.fixture
+def fitted_feature_combiner(sample_combined_df: pd.DataFrame) -> FeatureCombiner:
+    """Pre-fitted FeatureCombiner instance."""
+    combiner = FeatureCombiner()
+    combiner.fit(sample_combined_df, text_embedding_dim=384)
+    return combiner
+
+
+@pytest.fixture
+def sample_categorical_series() -> pd.Series:
+    """Sample categorical data for encoder tests."""
+    return pd.Series(["ChIP-seq", "RNA-seq", "ATAC-seq", "ChIP-seq", None])
+
+
+@pytest.fixture
+def sample_numeric_series() -> pd.Series:
+    """Sample numeric data for encoder tests."""
+    return pd.Series([1.0, 2.0, 3.0, np.nan, 5.0])

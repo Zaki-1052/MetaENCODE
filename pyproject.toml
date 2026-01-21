@@ -1,5 +1,9 @@
 # meta-encode/pyproject.toml
 
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "meta-encode"
 version = "0.1.0"
@@ -15,6 +19,10 @@ keywords = ["ENCODE", "bioinformatics", "similarity", "embeddings", "streamlit"]
 [project.urls]
 Homepage = "https://github.com/your-org/meta-encode"
 Repository = "https://github.com/your-org/meta-encode"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
 
 [tool.black]
 line-length = 88

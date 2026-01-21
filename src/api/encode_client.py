@@ -102,7 +102,7 @@ class EncodeClient:
         """
         params: dict[str, Any] = {
             "type": "Experiment",
-            "frame": "object",
+            "frame": "embedded",
             "format": "json",
         }
 
@@ -146,7 +146,7 @@ class EncodeClient:
             requests.RequestException: If the API request fails.
             ValueError: If the accession is not found.
         """
-        url = f"{self.BASE_URL}/experiments/{accession}/?frame=object&format=json"
+        url = f"{self.BASE_URL}/experiments/{accession}/?frame=embedded&format=json"
 
         self._rate_limiter.wait_if_needed()
 
@@ -179,7 +179,7 @@ class EncodeClient:
         params: dict[str, Any] = {
             "searchTerm": search_term,
             "type": object_type,
-            "frame": "object",
+            "frame": "embedded",
             "format": "json",
             "limit": limit,
         }
@@ -214,7 +214,7 @@ class EncodeClient:
         """Parse raw experiment JSON into standardized format.
 
         Extracts key fields from the nested ENCODE JSON structure,
-        handling missing fields gracefully.
+        handling missing fields gracefully. Works with frame=embedded responses.
 
         Args:
             data: Raw JSON data from API response.
@@ -240,9 +240,27 @@ class EncodeClient:
         else:
             biosample_term_name = ""
 
-        # Extract organism - can be in multiple places
+        # Extract organism from replicates structure (most reliable with frame=embedded)
+        # Path: replicates[0].library.biosample.donor.organism.name
         organism = ""
-        if isinstance(biosample_ontology, dict):
+        replicates = data.get("replicates", [])
+        if replicates and isinstance(replicates, list) and len(replicates) > 0:
+            rep = replicates[0]
+            if isinstance(rep, dict):
+                library = rep.get("library", {})
+                if isinstance(library, dict):
+                    biosample = library.get("biosample", {})
+                    if isinstance(biosample, dict):
+                        donor = biosample.get("donor", {})
+                        if isinstance(donor, dict):
+                            org_data = donor.get("organism", {})
+                            if isinstance(org_data, dict):
+                                organism = org_data.get(
+                                    "name", org_data.get("scientific_name", "")
+                                )
+
+        # Fallback: check biosample_ontology.organism
+        if not organism and isinstance(biosample_ontology, dict):
             organism_data = biosample_ontology.get("organism", {})
             if isinstance(organism_data, dict):
                 organism = organism_data.get(
@@ -270,6 +288,6 @@ class EncodeClient:
             "organism": organism,
             "lab": lab,
             "status": data.get("status", ""),
-            "replicate_count": len(data.get("replicates", [])),
+            "replicate_count": len(replicates),
             "file_count": len(data.get("files", [])),
         }
