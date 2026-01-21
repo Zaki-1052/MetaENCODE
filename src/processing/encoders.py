@@ -84,37 +84,37 @@ class CategoricalEncoder:
 
         if self.encoding_type == "onehot":
             # Create one-hot encoded matrix
-            encoded = np.zeros((n_samples, n_categories), dtype=np.float32)
+            onehot_encoded = np.zeros((n_samples, n_categories), dtype=np.float32)
 
             for i, value in enumerate(series):
                 if pd.isna(value):
                     continue  # All zeros for missing values
                 str_value = str(value)
                 if str_value in category_to_idx:
-                    encoded[i, category_to_idx[str_value]] = 1.0
+                    onehot_encoded[i, category_to_idx[str_value]] = 1.0
                 elif self.handle_unknown == "error":
                     raise ValueError(f"Unknown category: {str_value}")
                 # If handle_unknown == "ignore", the row remains all zeros
 
-            return encoded
+            return onehot_encoded
 
         elif self.encoding_type == "label":
             # Create label encoded array
-            encoded = np.zeros(n_samples, dtype=np.int32)
+            label_encoded = np.zeros(n_samples, dtype=np.int32)
 
             for i, value in enumerate(series):
                 if pd.isna(value):
-                    encoded[i] = -1  # -1 for missing values
+                    label_encoded[i] = -1  # -1 for missing values
                 else:
                     str_value = str(value)
                     if str_value in category_to_idx:
-                        encoded[i] = category_to_idx[str_value]
+                        label_encoded[i] = category_to_idx[str_value]
                     elif self.handle_unknown == "error":
                         raise ValueError(f"Unknown category: {str_value}")
                     else:
-                        encoded[i] = -1  # -1 for unknown categories
+                        label_encoded[i] = -1  # -1 for unknown categories
 
-            return encoded
+            return label_encoded
 
         else:
             raise ValueError(f"Unknown encoding type: {self.encoding_type}")
@@ -224,8 +224,11 @@ class NumericEncoder:
         numeric_series = pd.to_numeric(series, errors="coerce")
 
         # Fill NaN with 0 (or could use mean for standardize)
-        numeric_values = numeric_series.fillna(0).values.astype(np.float32)
+        numeric_values: np.ndarray = np.asarray(
+            numeric_series.fillna(0), dtype=np.float32
+        )
 
+        normalized: np.ndarray
         if self.method == "standardize":
             # Z-score normalization: (x - mean) / std
             mean = self._mean if self._mean is not None else 0.0
@@ -245,7 +248,7 @@ class NumericEncoder:
         else:
             raise ValueError(f"Unknown normalization method: {self.method}")
 
-        return normalized.astype(np.float32)
+        return np.asarray(normalized, dtype=np.float32)
 
     def fit_transform(self, series: pd.Series) -> np.ndarray:
         """Fit and transform in one step.

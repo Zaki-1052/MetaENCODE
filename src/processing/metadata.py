@@ -152,7 +152,7 @@ class MetadataProcessor:
             return None
 
         keys = field_path.split(".")
-        current = data
+        current: Any = data
 
         for key in keys:
             if isinstance(current, dict):

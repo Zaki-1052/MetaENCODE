@@ -155,13 +155,13 @@ class SimilarityEngine:
             raise ValueError("Engine has not been fitted. Call fit() first.")
 
         if self.metric == "cosine":
-            similarity_matrix = cosine_similarity(self._embeddings)
+            similarity_matrix: np.ndarray = cosine_similarity(self._embeddings)
         else:
             # Convert euclidean distances to similarity
-            distances = euclidean_distances(self._embeddings)
+            distances: np.ndarray = euclidean_distances(self._embeddings)
             similarity_matrix = 1 / (1 + distances)
 
-        return similarity_matrix.astype(np.float32)
+        return np.asarray(similarity_matrix, dtype=np.float32)
 
     def get_embedding(self, index: int) -> np.ndarray:
         """Get the embedding vector for a specific dataset.
@@ -183,4 +183,4 @@ class SimilarityEngine:
                 f"Index {index} out of range [0, {len(self._embeddings)})."
             )
 
-        return self._embeddings[index]
+        return np.asarray(self._embeddings[index], dtype=np.float32)

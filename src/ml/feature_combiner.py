@@ -117,20 +117,20 @@ class FeatureCombiner:
         # Fit categorical encoders
         for col in self.CATEGORICAL_COLUMNS:
             if col in df.columns:
-                encoder = CategoricalEncoder(
+                cat_encoder = CategoricalEncoder(
                     encoding_type=self.categorical_encoding,
                     handle_unknown="ignore",
                 )
-                encoder.fit(df[col])
-                self._categorical_encoders[col] = encoder
-                self._categorical_dims[col] = encoder.n_categories
+                cat_encoder.fit(df[col])
+                self._categorical_encoders[col] = cat_encoder
+                self._categorical_dims[col] = cat_encoder.n_categories
 
         # Fit numeric encoders
         for col in self.NUMERIC_COLUMNS:
             if col in df.columns:
-                encoder = NumericEncoder(method=self.numeric_method)
-                encoder.fit(df[col])
-                self._numeric_encoders[col] = encoder
+                num_encoder = NumericEncoder(method=self.numeric_method)
+                num_encoder.fit(df[col])
+                self._numeric_encoders[col] = num_encoder
 
         self._numeric_dim = len(self._numeric_encoders)
         self._fitted = True
@@ -175,8 +175,8 @@ class FeatureCombiner:
         # Categorical features
         for weight_key, col in self.WEIGHT_TO_COLUMN.items():
             if col in self._categorical_encoders:
-                encoder = self._categorical_encoders[col]
-                encoded = encoder.transform(df[col])
+                cat_enc = self._categorical_encoders[col]
+                encoded = cat_enc.transform(df[col])
                 weight = self.weights.get(weight_key, 0.1)
                 weighted_encoded = encoded * np.sqrt(weight)
                 segments.append(weighted_encoded)
@@ -186,8 +186,8 @@ class FeatureCombiner:
             numeric_vectors = []
             for col in self.NUMERIC_COLUMNS:
                 if col in self._numeric_encoders:
-                    encoder = self._numeric_encoders[col]
-                    normalized = encoder.transform(df[col])
+                    num_enc = self._numeric_encoders[col]
+                    normalized = num_enc.transform(df[col])
                     # Reshape to (n_samples, 1) for concatenation
                     numeric_vectors.append(normalized.reshape(-1, 1))
 
@@ -261,7 +261,7 @@ class FeatureCombiner:
         combined = self.transform(df, text_emb)
 
         # Return as 1D vector
-        return combined[0]
+        return np.asarray(combined[0], dtype=np.float32)
 
     @property
     def feature_dim(self) -> int:

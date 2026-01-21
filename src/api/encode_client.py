@@ -255,16 +255,20 @@ class EncodeClient:
                         if isinstance(donor, dict):
                             org_data = donor.get("organism", {})
                             if isinstance(org_data, dict):
-                                organism = org_data.get(
-                                    "name", org_data.get("scientific_name", "")
+                                organism = str(
+                                    org_data.get(
+                                        "name", org_data.get("scientific_name", "")
+                                    )
+                                    or ""
                                 )
 
         # Fallback: check biosample_ontology.organism
         if not organism and isinstance(biosample_ontology, dict):
             organism_data = biosample_ontology.get("organism", {})
             if isinstance(organism_data, dict):
-                organism = organism_data.get(
-                    "name", organism_data.get("scientific_name", "")
+                organism = str(
+                    organism_data.get("name", organism_data.get("scientific_name", ""))
+                    or ""
                 )
             elif isinstance(organism_data, str):
                 organism = organism_data
@@ -273,8 +277,9 @@ class EncodeClient:
         if not organism:
             organism_top = data.get("organism", {})
             if isinstance(organism_top, dict):
-                organism = organism_top.get(
-                    "name", organism_top.get("scientific_name", "")
+                organism = str(
+                    organism_top.get("name", organism_top.get("scientific_name", ""))
+                    or ""
                 )
             elif isinstance(organism_top, str):
                 organism = organism_top

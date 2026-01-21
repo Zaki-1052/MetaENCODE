@@ -98,7 +98,8 @@ class DimensionalityReducer:
             raise ValueError("Reducer has not been fitted. Call fit() first.")
 
         embeddings = np.asarray(embeddings, dtype=np.float32)
-        return self._reducer.transform(embeddings).astype(np.float32)
+        result: np.ndarray = self._reducer.transform(embeddings)
+        return result.astype(np.float32)
 
     def fit_transform(self, embeddings: np.ndarray) -> np.ndarray:
         """Fit and transform in one step.
@@ -135,7 +136,8 @@ class DimensionalityReducer:
             raise ValueError(f"Unknown method: {self.method}. Use 'umap' or 'pca'.")
 
         self._fitted = True
-        return self._reducer.fit_transform(embeddings).astype(np.float32)
+        result: np.ndarray = self._reducer.fit_transform(embeddings)
+        return result.astype(np.float32)
 
 
 class PlotGenerator:

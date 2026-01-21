@@ -72,6 +72,7 @@ class EmbeddingGenerator:
             NumPy array of shape (n_texts, embedding_dim).
         """
         self._load_model()
+        assert self._model is not None  # Type guard after _load_model()
 
         if not texts:
             return np.array([]).reshape(0, self.embedding_dim)
@@ -98,6 +99,7 @@ class EmbeddingGenerator:
             NumPy array of shape (embedding_dim,).
         """
         self._load_model()
+        assert self._model is not None  # Type guard after _load_model()
 
         # Handle empty string
         if not text.strip():
@@ -123,4 +125,5 @@ class EmbeddingGenerator:
 
         # Otherwise, load model and check
         self._load_model()
-        return self._model.get_sentence_embedding_dimension()
+        assert self._model is not None  # Type guard after _load_model()
+        return int(self._model.get_sentence_embedding_dimension())
