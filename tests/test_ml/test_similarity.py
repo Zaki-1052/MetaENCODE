@@ -120,3 +120,42 @@ class TestSimilarityEngine:
         engine.fit(sample_embeddings)
         results = engine.find_similar(sample_embeddings[0], n=3)
         assert len(results) == 3
+
+
+# ============================================================================
+# Edge Case Tests (Lines 140-141, 161-162, 179)
+# ============================================================================
+
+
+class TestSimilarityEngineEdgeCases:
+    """Tests for edge cases in SimilarityEngine."""
+
+    def test_compute_similarity_euclidean(self, sample_embeddings):
+        """Lines 140-141: compute_similarity with euclidean metric."""
+        engine = SimilarityEngine(metric="euclidean")
+        # Note: compute_similarity doesn't require fitting
+        similarity = engine.compute_similarity(
+            sample_embeddings[0], sample_embeddings[1]
+        )
+        # Euclidean similarity uses 1 / (1 + distance), so it's in (0, 1]
+        assert 0 < similarity <= 1
+
+    def test_compute_similarity_matrix_euclidean(self, sample_embeddings):
+        """Lines 161-162: compute_similarity_matrix with euclidean metric."""
+        engine = SimilarityEngine(metric="euclidean")
+        engine.fit(sample_embeddings)
+        matrix = engine.compute_similarity_matrix()
+        # Matrix should be square
+        assert matrix.shape == (len(sample_embeddings), len(sample_embeddings))
+        # Diagonal should be 1.0 (self-similarity)
+        assert np.allclose(np.diag(matrix), 1.0)
+        # Matrix should be symmetric
+        assert np.allclose(matrix, matrix.T)
+        # All values should be in (0, 1]
+        assert (matrix > 0).all() and (matrix <= 1).all()
+
+    def test_get_embedding_raises_if_not_fitted(self):
+        """Line 179: get_embedding raises ValueError when not fitted."""
+        engine = SimilarityEngine()
+        with pytest.raises(ValueError, match="not been fitted"):
+            engine.get_embedding(0)

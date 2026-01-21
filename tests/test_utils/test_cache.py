@@ -257,3 +257,31 @@ class TestCacheManagerOverwrite:
         cache_manager.save("large_data", large_data)
         loaded = cache_manager.load("large_data")
         np.testing.assert_array_equal(loaded, large_data)
+
+
+# ============================================================================
+# Additional Edge Case Tests for Coverage
+# ============================================================================
+
+
+class TestCacheManagerCoverageEdgeCases:
+    """Additional edge case tests for CacheManager coverage."""
+
+    def test_exists_returns_false_when_expired(self, temp_cache_dir: Path) -> None:
+        """Line 110: exists() returns False for expired entry."""
+        # Create cache with expiry_hours=0 (any file is immediately expired)
+        cache_mgr = CacheManager(cache_dir=str(temp_cache_dir), expiry_hours=0)
+        cache_mgr.save("test_key", "test_data")
+
+        # exists() should return False because expiry_hours=0 means
+        # everything is expired
+        assert cache_mgr.exists("test_key") is False
+
+    def test_is_expired_missing_file(self, temp_cache_dir: Path) -> None:
+        """Line 167: _is_expired() returns True for missing file."""
+        cache_mgr = CacheManager(cache_dir=str(temp_cache_dir), expiry_hours=24)
+        nonexistent_path = temp_cache_dir / "nonexistent.pkl"
+
+        # _is_expired should return True for missing file
+        result = cache_mgr._is_expired(nonexistent_path)
+        assert result is True
