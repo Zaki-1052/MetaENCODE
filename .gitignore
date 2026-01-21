@@ -31,6 +31,7 @@ data/cache/*
 *.pkl
 *.pickle
 *.parquet
+.mypy_cache
 
 # Model files (large)
 *.pt

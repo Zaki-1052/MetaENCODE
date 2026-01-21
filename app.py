@@ -224,6 +224,21 @@ def load_sample_data() -> None:
             # Process metadata
             processed_df = processor.process(raw_df)
 
+            # Validate records and filter invalid ones
+            valid_mask = processed_df.apply(
+                lambda row: processor.validate_record(row.to_dict()), axis=1
+            )
+            if not valid_mask.all():
+                invalid_count = (~valid_mask).sum()
+                st.warning(
+                    f"Filtered {invalid_count} records missing required metadata"
+                )
+                processed_df = processed_df[valid_mask].reset_index(drop=True)
+
+            if processed_df.empty:
+                st.error("No valid experiments found after validation")
+                return
+
             # Generate text embeddings
             st.info("Generating text embeddings...")
             texts = processed_df["combined_text"].tolist()

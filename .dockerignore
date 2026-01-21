@@ -1,0 +1,23 @@
+# .dockerignore
+.git
+.gitignore
+.github
+.venv
+venv
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+.mypy_cache
+.coverage
+htmlcov
+*.egg-info
+dist
+build
+data/cache/*
+.env
+.env.local
+*.md
+!README.md
+Makefile
+tests/
