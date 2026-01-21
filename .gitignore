@@ -27,11 +27,10 @@ env/
 
 # Data and cache
 data/cache/*
-!data/cache/.gitkeep
-*.pkl
 *.pickle
 *.parquet
 .mypy_cache
+#*.pkl
 
 # Model files (large)
 *.pt
@@ -58,6 +57,7 @@ dist/
 
 # OS files
 .DS_Store
+**/._DS_Store
 Thumbs.db
 
 # Logs

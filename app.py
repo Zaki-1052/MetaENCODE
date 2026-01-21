@@ -260,12 +260,24 @@ def load_sample_data() -> None:
             st.session_state.feature_combiner = combiner
             st.session_state.similarity_engine = similarity_engine
 
-            # Cache the data
+            # Cache the data (only if not overwriting a larger existing cache)
             cache_mgr = get_cache_manager()
-            cache_mgr.save("metadata", processed_df)
-            cache_mgr.save("embeddings", text_embeddings)
-            cache_mgr.save("combined_vectors", combined_vectors)
-            cache_mgr.save("feature_combiner", combiner)
+            existing_meta = (
+                cache_mgr.load("metadata") if cache_mgr.exists("metadata") else None
+            )
+
+            if existing_meta is not None and len(existing_meta) > len(processed_df):
+                st.warning(
+                    f"Skipped caching: existing cache has "
+                    f"{len(existing_meta)} experiments, "
+                    f"not overwriting with {len(processed_df)} samples. "
+                    "Use precompute_embeddings.py to update full cache."
+                )
+            else:
+                cache_mgr.save("metadata", processed_df)
+                cache_mgr.save("embeddings", text_embeddings)
+                cache_mgr.save("combined_vectors", combined_vectors)
+                cache_mgr.save("feature_combiner", combiner)
 
             # Show feature breakdown
             breakdown = combiner.get_feature_breakdown()
