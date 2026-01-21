@@ -14,6 +14,7 @@ import streamlit as st
 
 from src.api.encode_client import EncodeClient
 from src.ml.embeddings import EmbeddingGenerator
+from src.ml.feature_combiner import FeatureCombiner
 from src.ml.similarity import SimilarityEngine
 from src.processing.metadata import MetadataProcessor
 from src.utils.cache import CacheManager
@@ -55,23 +56,44 @@ def get_metadata_processor() -> MetadataProcessor:
     return MetadataProcessor()
 
 
+@st.cache_resource
+def get_feature_combiner() -> FeatureCombiner:
+    """Get or create the feature combiner instance."""
+    return FeatureCombiner()
+
+
 @st.cache_data
 def load_cached_data(
     _cache_mgr: CacheManager,
-) -> tuple[pd.DataFrame | None, pd.DataFrame | None]:
-    """Load precomputed metadata and embeddings from cache.
+) -> tuple[
+    pd.DataFrame | None,
+    pd.DataFrame | None,
+    pd.DataFrame | None,
+    FeatureCombiner | None,
+]:
+    """Load precomputed metadata, embeddings, and combined vectors from cache.
 
     Args:
         _cache_mgr: Cache manager instance (prefixed with _ to avoid hashing).
 
     Returns:
-        Tuple of (metadata_df, embeddings) or (None, None) if not cached.
+        Tuple of (metadata_df, text_embeddings, combined_vectors, feature_combiner)
+        or (None, None, None, None) if not cached.
     """
     if _cache_mgr.exists("metadata") and _cache_mgr.exists("embeddings"):
         metadata = _cache_mgr.load("metadata")
         embeddings = _cache_mgr.load("embeddings")
-        return metadata, embeddings
-    return None, None
+
+        # Try to load combined vectors and combiner (Phase 2 data)
+        combined_vectors = None
+        feature_combiner = None
+        if _cache_mgr.exists("combined_vectors"):
+            combined_vectors = _cache_mgr.load("combined_vectors")
+        if _cache_mgr.exists("feature_combiner"):
+            feature_combiner = _cache_mgr.load("feature_combiner")
+
+        return metadata, embeddings, combined_vectors, feature_combiner
+    return None, None, None, None
 
 
 def init_session_state() -> None:
@@ -83,6 +105,8 @@ def init_session_state() -> None:
         "similar_datasets": None,
         "metadata_df": None,
         "embeddings": None,
+        "combined_vectors": None,
+        "feature_combiner": None,
         "similarity_engine": None,
         "coords_2d": None,
         "filter_settings": {
@@ -188,6 +212,7 @@ def load_sample_data() -> None:
             client = get_api_client()
             processor = get_metadata_processor()
             embedder = get_embedding_generator()
+            combiner = get_feature_combiner()
 
             # Fetch a small sample of experiments
             raw_df = client.fetch_experiments(limit=100)
@@ -199,26 +224,49 @@ def load_sample_data() -> None:
             # Process metadata
             processed_df = processor.process(raw_df)
 
-            # Generate embeddings
-            st.info("Generating embeddings (this may take a moment)...")
+            # Generate text embeddings
+            st.info("Generating text embeddings...")
             texts = processed_df["combined_text"].tolist()
-            embeddings = embedder.encode(texts, show_progress=False)
+            text_embeddings = embedder.encode(texts, show_progress=False)
 
-            # Fit similarity engine
+            # Fit feature combiner and generate combined vectors
+            st.info("Combining features (text + categorical + numeric)...")
+            combiner.fit(processed_df, text_embedding_dim=text_embeddings.shape[1])
+            combined_vectors = combiner.transform(processed_df, text_embeddings)
+
+            # Fit similarity engine with COMBINED vectors (not text-only)
             similarity_engine = SimilarityEngine()
-            similarity_engine.fit(embeddings)
+            similarity_engine.fit(combined_vectors)
 
             # Store in session state
             st.session_state.metadata_df = processed_df
-            st.session_state.embeddings = embeddings
+            st.session_state.embeddings = text_embeddings
+            st.session_state.combined_vectors = combined_vectors
+            st.session_state.feature_combiner = combiner
             st.session_state.similarity_engine = similarity_engine
 
             # Cache the data
             cache_mgr = get_cache_manager()
             cache_mgr.save("metadata", processed_df)
-            cache_mgr.save("embeddings", embeddings)
+            cache_mgr.save("embeddings", text_embeddings)
+            cache_mgr.save("combined_vectors", combined_vectors)
+            cache_mgr.save("feature_combiner", combiner)
 
-            st.success(f"Loaded {len(processed_df)} experiments")
+            # Show feature breakdown
+            breakdown = combiner.get_feature_breakdown()
+            text_dim = breakdown.get("text_embedding", 0)
+            numeric_dim = breakdown.get("numeric_features", 0)
+            categorical_dim = sum(
+                v
+                for k, v in breakdown.items()
+                if k not in ["text_embedding", "numeric_features"]
+            )
+            st.success(
+                f"Loaded {len(processed_df)} experiments with "
+                f"{combiner.feature_dim}-dim combined vectors "
+                f"(text: {text_dim}, categorical: {categorical_dim}, "
+                f"numeric: {numeric_dim})"
+            )
 
         except Exception as e:
             st.error(f"Failed to load data: {e}")
@@ -335,6 +383,35 @@ def render_search_tab() -> None:
             st.json(dataset)
 
 
+def apply_filters(
+    similar_df: pd.DataFrame,
+    organism: str | None = None,
+    assay_type: str | None = None,
+) -> pd.DataFrame:
+    """Apply filters to similarity results.
+
+    Filters are applied AFTER similarity computation for responsive UX.
+
+    Args:
+        similar_df: DataFrame with similarity results (must have organism,
+                   assay_term_name columns).
+        organism: Filter by organism (e.g., "human", "mouse").
+        assay_type: Filter by assay type (e.g., "ChIP-seq", "RNA-seq").
+
+    Returns:
+        Filtered DataFrame.
+    """
+    filtered = similar_df.copy()
+
+    if organism is not None and "organism" in filtered.columns:
+        filtered = filtered[filtered["organism"] == organism]
+
+    if assay_type is not None and "assay_term_name" in filtered.columns:
+        filtered = filtered[filtered["assay_term_name"] == assay_type]
+
+    return filtered
+
+
 def render_similar_tab() -> None:
     """Render the similar datasets tab."""
     st.header("Similar Datasets")
@@ -361,6 +438,7 @@ def render_similar_tab() -> None:
             try:
                 embedder = get_embedding_generator()
                 similarity_engine = st.session_state.similarity_engine
+                feature_combiner = st.session_state.feature_combiner
 
                 if similarity_engine is None:
                     st.error(
@@ -368,13 +446,22 @@ def render_similar_tab() -> None:
                     )
                     return
 
-                # Generate embedding for selected dataset
+                # Generate text embedding for selected dataset
                 text = f"{selected.get('description', '')} {selected.get('title', '')}"
-                query_embedding = embedder.encode_single(text)
+                text_embedding = embedder.encode_single(text)
 
-                # Find similar datasets
+                # Generate combined query vector (if feature combiner is available)
+                if feature_combiner is not None and feature_combiner.is_fitted:
+                    query_vector = feature_combiner.transform_single(
+                        selected, text_embedding
+                    )
+                else:
+                    # Fallback to text-only similarity
+                    query_vector = text_embedding
+
+                # Find similar datasets using combined vector
                 similar_df = similarity_engine.find_similar(
-                    query_embedding, n=top_n, exclude_self=True
+                    query_vector, n=top_n, exclude_self=True
                 )
 
                 # Get metadata for similar datasets
@@ -399,6 +486,28 @@ def render_similar_tab() -> None:
         if not similar.empty:
             st.subheader("Most Similar Datasets")
 
+            # Apply filters from sidebar settings
+            filter_settings = st.session_state.filter_settings
+            filtered_similar = apply_filters(
+                similar,
+                organism=filter_settings.get("organism"),
+                assay_type=filter_settings.get("assay_type"),
+            )
+
+            # Show filter status
+            if len(filtered_similar) < len(similar):
+                st.caption(
+                    f"Showing {len(filtered_similar)} of {len(similar)} results "
+                    "(filtered by sidebar settings)"
+                )
+
+            if filtered_similar.empty:
+                st.warning(
+                    "No results match the current filters. "
+                    "Try adjusting the filter settings in the sidebar."
+                )
+                return
+
             # Display columns
             display_cols = [
                 "similarity_score",
@@ -407,9 +516,9 @@ def render_similar_tab() -> None:
                 "organism",
                 "description",
             ]
-            display_cols = [c for c in display_cols if c in similar.columns]
+            display_cols = [c for c in display_cols if c in filtered_similar.columns]
 
-            display_df = similar[display_cols].copy()
+            display_df = filtered_similar[display_cols].copy()
             display_df["similarity_score"] = display_df["similarity_score"].apply(
                 lambda x: f"{x:.3f}"
             )
@@ -422,7 +531,7 @@ def render_similar_tab() -> None:
 
             # Link to ENCODE
             st.markdown("Click accession numbers to view on ENCODE portal:")
-            for _, row in similar.head(5).iterrows():
+            for _, row in filtered_similar.head(5).iterrows():
                 acc = row.get("accession", "")
                 if acc:
                     url = f"https://www.encodeproject.org/experiments/{acc}/"
@@ -524,14 +633,27 @@ def main() -> None:
     # Try to load cached data on startup
     cache_mgr = get_cache_manager()
     if st.session_state.metadata_df is None:
-        cached_meta, cached_emb = load_cached_data(cache_mgr)
+        cached_meta, cached_emb, cached_combined, cached_combiner = load_cached_data(
+            cache_mgr
+        )
         if cached_meta is not None and cached_emb is not None:
             st.session_state.metadata_df = cached_meta
             st.session_state.embeddings = cached_emb
-            # Fit similarity engine
-            similarity_engine = SimilarityEngine()
-            similarity_engine.fit(cached_emb)
+
+            # Use combined vectors if available, otherwise fallback to text embeddings
+            if cached_combined is not None:
+                st.session_state.combined_vectors = cached_combined
+                similarity_engine = SimilarityEngine()
+                similarity_engine.fit(cached_combined)
+            else:
+                similarity_engine = SimilarityEngine()
+                similarity_engine.fit(cached_emb)
+
             st.session_state.similarity_engine = similarity_engine
+
+            # Restore feature combiner if available
+            if cached_combiner is not None:
+                st.session_state.feature_combiner = cached_combiner
 
     # Render sidebar and get filter settings
     filters = render_sidebar()
