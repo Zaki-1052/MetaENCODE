@@ -17,6 +17,16 @@ from src.ml.embeddings import EmbeddingGenerator
 from src.ml.feature_combiner import FeatureCombiner
 from src.ml.similarity import SimilarityEngine
 from src.processing.metadata import MetadataProcessor
+from src.ui.search_filters import FilterState, SearchFilterManager
+from src.ui.vocabularies import (
+    ASSAY_TYPES,
+    BODY_PARTS,
+    COMMON_LABS,
+    DEVELOPMENTAL_STAGES,
+    HISTONE_MODIFICATIONS,
+    ORGANISMS,
+    get_organism_display,
+)
 from src.utils.cache import CacheManager
 from src.visualization.plots import DimensionalityReducer, PlotGenerator
 
@@ -96,6 +106,12 @@ def load_cached_data(
     return None, None, None, None
 
 
+@st.cache_resource
+def get_filter_manager() -> SearchFilterManager:
+    """Get or create the search filter manager instance."""
+    return SearchFilterManager()
+
+
 def init_session_state() -> None:
     """Initialize Streamlit session state variables."""
     defaults = {
@@ -109,6 +125,9 @@ def init_session_state() -> None:
         "feature_combiner": None,
         "similarity_engine": None,
         "coords_2d": None,
+        # New filter state using FilterState dataclass
+        "filter_state": FilterState(),
+        # Legacy filter_settings for backward compatibility
         "filter_settings": {
             "organism": None,
             "assay_type": None,
@@ -124,63 +143,271 @@ def init_session_state() -> None:
 def render_sidebar() -> dict:
     """Render sidebar with search and filter controls.
 
+    The sidebar now includes:
+    - Assay type selection with autocomplete
+    - Organism selection with genome assembly labels
+    - Hierarchical biosample selection (body part -> tissue)
+    - Histone modification / target selection
+    - Age/developmental stage search
+    - More Options (lab, replicates)
+
     Returns:
         Dictionary containing current filter settings.
     """
+    filter_mgr = get_filter_manager()
+
     st.sidebar.title("MetaENCODE")
     st.sidebar.markdown("*ENCODE Dataset Similarity Search*")
     st.sidebar.divider()
 
-    # Search section
-    st.sidebar.subheader("Search")
-    search_query = st.sidebar.text_input(
-        "Search datasets",
-        placeholder="e.g., ChIP-seq K562 H3K27ac",
-        help="Search ENCODE for datasets by keyword",
-        key="search_query_input",
+    # --- Primary Filters (always visible) ---
+    st.sidebar.subheader("Search Filters")
+    st.sidebar.caption(
+        "Filters apply to both initial search and similar dataset results"
     )
 
-    if st.sidebar.button("Search", type="primary", use_container_width=True):
-        if search_query.strip():
+    # 1. Assay Type Selection
+    assay_options = [""] + sorted(ASSAY_TYPES.keys())
+    current_assay = st.session_state.filter_state.assay_type or ""
+
+    assay_type = st.sidebar.selectbox(
+        "Assay Type",
+        options=assay_options,
+        index=assay_options.index(current_assay) if current_assay in assay_options else 0,
+        format_func=lambda x: "All assay types" if x == "" else ASSAY_TYPES.get(x, x),
+        help="Filter by assay type (e.g., ChIP-seq, RNA-seq, Hi-C)",
+        key="filter_assay_type",
+    )
+
+    # 2. Organism Selection with genome assembly
+    organism_options = [""] + list(ORGANISMS.keys())
+    current_org = st.session_state.filter_state.organism or ""
+
+    organism = st.sidebar.selectbox(
+        "Organism",
+        options=organism_options,
+        index=organism_options.index(current_org) if current_org in organism_options else 0,
+        format_func=lambda x: "All organisms" if x == "" else get_organism_display(x),
+        help="Filter by organism (shows genome assembly)",
+        key="filter_organism",
+    )
+
+    # 3. Histone Modification / Target
+    target_options = [""] + sorted(HISTONE_MODIFICATIONS.keys())
+    current_target = st.session_state.filter_state.target or ""
+
+    target = st.sidebar.selectbox(
+        "Target / Histone Mark",
+        options=target_options,
+        index=target_options.index(current_target) if current_target in target_options else 0,
+        format_func=lambda x: (
+            "All targets"
+            if x == ""
+            else f"{x} - {HISTONE_MODIFICATIONS[x]['description']}"
+        ),
+        help="Filter by ChIP-seq target (e.g., H3K27ac, CTCF)",
+        key="filter_target",
+    )
+
+    st.sidebar.divider()
+
+    # --- Biosample Selection (Hierarchical) ---
+    st.sidebar.subheader("Biosample")
+
+    # 4. Body Part / Organ System
+    body_part_options = [""] + list(BODY_PARTS.keys())
+    current_bp = st.session_state.filter_state.body_part or ""
+
+    body_part = st.sidebar.selectbox(
+        "Organ / System",
+        options=body_part_options,
+        index=body_part_options.index(current_bp) if current_bp in body_part_options else 0,
+        format_func=lambda x: (
+            "All organs/systems"
+            if x == ""
+            else BODY_PARTS[x]["display_name"]
+        ),
+        help="Select organ system to filter tissues",
+        key="filter_body_part",
+    )
+
+    # 5. Tissue / Cell Type (filtered by body part if selected)
+    if body_part and body_part in BODY_PARTS:
+        tissue_options = [""] + BODY_PARTS[body_part]["tissues"]
+    else:
+        # Show all tissues from all body parts
+        all_tissues = []
+        for bp_info in BODY_PARTS.values():
+            all_tissues.extend(bp_info["tissues"])
+        tissue_options = [""] + sorted(set(all_tissues))
+
+    current_biosample = st.session_state.filter_state.biosample or ""
+
+    biosample = st.sidebar.selectbox(
+        "Tissue / Cell Type",
+        options=tissue_options,
+        index=(
+            tissue_options.index(current_biosample)
+            if current_biosample in tissue_options
+            else 0
+        ),
+        format_func=lambda x: "All tissues" if x == "" else x,
+        help="Filter by specific tissue or cell type (related terms will also match)",
+        key="filter_biosample",
+    )
+
+    # Show related tissues hint if biosample is selected
+    if biosample:
+        related = filter_mgr.get_related_tissues(biosample)
+        if len(related) > 1:
+            other_related = [t for t in related if t.lower() != biosample.lower()]
+            if other_related:
+                st.sidebar.caption(f"Also matches: {', '.join(other_related[:3])}")
+
+    st.sidebar.divider()
+
+    # --- Age / Developmental Stage ---
+    st.sidebar.subheader("Age / Stage")
+
+    # 6. Age/Developmental Stage
+    # Filter stages by organism if selected
+    if organism:
+        stage_options = [""] + [
+            k
+            for k, v in DEVELOPMENTAL_STAGES.items()
+            if v.get("species") == organism
+        ]
+    else:
+        stage_options = [""] + list(DEVELOPMENTAL_STAGES.keys())
+
+    current_age = st.session_state.filter_state.age_stage or ""
+
+    age_stage = st.sidebar.selectbox(
+        "Developmental Stage",
+        options=stage_options,
+        index=stage_options.index(current_age) if current_age in stage_options else 0,
+        format_func=lambda x: (
+            "All stages"
+            if x == ""
+            else f"{x} ({DEVELOPMENTAL_STAGES[x]['description']})"
+        ),
+        help="Filter by developmental stage (e.g., P60, E14.5, 8 weeks)",
+        key="filter_age_stage",
+    )
+
+    # Free text description search (for custom age queries)
+    description_search = st.sidebar.text_input(
+        "Description search",
+        value=st.session_state.filter_state.description_search or "",
+        placeholder="e.g., 8-week cerebellum",
+        help="Search in experiment descriptions (for age, conditions, etc.)",
+        key="filter_description",
+    )
+
+    st.sidebar.divider()
+
+    # --- Results Control ---
+    st.sidebar.subheader("Results")
+
+    max_results = st.sidebar.slider(
+        "Max results to show",
+        min_value=5,
+        max_value=50,
+        value=st.session_state.filter_state.max_results,
+        step=5,
+        help="Applies to both search results and similar datasets",
+        key="filter_max_results",
+    )
+
+    # --- More Options (Collapsible) ---
+    with st.sidebar.expander("More Options"):
+        # 7. Lab filter
+        lab_options = [""] + COMMON_LABS
+        current_lab = st.session_state.filter_state.lab or ""
+
+        lab = st.selectbox(
+            "Lab",
+            options=lab_options,
+            index=lab_options.index(current_lab) if current_lab in lab_options else 0,
+            format_func=lambda x: "All labs" if x == "" else x,
+            help="Filter by contributing lab",
+            key="filter_lab",
+        )
+
+        # 8. Minimum replicates
+        min_replicates = st.number_input(
+            "Minimum replicates",
+            min_value=0,
+            max_value=10,
+            value=st.session_state.filter_state.min_replicates,
+            help="Filter by minimum number of replicates",
+            key="filter_min_replicates",
+        )
+
+    st.sidebar.divider()
+
+    # --- Search Button ---
+    # Build search query from filters
+    filter_state = FilterState(
+        assay_type=assay_type if assay_type else None,
+        organism=organism if organism else None,
+        body_part=body_part if body_part else None,
+        biosample=biosample if biosample else None,
+        target=target if target else None,
+        age_stage=age_stage if age_stage else None,
+        lab=lab if lab else None,
+        min_replicates=int(min_replicates),
+        max_results=max_results,
+        description_search=description_search if description_search else None,
+    )
+
+    # Store filter state
+    st.session_state.filter_state = filter_state
+
+    # Build search query preview
+    search_query = filter_mgr.build_search_query(filter_state)
+
+    if search_query:
+        st.sidebar.caption(f"Search: {search_query}")
+
+    if st.sidebar.button(
+        "Search ENCODE",
+        type="primary",
+        use_container_width=True,
+        disabled=not filter_state.has_any_filter(),
+    ):
+        if filter_state.has_any_filter():
             with st.spinner("Searching ENCODE..."):
                 try:
                     client = get_api_client()
-                    results = client.search(search_query, limit=50)
+                    # Use filter-based search
+                    results = client.search(
+                        search_query,
+                        limit=max(max_results * 2, 50),  # Fetch extra for filtering
+                    )
+
+                    # Apply additional filters
+                    if not results.empty:
+                        results = filter_mgr.apply_filters(
+                            results, filter_state, search_mode=True
+                        )
+                        results = results.head(max_results)
+
                     st.session_state.search_results = results
                     st.sidebar.success(f"Found {len(results)} results")
                 except Exception as e:
                     st.sidebar.error(f"Search failed: {e}")
         else:
-            st.sidebar.warning("Please enter a search term")
+            st.sidebar.warning("Please set at least one filter")
+
+    # Clear filters button
+    if st.sidebar.button("Clear Filters", use_container_width=True):
+        st.session_state.filter_state = FilterState()
+        st.rerun()
 
     st.sidebar.divider()
 
-    # Filter section
-    st.sidebar.subheader("Filters")
-
-    organism = st.sidebar.selectbox(
-        "Organism",
-        options=[None, "human", "mouse"],
-        format_func=lambda x: "All organisms" if x is None else x.capitalize(),
-    )
-
-    assay_type = st.sidebar.selectbox(
-        "Assay Type",
-        options=[None, "ChIP-seq", "RNA-seq", "ATAC-seq", "DNase-seq"],
-        format_func=lambda x: "All assay types" if x is None else x,
-    )
-
-    top_n = st.sidebar.slider(
-        "Number of similar datasets",
-        min_value=5,
-        max_value=50,
-        value=10,
-        step=5,
-    )
-
-    st.sidebar.divider()
-
-    # Data loading section
+    # --- Data Loading Section ---
     st.sidebar.subheader("Data")
     if st.sidebar.button("Load Sample Data", use_container_width=True):
         load_sample_data()
@@ -197,11 +424,12 @@ def render_sidebar() -> dict:
         """
     )
 
+    # Return legacy format for backward compatibility
     return {
         "search_query": search_query,
-        "organism": organism,
-        "assay_type": assay_type,
-        "top_n": top_n,
+        "organism": organism if organism else None,
+        "assay_type": assay_type if assay_type else None,
+        "top_n": max_results,
     }
 
 
@@ -326,27 +554,57 @@ def render_search_tab() -> None:
     """Render the search and selection tab."""
     st.header("Search & Select Dataset")
 
+    # Get current filter state
+    filter_state = st.session_state.filter_state
+    max_results = filter_state.max_results
+
     # Display search results if available
     if st.session_state.search_results is not None:
         results_df = st.session_state.search_results
 
         if not results_df.empty:
-            st.subheader("Search Results")
+            st.subheader(f"Search Results ({len(results_df)} datasets)")
 
-            # Display as interactive table
-            display_cols = ["accession", "assay_term_name", "organism", "description"]
+            # Display as interactive table with formatted columns
+            display_cols = [
+                "accession",
+                "assay_term_name",
+                "organism",
+                "biosample_term_name",
+                "description",
+            ]
             display_cols = [c for c in display_cols if c in results_df.columns]
 
-            # Truncate descriptions for display
+            # Create display DataFrame with formatting
             display_df = results_df[display_cols].copy()
+
+            # Format organism with genome assembly
+            if "organism" in display_df.columns:
+                display_df["organism"] = display_df["organism"].apply(
+                    format_organism_display
+                )
+
+            # Truncate descriptions for display
             if "description" in display_df.columns:
                 display_df["description"] = display_df["description"].apply(
                     lambda x: (str(x)[:80] + "...") if len(str(x)) > 80 else str(x)
                 )
 
+            # Rename columns for display
+            column_labels = {
+                "accession": "Accession",
+                "assay_term_name": "Assay",
+                "organism": "Organism [Assembly]",
+                "biosample_term_name": "Biosample",
+                "description": "Description",
+            }
+            display_df = display_df.rename(
+                columns={k: v for k, v in column_labels.items() if k in display_df.columns}
+            )
+
             # Let user select a row
             selection = st.dataframe(
-                display_df,
+                display_df.head(max_results),
                 use_container_width=True,
                 hide_index=True,
                 on_select="rerun",
@@ -359,11 +617,29 @@ def render_search_tab() -> None:
                 selected_row = results_df.iloc[selected_idx]
                 st.session_state.selected_dataset = selected_row.to_dict()
                 st.success(f"Selected: {selected_row['accession']}")
+
+            # Show info about filters applied
+            if filter_state.has_any_filter():
+                active_filters = []
+                if filter_state.assay_type:
+                    active_filters.append(f"Assay: {filter_state.assay_type}")
+                if filter_state.organism:
+                    active_filters.append(
+                        f"Organism: {format_organism_display(filter_state.organism)}"
+                    )
+                if filter_state.target:
+                    active_filters.append(f"Target: {filter_state.target}")
+                if filter_state.biosample:
+                    active_filters.append(f"Biosample: {filter_state.biosample}")
+                if filter_state.age_stage:
+                    active_filters.append(f"Stage: {filter_state.age_stage}")
+                if active_filters:
+                    st.caption(f"Filtered by: {' | '.join(active_filters)}")
         else:
-            st.info("No results found. Try a different search term.")
+            st.info("No results found. Try adjusting your filters.")
     else:
         st.info(
-            "Use the search bar in the sidebar to find datasets, "
+            "Use the filters in the sidebar to search for datasets, "
             "or enter an accession number below."
         )
 
@@ -403,7 +679,10 @@ def render_search_tab() -> None:
             st.metric("Accession", dataset.get("accession", "N/A"))
             st.metric("Assay", dataset.get("assay_term_name", "N/A"))
         with col2:
-            st.metric("Organism", dataset.get("organism", "N/A"))
+            st.metric(
+                "Organism",
+                format_organism_display(dataset.get("organism", "")),
+            )
             st.metric("Biosample", dataset.get("biosample_term_name", "N/A"))
 
         with st.expander("Full Metadata"):
@@ -414,29 +693,72 @@ def apply_filters(
     similar_df: pd.DataFrame,
     organism: str | None = None,
     assay_type: str | None = None,
+    filter_state: FilterState | None = None,
 ) -> pd.DataFrame:
     """Apply filters to similarity results.
 
     Filters are applied AFTER similarity computation for responsive UX.
+    If filter_state is provided, uses the new comprehensive filtering.
+    Otherwise falls back to legacy organism/assay_type filtering.
 
     Args:
         similar_df: DataFrame with similarity results (must have organism,
                    assay_term_name columns).
         organism: Filter by organism (e.g., "human", "mouse").
         assay_type: Filter by assay type (e.g., "ChIP-seq", "RNA-seq").
+        filter_state: Optional FilterState for comprehensive filtering.
 
     Returns:
         Filtered DataFrame.
     """
+    if similar_df.empty:
+        return similar_df
+
+    # Use new filter state if provided
+    if filter_state is not None and filter_state.has_any_filter():
+        filter_mgr = get_filter_manager()
+        return filter_mgr.apply_filters(similar_df, filter_state)
+
+    # Legacy filtering for backward compatibility
     filtered = similar_df.copy()
 
     if organism is not None and "organism" in filtered.columns:
-        filtered = filtered[filtered["organism"] == organism]
+        filtered = filtered[filtered["organism"].str.lower() == organism.lower()]
 
     if assay_type is not None and "assay_term_name" in filtered.columns:
-        filtered = filtered[filtered["assay_term_name"] == assay_type]
+        # Handle Hi-C variants
+        if assay_type.lower() in ("hi-c", "hic"):
+            filtered = filtered[
+                filtered["assay_term_name"].str.lower().isin(
+                    ["hi-c", "hic", "in situ hi-c"]
+                )
+            ]
+        else:
+            filtered = filtered[
+                filtered["assay_term_name"].str.lower() == assay_type.lower()
+            ]
 
     return filtered
+
+
+def format_organism_display(organism: str) -> str:
+    """Format organism name with genome assembly label.
+
+    Args:
+        organism: Organism name (e.g., "human", "mouse").
+
+    Returns:
+        Formatted string with assembly (e.g., "Human [hg38]").
+    """
+    if not organism:
+        return "N/A"
+
+    org_lower = organism.lower()
+    if org_lower in ORGANISMS:
+        info = ORGANISMS[org_lower]
+        return f"{organism.capitalize()} [{info['assembly']}]"
+
+    return organism.capitalize()
 
 
 def render_similar_tab() -> None:
@@ -458,7 +780,16 @@ def render_similar_tab() -> None:
     selected = st.session_state.selected_dataset
     st.write(f"Finding datasets similar to: **{selected.get('accession', 'Unknown')}**")
 
-    top_n = st.session_state.filter_settings.get("top_n", 10)
+    # Get filter state
+    filter_state = st.session_state.filter_state
+    top_n = filter_state.max_results
+
+    # Show current filter summary
+    if filter_state.has_any_filter():
+        st.caption(
+            "Filters from sidebar will be applied to results. "
+            "Adjust filters to refine similar datasets."
+        )
 
     if st.button("Find Similar Datasets", type="primary"):
         with st.spinner("Computing similarities..."):
@@ -486,9 +817,10 @@ def render_similar_tab() -> None:
                     # Fallback to text-only similarity
                     query_vector = text_embedding
 
-                # Find similar datasets using combined vector
+                # Find more similar datasets than requested (for post-filtering)
+                fetch_n = max(top_n * 3, 30)
                 similar_df = similarity_engine.find_similar(
-                    query_vector, n=top_n, exclude_self=True
+                    query_vector, n=fetch_n, exclude_self=True
                 )
 
                 # Get metadata for similar datasets
@@ -513,46 +845,73 @@ def render_similar_tab() -> None:
         if not similar.empty:
             st.subheader("Most Similar Datasets")
 
-            # Apply filters from sidebar settings
-            filter_settings = st.session_state.filter_settings
+            # Apply filters using the new filter state
             filtered_similar = apply_filters(
                 similar,
-                organism=filter_settings.get("organism"),
-                assay_type=filter_settings.get("assay_type"),
+                organism=filter_state.organism,
+                assay_type=filter_state.assay_type,
+                filter_state=filter_state,
             )
+
+            # Limit to max_results
+            filtered_similar = filtered_similar.head(top_n)
 
             # Show filter status
             if len(filtered_similar) < len(similar):
                 st.caption(
-                    f"Showing {len(filtered_similar)} of {len(similar)} results "
+                    f"Showing {len(filtered_similar)} of {len(similar)} similar datasets "
                     "(filtered by sidebar settings)"
                 )
 
             if filtered_similar.empty:
                 st.warning(
-                    "No results match the current filters. "
+                    "No similar datasets match the current filters. "
                     "Try adjusting the filter settings in the sidebar."
                 )
                 return
 
-            # Display columns
+            # Display columns with proper formatting
             display_cols = [
                 "similarity_score",
                 "accession",
                 "assay_term_name",
                 "organism",
+                "biosample_term_name",
                 "description",
             ]
             display_cols = [c for c in display_cols if c in filtered_similar.columns]
 
             display_df = filtered_similar[display_cols].copy()
+
+            # Format similarity score
             display_df["similarity_score"] = display_df["similarity_score"].apply(
                 lambda x: f"{x:.3f}"
             )
+
+            # Format organism with assembly
+            if "organism" in display_df.columns:
+                display_df["organism"] = display_df["organism"].apply(
+                    format_organism_display
+                )
+
+            # Truncate description
             if "description" in display_df.columns:
                 display_df["description"] = display_df["description"].apply(
                     lambda x: (str(x)[:60] + "...") if len(str(x)) > 60 else str(x)
                 )
+
+            # Rename columns for display
+            column_labels = {
+                "similarity_score": "Similarity",
+                "accession": "Accession",
+                "assay_term_name": "Assay",
+                "organism": "Organism [Assembly]",
+                "biosample_term_name": "Biosample",
+                "description": "Description",
+            }
+            display_df = display_df.rename(
+                columns={k: v for k, v in column_labels.items() if k in display_df.columns}
+            )
 
             st.dataframe(display_df, use_container_width=True, hide_index=True)
 
