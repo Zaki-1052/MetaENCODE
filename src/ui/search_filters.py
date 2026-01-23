@@ -698,6 +698,9 @@ def parse_age_from_text(text: str) -> Optional[str]:
             if re.match(r"^\d+[\s-]?months?$", result):
                 num = re.match(r"(\d+)", result).group(1)
                 return f"{num} months"
-            return result.upper() if result[0] in "ep" else result
+            # Only uppercase P-day/E-day patterns (e.g., p0, e14.5), not words
+            if re.match(r"^[ep]\d", result):
+                return result.upper()
+            return result
 
     return None
