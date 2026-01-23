@@ -394,33 +394,29 @@ def render_sidebar() -> dict:
                             filter_state.organism, filter_state.organism
                         )
 
-                    # Determine life_stage from age_stage if applicable
-                    # ENCODE life_stage values: embryonic, postnatal, adult
-                    life_stage = None
-                    if filter_state.age_stage:
-                        age = filter_state.age_stage
-                        if age.startswith("E") or age in ("embryonic", "fetal"):
-                            life_stage = "embryonic"
-                        elif age.startswith("P") or age in ("newborn", "infant", "child"):
-                            life_stage = "postnatal"
-                        elif age in ("adult", "adolescent") or "month" in age:
-                            life_stage = "adult"
-
-                    # Use fetch_experiments with proper API parameters
+                    # Use fetch_experiments with only the core API parameters
+                    # Don't use life_stage or target at API level - too restrictive
                     results = client.fetch_experiments(
                         assay_type=filter_state.assay_type,
                         organism=organism_scientific,
                         biosample=filter_state.biosample,
-                        life_stage=life_stage,
-                        target=filter_state.target,
-                        limit=max(max_results * 3, 100),  # Fetch extra for filtering
+                        limit=max(max_results * 5, 200),  # Fetch more for filtering
                     )
 
-                    # Apply additional post-filtering (description search, age details)
+                    # Apply post-filtering for target, age, etc.
                     if not results.empty:
-                        results = filter_mgr.apply_filters(
-                            results, filter_state, search_mode=True
+                        # Only apply non-API filters (target, age, description)
+                        post_filter_state = FilterState(
+                            target=filter_state.target,
+                            age_stage=filter_state.age_stage,
+                            lab=filter_state.lab,
+                            min_replicates=filter_state.min_replicates,
+                            description_search=filter_state.description_search,
                         )
+                        if post_filter_state.has_any_filter():
+                            results = filter_mgr.apply_filters(
+                                results, post_filter_state, search_mode=True
+                            )
                         results = results.head(max_results)
 
                     st.session_state.search_results = results
@@ -728,15 +724,16 @@ def apply_filters(
     """Apply filters to similarity results.
 
     Filters are applied AFTER similarity computation for responsive UX.
-    If filter_state is provided, uses the new comprehensive filtering.
-    Otherwise falls back to legacy organism/assay_type filtering.
+    For similarity results, only organism and assay_type filters are applied
+    to avoid being too restrictive (other filters like age, target are not
+    useful for post-filtering similarity results).
 
     Args:
         similar_df: DataFrame with similarity results (must have organism,
                    assay_term_name columns).
         organism: Filter by organism (e.g., "human", "mouse").
         assay_type: Filter by assay type (e.g., "ChIP-seq", "RNA-seq").
-        filter_state: Optional FilterState for comprehensive filtering.
+        filter_state: Optional FilterState (only organism/assay used).
 
     Returns:
         Filtered DataFrame.
@@ -744,20 +741,23 @@ def apply_filters(
     if similar_df.empty:
         return similar_df
 
-    # Use new filter state if provided
-    if filter_state is not None and filter_state.has_any_filter():
-        filter_mgr = get_filter_manager()
-        return filter_mgr.apply_filters(similar_df, filter_state)
-
-    # Legacy filtering for backward compatibility
     filtered = similar_df.copy()
 
-    if organism is not None and "organism" in filtered.columns:
-        filtered = filtered[filtered["organism"].str.lower() == organism.lower()]
+    # Get organism and assay_type from filter_state if provided
+    org = organism
+    assay = assay_type
+    if filter_state is not None:
+        org = filter_state.organism or organism
+        assay = filter_state.assay_type or assay_type
 
-    if assay_type is not None and "assay_term_name" in filtered.columns:
-        # Handle Hi-C variants
-        if assay_type.lower() in ("hi-c", "hic"):
+    # Apply organism filter
+    if org is not None and "organism" in filtered.columns:
+        filtered = filtered[filtered["organism"].str.lower() == org.lower()]
+
+    # Apply assay type filter
+    if assay is not None and "assay_term_name" in filtered.columns:
+        # Handle HiC variants (ENCODE uses "HiC")
+        if assay.lower() in ("hi-c", "hic"):
             filtered = filtered[
                 filtered["assay_term_name"].str.lower().isin(
                     ["hi-c", "hic", "in situ hi-c"]
@@ -765,7 +765,7 @@ def apply_filters(
             ]
         else:
             filtered = filtered[
-                filtered["assay_term_name"].str.lower() == assay_type.lower()
+                filtered["assay_term_name"].str.lower() == assay.lower()
             ]
 
     return filtered

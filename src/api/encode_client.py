@@ -82,8 +82,6 @@ class EncodeClient:
         assay_type: Optional[str] = None,
         organism: Optional[str] = None,
         biosample: Optional[str] = None,
-        life_stage: Optional[str] = None,
-        target: Optional[str] = None,
         limit: int = 100,
     ) -> pd.DataFrame:
         """Fetch experiment metadata from ENCODE API.
@@ -92,8 +90,6 @@ class EncodeClient:
             assay_type: Filter by assay type (e.g., "ChIP-seq", "RNA-seq", "HiC").
             organism: Filter by organism (e.g., "Homo sapiens", "Mus musculus").
             biosample: Filter by biosample term name (e.g., "K562", "cerebellum").
-            life_stage: Filter by life stage (e.g., "embryonic", "adult", "postnatal").
-            target: Filter by ChIP-seq target (e.g., "H3K27ac", "CTCF").
             limit: Maximum number of experiments to fetch (default 100, use 0 for all).
 
         Returns:
@@ -118,10 +114,6 @@ class EncodeClient:
             ] = organism
         if biosample:
             params["biosample_ontology.term_name"] = biosample
-        if life_stage:
-            params["replicates.library.biosample.life_stage"] = life_stage
-        if target:
-            params["target.label"] = target
         if limit > 0:
             params["limit"] = limit
         else:
