@@ -33,13 +33,15 @@ class TestAssayTypes:
 
     def test_assay_types_contains_common_assays(self) -> None:
         """Test that common ENCODE assays are present."""
-        common_assays = ["ChIP-seq", "RNA-seq", "ATAC-seq", "DNase-seq", "Hi-C"]
+        # Note: ENCODE uses "HiC" not "Hi-C" as the canonical spelling
+        common_assays = ["ChIP-seq", "RNA-seq", "ATAC-seq", "DNase-seq", "HiC"]
         for assay in common_assays:
             assert assay in ASSAY_TYPES
 
     def test_hic_variants_present(self) -> None:
-        """Test that Hi-C variants are all present."""
-        hic_variants = ["Hi-C", "HiC", "in situ Hi-C"]
+        """Test that HiC-related assays are present."""
+        # Note: ENCODE uses "HiC" (not "Hi-C") and "capture Hi-C" (not "in situ Hi-C")
+        hic_variants = ["HiC", "capture Hi-C"]
         for variant in hic_variants:
             assert variant in ASSAY_TYPES
 

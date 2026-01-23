@@ -11,7 +11,8 @@ from typing import Dict, List, Set
 # =============================================================================
 # ASSAY TYPES
 # =============================================================================
-# Comprehensive list of ENCODE assay types with display names
+# Official ENCODE assay_term_name values from schema
+# Source: https://github.com/ENCODE-DCC/encoded/blob/dev/src/encoded/schemas/mixins.json
 ASSAY_TYPES: Dict[str, str] = {
     # Chromatin accessibility
     "ATAC-seq": "ATAC-seq (Chromatin Accessibility)",
@@ -23,67 +24,105 @@ ASSAY_TYPES: Dict[str, str] = {
     "CUT&RUN": "CUT&RUN (Chromatin Profiling)",
     "CUT&Tag": "CUT&Tag (Chromatin Profiling)",
     "Mint-ChIP-seq": "Mint-ChIP-seq (Low-input ChIP)",
-    # Chromatin conformation
-    "Hi-C": "Hi-C (Chromatin Conformation)",
-    "HiC": "Hi-C (Chromatin Conformation)",  # Alternative spelling
-    "in situ Hi-C": "in situ Hi-C (Chromatin Conformation)",
-    "Capture Hi-C": "Capture Hi-C (Promoter Contacts)",
-    "Micro-C": "Micro-C (High-res Chromatin Conformation)",
+    # Chromatin conformation (NOTE: ENCODE uses "HiC" not "Hi-C")
+    "HiC": "HiC (Chromatin Conformation)",
+    "capture Hi-C": "capture Hi-C (Promoter Contacts)",
     "ChIA-PET": "ChIA-PET (Chromatin Interaction)",
     "PLAC-seq": "PLAC-seq (Promoter-Enhancer Contacts)",
-    # Transcription
+    "5C": "5C (Chromatin Conformation)",
+    "4C": "4C (Chromatin Conformation)",
+    "genotype phasing by HiC": "genotype phasing by HiC",
+    "SPRITE": "SPRITE (3D Chromatin)",
+    "SPRITE-IP": "SPRITE-IP (3D Chromatin)",
+    # Transcription - RNA-seq variants
     "RNA-seq": "RNA-seq (Transcriptome)",
-    "total RNA-seq": "total RNA-seq (Total Transcriptome)",
     "polyA plus RNA-seq": "polyA plus RNA-seq (mRNA)",
     "polyA minus RNA-seq": "polyA minus RNA-seq (Non-polyA)",
     "small RNA-seq": "small RNA-seq (Small RNAs)",
     "microRNA-seq": "microRNA-seq (miRNAs)",
     "long read RNA-seq": "long read RNA-seq (Isoform)",
+    "long read single-cell RNA-seq": "long read single-cell RNA-seq",
+    "direct RNA-seq": "direct RNA-seq",
+    # TSS mapping
     "CAGE": "CAGE (TSS Mapping)",
     "RAMPAGE": "RAMPAGE (TSS Mapping)",
     "RNA-PET": "RNA-PET (Transcript Boundaries)",
+    # Nascent transcription
     "PRO-seq": "PRO-seq (Nascent Transcription)",
+    "PRO-cap": "PRO-cap (Nascent Transcription)",
     "GRO-seq": "GRO-seq (Nascent Transcription)",
-    # Single-cell
+    "GRO-cap": "GRO-cap (Nascent Transcription)",
+    "Bru-seq": "Bru-seq (Nascent Transcription)",
+    "BruChase-seq": "BruChase-seq (Nascent Transcription)",
+    "BruUV-seq": "BruUV-seq (Nascent Transcription)",
+    # Single-cell assays
     "single-cell RNA sequencing assay": "scRNA-seq (Single-Cell Transcriptome)",
-    "scRNA-seq": "scRNA-seq (Single-Cell Transcriptome)",
-    "single-nucleus RNA-seq": "snRNA-seq (Single-Nucleus)",
-    "single-cell ATAC-seq": "scATAC-seq (Single-Cell Accessibility)",
-    "snATAC-seq": "snATAC-seq (Single-Nucleus Accessibility)",
+    "single-nucleus ATAC-seq": "snATAC-seq (Single-Nucleus Accessibility)",
     # DNA methylation
-    "WGBS": "WGBS (Whole-Genome Bisulfite)",
     "whole-genome shotgun bisulfite sequencing": "WGBS (Whole-Genome Bisulfite)",
     "RRBS": "RRBS (Reduced Representation Bisulfite)",
     "MeDIP-seq": "MeDIP-seq (Methylation)",
-    # Protein-DNA/RNA interactions
+    "TAB-seq": "TAB-seq (5hmC Mapping)",
+    # RNA-protein interactions
     "eCLIP": "eCLIP (RNA-Protein Binding)",
     "iCLIP": "iCLIP (RNA-Protein Binding)",
     "RIP-seq": "RIP-seq (RNA-Protein Binding)",
+    "RIP-chip": "RIP-chip (RNA-Protein Binding)",
+    "RNA Bind-n-Seq": "RNA Bind-n-Seq",
+    "icLASER": "icLASER (RNA Structure)",
+    "icSHAPE": "icSHAPE (RNA Structure)",
+    # Translation
     "Ribo-seq": "Ribo-seq (Translation)",
     # Replication
     "Repli-seq": "Repli-seq (Replication Timing)",
     "Repli-chip": "Repli-chip (Replication Timing)",
-    # Other
-    "5C": "5C (Chromatin Conformation)",
-    "4C": "4C (Chromatin Conformation)",
+    # Perturbation assays
     "genetic modification followed by DNase-seq": "CRISPR-DNase",
-    "STARR-seq": "STARR-seq (Enhancer Activity)",
-    "MPRA": "MPRA (Massively Parallel Reporter)",
-    "TF footprinting": "TF Footprinting",
+    "CRISPR genome editing followed by RNA-seq": "CRISPR followed by RNA-seq",
+    "CRISPRi followed by RNA-seq": "CRISPRi followed by RNA-seq",
+    "shRNA knockdown followed by RNA-seq": "shRNA knockdown RNA-seq",
+    "siRNA knockdown followed by RNA-seq": "siRNA knockdown RNA-seq",
+    "genomic perturbation followed by RT-qPCR": "Perturbation RT-qPCR",
+    # Other specialized assays
+    "seqFISH": "seqFISH (Spatial Transcriptomics)",
+    "PAS-seq": "PAS-seq (PolyA Site)",
+    "microRNA counts": "microRNA counts",
+    "Switchgear": "Switchgear",
+    "Circulome-seq": "Circulome-seq",
+    "Clone-seq": "Clone-seq",
+    "DNA-PET": "DNA-PET",
+    "MRE-seq": "MRE-seq (Methylation)",
+    # RACE assays
+    "3' RACE": "3' RACE",
+    "5' RACE": "5' RACE",
+    "5' RLM RACE": "5' RLM RACE",
+    # Array-based assays
+    "comparative genomic hybridization by array": "CGH Array",
+    "DNA methylation profiling by array assay": "Methylation Array",
+    "transcription profiling by array assay": "Expression Array",
+    # Proteomics
+    "protein sequencing by tandem mass spectrometry assay": "MS/MS Proteomics",
+    "LC/MS label-free quantitative proteomics": "LC/MS Proteomics",
+    "LC-MS/MS isobaric label quantitative proteomics": "LC-MS/MS Proteomics",
+    # Other genomics
+    "whole genome sequencing assay": "WGS (Whole Genome Sequencing)",
+    "genotyping by high throughput sequencing assay": "Genotyping",
 }
 
 # Common assay type aliases for matching user input
+# Keys must match ASSAY_TYPES keys exactly
 ASSAY_ALIASES: Dict[str, List[str]] = {
     "ChIP-seq": ["chip", "chipseq", "chip-seq", "chromatin immunoprecipitation"],
     "RNA-seq": ["rna", "rnaseq", "rna-seq", "transcriptome", "expression"],
     "ATAC-seq": ["atac", "atacseq", "atac-seq", "chromatin accessibility"],
     "DNase-seq": ["dnase", "dnaseseq", "dnase-seq", "dhs"],
-    "Hi-C": ["hic", "hi-c", "chromatin conformation", "3d genome"],
-    "HiC": ["hic", "hi-c", "chromatin conformation", "3d genome"],
-    "WGBS": ["wgbs", "bisulfite", "methylation", "dna methylation"],
+    "HiC": ["hic", "hi-c", "Hi-C", "chromatin conformation", "3d genome"],
+    "whole-genome shotgun bisulfite sequencing": ["wgbs", "bisulfite", "methylation", "dna methylation"],
     "eCLIP": ["eclip", "clip", "rna binding"],
     "CUT&RUN": ["cut and run", "cutandrun", "cutnrun"],
     "CUT&Tag": ["cut and tag", "cutandtag", "cutntag"],
+    "single-cell RNA sequencing assay": ["scrna", "scrnaseq", "single cell rna"],
+    "single-nucleus ATAC-seq": ["snatac", "snatacsep", "single nucleus atac"],
 }
 
 # =============================================================================
@@ -488,21 +527,26 @@ BODY_PARTS: Dict[str, Dict[str, List[str]]] = {
     "cell_line": {
         "display_name": "Cell Lines",
         "tissues": [
+            # ENCODE Tier 1 (highest priority)
             "K562",
-            "HepG2",
             "GM12878",
             "H1-hESC",
+            "H1",  # Alias for H1-hESC
+            # ENCODE Tier 2
+            "A549",
+            "HeLa-S3",
+            "HepG2",
+            "HUVEC",
+            "IMR-90",
+            "MCF-7",
+            "SK-N-SH",
+            # Other common cell lines
             "H9",
             "HeLa",
-            "MCF-7",
-            "A549",
             "HEK293",
             "293T",
             "HCT116",
-            "IMR-90",
-            "HUVEC",
             "NHEK",
-            "SK-N-SH",
             "Caco-2",
             "Jurkat",
             "U2OS",

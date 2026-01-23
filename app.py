@@ -380,13 +380,43 @@ def render_sidebar() -> dict:
             with st.spinner("Searching ENCODE..."):
                 try:
                     client = get_api_client()
-                    # Use filter-based search
-                    results = client.search(
-                        search_query,
-                        limit=max(max_results * 2, 50),  # Fetch extra for filtering
+
+                    # Map organism key to scientific name for API
+                    organism_scientific = None
+                    if filter_state.organism:
+                        org_map = {
+                            "human": "Homo sapiens",
+                            "mouse": "Mus musculus",
+                            "fly": "Drosophila melanogaster",
+                            "worm": "Caenorhabditis elegans",
+                        }
+                        organism_scientific = org_map.get(
+                            filter_state.organism, filter_state.organism
+                        )
+
+                    # Determine life_stage from age_stage if applicable
+                    # ENCODE life_stage values: embryonic, postnatal, adult
+                    life_stage = None
+                    if filter_state.age_stage:
+                        age = filter_state.age_stage
+                        if age.startswith("E") or age in ("embryonic", "fetal"):
+                            life_stage = "embryonic"
+                        elif age.startswith("P") or age in ("newborn", "infant", "child"):
+                            life_stage = "postnatal"
+                        elif age in ("adult", "adolescent") or "month" in age:
+                            life_stage = "adult"
+
+                    # Use fetch_experiments with proper API parameters
+                    results = client.fetch_experiments(
+                        assay_type=filter_state.assay_type,
+                        organism=organism_scientific,
+                        biosample=filter_state.biosample,
+                        life_stage=life_stage,
+                        target=filter_state.target,
+                        limit=max(max_results * 3, 100),  # Fetch extra for filtering
                     )
 
-                    # Apply additional filters
+                    # Apply additional post-filtering (description search, age details)
                     if not results.empty:
                         results = filter_mgr.apply_filters(
                             results, filter_state, search_mode=True

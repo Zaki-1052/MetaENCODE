@@ -622,16 +622,17 @@ class SearchFilterManager:
         return result
 
     def build_search_query(self, filters: FilterState) -> str:
-        """Build an ENCODE search query string from filter state.
+        """Build a human-readable search summary from filter state.
 
-        Constructs a search term that can be used with the ENCODE API
-        search endpoint.
+        This is used for display purposes only (showing the user what filters
+        are active). The actual API call uses structured parameters via
+        fetch_experiments(), not free-text search.
 
         Args:
             filters: Current filter state.
 
         Returns:
-            Search query string.
+            Human-readable summary of active filters.
         """
         parts = []
 
@@ -648,10 +649,10 @@ class SearchFilterManager:
             parts.append(filters.biosample)
 
         if filters.age_stage:
-            parts.append(filters.age_stage)
+            parts.append(f"age:{filters.age_stage}")
 
         if filters.description_search:
-            parts.append(filters.description_search)
+            parts.append(f'"{filters.description_search}"')
 
         return " ".join(parts) if parts else ""
 
