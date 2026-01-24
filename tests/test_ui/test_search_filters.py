@@ -818,6 +818,7 @@ def sample_df_for_filtering() -> pd.DataFrame:
                 "ChIP-seq targeting H3K4me3 in 8-week hindbrain",
                 "ATAC-seq on adult HepG2 cells",
             ],
+            "life_stage": ["adult", "embryonic", "postnatal", "adult", "adult"],
             "lab": ["lab-a", "lab-b", "Bing Ren", "lab-b", "lab-a"],
             "replicate_count": [2, 3, 1, 4, 2],
         }
@@ -898,11 +899,11 @@ class TestSearchFilterManagerApplyFilters:
     def test_apply_filters_age_stage(
         self, manager: SearchFilterManager, sample_df_for_filtering: pd.DataFrame
     ) -> None:
-        """Test apply_filters with age_stage filter."""
-        filters = FilterState(age_stage="P60")
+        """Test apply_filters with age_stage filter uses life_stage column."""
+        filters = FilterState(age_stage="embryonic")
         result = manager.apply_filters(sample_df_for_filtering, filters)
         assert len(result) == 1
-        assert "P60" in result.iloc[0]["description"]
+        assert result.iloc[0]["life_stage"] == "embryonic"
 
     def test_apply_filters_description_search(
         self, manager: SearchFilterManager, sample_df_for_filtering: pd.DataFrame

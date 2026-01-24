@@ -582,14 +582,11 @@ class SearchFilterManager:
                     mask = mask | result[col].str.contains(target, case=False, na=False)
             result = result[mask]
 
-        # Age/developmental stage filter - search in description
-        if filters.age_stage:
-            age = filters.age_stage
-            mask = pd.Series(False, index=result.index)
-            for col in ["description", "title", "combined_text"]:
-                if col in result.columns:
-                    mask = mask | result[col].str.contains(age, case=False, na=False)
-            result = result[mask]
+        # Life stage filter - use the life_stage column directly
+        if filters.age_stage and "life_stage" in result.columns:
+            result = result[
+                result["life_stage"].str.lower() == filters.age_stage.lower()
+            ]
 
         # Description search
         if filters.description_search:

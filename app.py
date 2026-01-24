@@ -171,10 +171,19 @@ def render_sidebar() -> dict:
     # --- Primary Filters (always visible) ---
     st.sidebar.subheader("Search Filters")
     st.sidebar.caption(
-        "Filters apply to both initial search and similar dataset results"
+        "Filters apply to Search results only. Similar datasets show pure ML similarity."
     )
 
-    # 1. Assay Type Selection - ordered by popularity (from JSON)
+    # 1. Free text description search (most general filter - at top)
+    description_search = st.sidebar.text_input(
+        "Description search",
+        value=st.session_state.filter_state.description_search or "",
+        placeholder="e.g., 8-week cerebellum, H3K27ac",
+        help="Search in experiment descriptions, titles, and metadata",
+        key="filter_description",
+    )
+
+    # Assay Type Selection - ordered by popularity (from JSON)
     assay_data = get_assay_types()  # Returns list of (name, count) tuples
     assay_options = [""] + [name for name, count in assay_data]
     assay_counts = {name: count for name, count in assay_data}
@@ -195,7 +204,7 @@ def render_sidebar() -> dict:
         key="filter_assay_type",
     )
 
-    # 2. Organism Selection - Dynamic from ENCODE with experiment counts
+    # Organism Selection - Dynamic from ENCODE with experiment counts
     organism_data = get_organisms()  # Returns [(scientific_name, count), ...]
     organism_options = [""] + [name for name, _ in organism_data]
     organism_counts = {name: count for name, count in organism_data}
@@ -218,7 +227,7 @@ def render_sidebar() -> dict:
         key="filter_organism",
     )
 
-    # 3. Histone Modification / Target - ordered by popularity (from JSON)
+    # Histone Modification / Target - ordered by popularity (from JSON)
     # Get targets from JSON, but filter to show curated histone mods with descriptions
     all_targets = get_targets()  # Returns list of (name, count) tuples
     target_counts = {name: count for name, count in all_targets}
@@ -258,7 +267,7 @@ def render_sidebar() -> dict:
     # --- Biosample Selection (Hierarchical) ---
     st.sidebar.subheader("Biosample")
 
-    # 4. Body Part / Organ System - Dynamic from ENCODE's organ_slims
+    # Body Part / Organ System - Dynamic from ENCODE's organ_slims
     organ_data = get_organ_systems()[:20]  # Top 20 by experiment count
     organ_options = [""] + [name for name, _ in organ_data]
     organ_counts = {name: count for name, count in organ_data}
@@ -279,7 +288,7 @@ def render_sidebar() -> dict:
         key="filter_body_part",
     )
 
-    # 5. Tissue / Cell Type (filtered by organ if selected)
+    # Tissue / Cell Type (filtered by organ if selected)
     if body_part:
         # Get biosamples for selected organ from JSON
         biosamples_data = get_biosamples_for_organ(body_part)[:50]
@@ -317,17 +326,10 @@ def render_sidebar() -> dict:
             if other_related:
                 st.sidebar.caption(f"Also matches: {', '.join(other_related[:3])}")
 
-    st.sidebar.divider()
-
-    # --- Age / Developmental Stage ---
-    st.sidebar.subheader("Age / Stage")
-
-    # 6. Life Stage - ordered by popularity (from JSON)
-    # These are actual ENCODE life_stage values like "adult", "embryonic", "child"
+    # Life Stage - property of biosample (adult, embryonic, child, etc.)
     life_stage_data = get_life_stages()  # Returns list of (name, count) tuples
     stage_options = [""] + [name for name, count in life_stage_data]
     stage_counts = {name: count for name, count in life_stage_data}
-
     current_age = st.session_state.filter_state.age_stage or ""
 
     age_stage = st.sidebar.selectbox(
@@ -339,15 +341,6 @@ def render_sidebar() -> dict:
         ),
         help="Filter by life stage (e.g., adult, embryonic, child)",
         key="filter_age_stage",
-    )
-
-    # Free text description search (for custom age queries)
-    description_search = st.sidebar.text_input(
-        "Description search",
-        value=st.session_state.filter_state.description_search or "",
-        placeholder="e.g., 8-week cerebellum",
-        help="Search in experiment descriptions (for age, conditions, etc.)",
-        key="filter_description",
     )
 
     st.sidebar.divider()
@@ -807,13 +800,6 @@ def render_similar_tab() -> None:
     filter_state = st.session_state.filter_state
     top_n = filter_state.max_results
 
-    # Show current filter summary
-    if filter_state.has_any_filter():
-        st.caption(
-            "Filters from sidebar will be applied to results. "
-            "Adjust filters to refine similar datasets."
-        )
-
     if st.button("Find Similar Datasets", type="primary"):
         with st.spinner("Computing similarities..."):
             try:
@@ -868,30 +854,8 @@ def render_similar_tab() -> None:
         if not similar.empty:
             st.subheader("Most Similar Datasets")
 
-            # Apply filters using unified filter manager
-            filter_mgr = SearchFilterManager()
-            sim_filter_state = FilterState(
-                organism=filter_state.organism,
-                assay_type=filter_state.assay_type,
-                body_part=filter_state.body_part,
-                biosample=filter_state.biosample,
-            )
-            filtered_similar = filter_mgr.apply_filters(similar, sim_filter_state)
-
-            # Limit to max_results
-            filtered_similar = filtered_similar.head(top_n)
-
-            # Show filter status
-            if len(filtered_similar) < len(similar):
-                msg = f"Showing {len(filtered_similar)} of {len(similar)}"
-                st.caption(f"{msg} similar datasets (filtered by sidebar settings)")
-
-            if filtered_similar.empty:
-                st.warning(
-                    "No similar datasets match the current filters. "
-                    "Try adjusting the filter settings in the sidebar."
-                )
-                return
+            # Limit to max_results (no filtering - pure similarity ranking)
+            display_similar = similar.head(top_n)
 
             # Display columns with proper formatting
             display_cols = [
@@ -902,9 +866,9 @@ def render_similar_tab() -> None:
                 "biosample_term_name",
                 "description",
             ]
-            display_cols = [c for c in display_cols if c in filtered_similar.columns]
+            display_cols = [c for c in display_cols if c in display_similar.columns]
 
-            display_df = filtered_similar[display_cols].copy()
+            display_df = display_similar[display_cols].copy()
 
             # Format similarity score
             display_df["similarity_score"] = display_df["similarity_score"].apply(
@@ -942,7 +906,7 @@ def render_similar_tab() -> None:
 
             # Link to ENCODE
             st.markdown("Click accession numbers to view on ENCODE portal:")
-            for _, row in filtered_similar.head(5).iterrows():
+            for _, row in display_similar.head(5).iterrows():
                 acc = row.get("accession", "")
                 if acc:
                     url = f"https://www.encodeproject.org/experiments/{acc}/"
