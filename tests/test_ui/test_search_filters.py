@@ -29,7 +29,7 @@ class TestFilterStateInit:
         assert state.age_stage is None
         assert state.lab is None
         assert state.min_replicates == 0
-        assert state.max_results == 10
+        assert state.max_results == 20
         assert state.description_search is None
 
     def test_custom_initialization(self) -> None:
@@ -60,7 +60,7 @@ class TestFilterStateToDict:
         assert result["assay_type"] is None
         assert result["organism"] is None
         assert result["min_replicates"] == 0
-        assert result["max_results"] == 10
+        assert result["max_results"] == 20
 
     def test_to_dict_with_values(self) -> None:
         """Test to_dict with custom values."""
@@ -105,7 +105,7 @@ class TestFilterStateFromDict:
         state = FilterState.from_dict({})
         assert state.assay_type is None
         assert state.min_replicates == 0
-        assert state.max_results == 10
+        assert state.max_results == 20
 
     def test_from_dict_partial(self) -> None:
         """Test from_dict with partial dictionary."""

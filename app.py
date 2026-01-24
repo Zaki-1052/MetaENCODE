@@ -439,6 +439,7 @@ def render_sidebar() -> dict:
                         biosample=filter_state.biosample,
                         target=filter_state.target,
                         life_stage=filter_state.age_stage,
+                        search_term=filter_state.description_search,
                         limit=max(max_results * 5, 200),  # Fetch more for filtering
                     )
 

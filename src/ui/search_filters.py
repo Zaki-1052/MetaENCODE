@@ -39,7 +39,7 @@ class FilterState:
     age_stage: Optional[str] = None
     lab: Optional[str] = None
     min_replicates: int = 0
-    max_results: int = 10
+    max_results: int = 20
     # Free text for description search (age, etc.)
     description_search: Optional[str] = None
 
@@ -70,7 +70,7 @@ class FilterState:
             age_stage=d.get("age_stage"),
             lab=d.get("lab"),
             min_replicates=d.get("min_replicates", 0),
-            max_results=d.get("max_results", 10),
+            max_results=d.get("max_results", 20),
             description_search=d.get("description_search"),
         )
 
