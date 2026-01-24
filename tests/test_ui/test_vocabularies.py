@@ -1,29 +1,115 @@
 # tests/test_ui/test_vocabularies.py
-"""Tests for vocabulary definitions and helper functions."""
+"""Tests for vocabulary definitions and helper functions.
+
+Tests the new dynamic JSON loading architecture where all vocabulary
+values are loaded from scripts/encode_facets_raw.json.
+"""
 
 from src.ui.vocabularies import (
-    AGE_ALIASES,
     ASSAY_ALIASES,
     ASSAY_TYPES,
     BODY_PARTS,
     COMMON_LABS,
-    DEVELOPMENTAL_STAGES,
     HISTONE_ALIASES,
     HISTONE_MODIFICATIONS,
+    LIFE_STAGES,
     ORGANISMS,
     TISSUE_SYNONYMS,
+    TOP_BIOSAMPLES,
+    TOP_TARGETS,
     get_all_assay_types,
     get_all_body_parts,
     get_all_developmental_stages,
     get_all_histone_mods,
     get_all_organisms,
+    get_assay_display_name,
+    get_assay_types,
+    get_biosamples,
+    get_labs,
+    get_life_stages,
     get_organism_display,
+    get_targets,
     get_tissues_for_body_part,
+    get_total_experiments,
 )
 
 
+class TestJSONLoading:
+    """Tests for dynamic JSON loading functionality."""
+
+    def test_json_loads_successfully(self) -> None:
+        """Test that JSON data loads without errors."""
+        # This implicitly tests _load_facets()
+        total = get_total_experiments()
+        assert total > 0
+
+    def test_assay_types_loaded_from_json(self) -> None:
+        """Test that assay types are loaded from JSON."""
+        assays = get_assay_types()
+        assert isinstance(assays, list)
+        assert len(assays) > 0
+        # Check structure: list of (name, count) tuples
+        name, count = assays[0]
+        assert isinstance(name, str)
+        assert isinstance(count, int)
+        assert count > 0
+
+    def test_assay_types_ordered_by_popularity(self) -> None:
+        """Test that assay types are ordered by experiment count (descending)."""
+        assays = get_assay_types()
+        counts = [count for name, count in assays]
+        # Counts should be in descending order (most popular first)
+        assert counts == sorted(counts, reverse=True)
+
+    def test_chip_seq_is_first(self) -> None:
+        """Test that ChIP-seq is the most popular assay type."""
+        assays = get_assay_types()
+        first_assay = assays[0][0]
+        assert first_assay == "ChIP-seq"
+
+    def test_biosamples_loaded_from_json(self) -> None:
+        """Test that biosamples are loaded from JSON."""
+        biosamples = get_biosamples()
+        assert isinstance(biosamples, list)
+        assert len(biosamples) > 100  # ENCODE has many biosamples
+
+    def test_targets_loaded_from_json(self) -> None:
+        """Test that targets are loaded from JSON."""
+        targets = get_targets()
+        assert isinstance(targets, list)
+        assert len(targets) > 50  # ENCODE has many targets
+        # H3K4me3 should be in top targets
+        target_names = [name for name, count in targets[:20]]
+        assert "H3K4me3" in target_names
+
+    def test_life_stages_loaded_from_json(self) -> None:
+        """Test that life stages are loaded from JSON."""
+        stages = get_life_stages()
+        assert isinstance(stages, list)
+        assert len(stages) > 0
+        # Check for actual ENCODE life stages
+        stage_names = [name for name, count in stages]
+        assert "adult" in stage_names
+        assert "embryonic" in stage_names
+
+    def test_life_stages_not_fabricated(self) -> None:
+        """Test that life stages are real ENCODE values, not fabricated."""
+        stages = get_life_stages()
+        stage_names = [name for name, count in stages]
+        # These fabricated values should NOT be present
+        fabricated_stages = ["E10.5", "E14.5", "P0", "P56", "P60"]
+        for fake_stage in fabricated_stages:
+            assert fake_stage not in stage_names, f"Fabricated stage {fake_stage} found"
+
+    def test_labs_loaded_from_json(self) -> None:
+        """Test that labs are loaded from JSON."""
+        labs = get_labs()
+        assert isinstance(labs, list)
+        assert len(labs) > 10  # ENCODE has many labs
+
+
 class TestAssayTypes:
-    """Tests for ASSAY_TYPES dictionary."""
+    """Tests for ASSAY_TYPES dictionary (legacy compatibility)."""
 
     def test_assay_types_not_empty(self) -> None:
         """Test that ASSAY_TYPES contains entries."""
@@ -61,6 +147,22 @@ class TestAssayTypes:
             assert len(aliases) > 0, f"Aliases for {key} should not be empty"
             for alias in aliases:
                 assert isinstance(alias, str), f"Alias {alias} should be a string"
+
+
+class TestDisplayNames:
+    """Tests for display name functionality."""
+
+    def test_get_assay_display_name_returns_short_name(self) -> None:
+        """Test that long assay names get shortened."""
+        long_name = "single-cell RNA sequencing assay"
+        display = get_assay_display_name(long_name)
+        assert display == "scRNA-seq"
+
+    def test_get_assay_display_name_returns_original_for_unknown(self) -> None:
+        """Test that unknown assays return original name."""
+        unknown_assay = "ChIP-seq"
+        display = get_assay_display_name(unknown_assay)
+        assert display == "ChIP-seq"
 
 
 class TestOrganisms:
@@ -196,38 +298,27 @@ class TestTissueSynonyms:
             assert isinstance(synonyms, set), f"Synonyms for {key} should be a set"
 
 
-class TestDevelopmentalStages:
-    """Tests for DEVELOPMENTAL_STAGES dictionary."""
+class TestLifeStages:
+    """Tests for life stages (replacing DEVELOPMENTAL_STAGES)."""
 
-    def test_developmental_stages_not_empty(self) -> None:
-        """Test that DEVELOPMENTAL_STAGES contains entries."""
-        assert len(DEVELOPMENTAL_STAGES) > 0
+    def test_life_stages_not_empty(self) -> None:
+        """Test that LIFE_STAGES contains entries."""
+        assert len(LIFE_STAGES) > 0
 
-    def test_mouse_stages_present(self) -> None:
-        """Test that mouse developmental stages are present."""
-        mouse_stages = ["E10.5", "E14.5", "P0", "P7", "P56"]
-        for stage in mouse_stages:
-            assert stage in DEVELOPMENTAL_STAGES
+    def test_real_encode_stages_present(self) -> None:
+        """Test that real ENCODE life stages are present."""
+        real_stages = ["adult", "embryonic", "child", "newborn"]
+        for stage in real_stages:
+            assert stage in LIFE_STAGES, f"Real ENCODE stage {stage} not found"
 
-    def test_human_stages_present(self) -> None:
-        """Test that human developmental stages are present."""
-        human_stages = ["embryonic", "fetal", "newborn", "adult"]
-        for stage in human_stages:
-            assert stage in DEVELOPMENTAL_STAGES
-
-    def test_stages_have_required_fields(self) -> None:
-        """Test that all stages have required fields."""
-        for stage_key, stage_info in DEVELOPMENTAL_STAGES.items():
-            assert "species" in stage_info, f"Missing species for {stage_key}"
-            assert "description" in stage_info, f"Missing description for {stage_key}"
-            assert "days" in stage_info, f"Missing days for {stage_key}"
-
-    def test_age_aliases_reference_valid_stages(self) -> None:
-        """Test that all age aliases reference valid stages."""
-        for stage_key in AGE_ALIASES.keys():
+    def test_fabricated_stages_not_present(self) -> None:
+        """Test that fabricated developmental stages are NOT present."""
+        # These were invented values that don't exist in ENCODE
+        fabricated = ["E10.5", "E14.5", "P0", "P7", "P56", "P60", "8 weeks"]
+        for stage in fabricated:
             assert (
-                stage_key in DEVELOPMENTAL_STAGES
-            ), f"Alias key {stage_key} not in DEVELOPMENTAL_STAGES"
+                stage not in LIFE_STAGES
+            ), f"Fabricated stage {stage} should not be in LIFE_STAGES"
 
 
 class TestCommonLabs:
@@ -309,11 +400,12 @@ class TestHelperFunctions:
         assert result == []
 
     def test_get_all_developmental_stages_returns_list(self) -> None:
-        """Test that get_all_developmental_stages returns a list."""
+        """Test that get_all_developmental_stages returns actual ENCODE life stages."""
         result = get_all_developmental_stages()
         assert isinstance(result, list)
-        assert len(result) == len(DEVELOPMENTAL_STAGES)
-        assert "P0" in result
+        assert len(result) > 0
+        # Should contain real ENCODE stages
+        assert "adult" in result
 
 
 class TestVocabularyConsistency:
@@ -337,11 +429,16 @@ class TestVocabularyConsistency:
                 set(tissues_lower)
             ), f"Duplicate tissues in {part_key}"
 
-    def test_developmental_stages_days_are_numeric(self) -> None:
-        """Test that all developmental stage days are numeric."""
-        for stage_key, stage_info in DEVELOPMENTAL_STAGES.items():
-            days = stage_info["days"]
-            assert isinstance(
-                days, (int, float)
-            ), f"Days for {stage_key} should be numeric"
-            assert days >= 0, f"Days for {stage_key} should be non-negative"
+    def test_top_biosamples_matches_json(self) -> None:
+        """Test that TOP_BIOSAMPLES comes from JSON data."""
+        top_biosamples = list(TOP_BIOSAMPLES)
+        json_biosamples = get_biosamples()[:50]
+        json_names = [name for name, count in json_biosamples]
+        assert top_biosamples == json_names
+
+    def test_top_targets_matches_json(self) -> None:
+        """Test that TOP_TARGETS comes from JSON data."""
+        top_targets = list(TOP_TARGETS)
+        json_targets = get_targets()[:40]
+        json_names = [name for name, count in json_targets]
+        assert top_targets == json_names

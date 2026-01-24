@@ -529,7 +529,11 @@ class TestSearchFilterManagerAutocompleteBiosample:
 
 
 class TestSearchFilterManagerAutocompleteAge:
-    """Tests for SearchFilterManager.autocomplete_age() method."""
+    """Tests for SearchFilterManager.autocomplete_age() method.
+
+    Note: These tests use ACTUAL ENCODE life stages (adult, embryonic, child, etc.),
+    not fabricated developmental stages like P60 or E14.5 which don't exist in ENCODE.
+    """
 
     @pytest.fixture
     def manager(self) -> SearchFilterManager:
@@ -537,16 +541,21 @@ class TestSearchFilterManagerAutocompleteAge:
         return SearchFilterManager()
 
     def test_autocomplete_age_empty_query(self, manager: SearchFilterManager) -> None:
-        """Test autocomplete_age with empty query."""
+        """Test autocomplete_age with empty query returns real ENCODE life stages."""
         results = manager.autocomplete_age("")
         assert len(results) > 0
+        # Results should be (stage_name, count_info) tuples
+        stages = [r[0] for r in results]
+        # Should contain real ENCODE life stages
+        assert "adult" in stages
+        assert "embryonic" in stages
 
-    def test_autocomplete_age_p60_query(self, manager: SearchFilterManager) -> None:
-        """Test autocomplete_age with 'P60' query."""
-        results = manager.autocomplete_age("P60")
+    def test_autocomplete_age_adult_query(self, manager: SearchFilterManager) -> None:
+        """Test autocomplete_age with 'adult' query."""
+        results = manager.autocomplete_age("adult")
         assert len(results) > 0
         stages = [r[0] for r in results]
-        assert "P60" in stages
+        assert "adult" in stages
 
     def test_autocomplete_age_embryonic_query(
         self, manager: SearchFilterManager
@@ -554,45 +563,49 @@ class TestSearchFilterManagerAutocompleteAge:
         """Test autocomplete_age with 'embryonic' query."""
         results = manager.autocomplete_age("embryonic")
         assert len(results) > 0
+        stages = [r[0] for r in results]
+        assert "embryonic" in stages
 
-    def test_autocomplete_age_with_organism_filter(
+    def test_autocomplete_age_child_query(self, manager: SearchFilterManager) -> None:
+        """Test autocomplete_age with 'child' query."""
+        results = manager.autocomplete_age("child")
+        assert len(results) > 0
+        stages = [r[0] for r in results]
+        assert "child" in stages
+
+    def test_autocomplete_age_organism_param_ignored(
         self, manager: SearchFilterManager
     ) -> None:
-        """Test autocomplete_age filtered by organism."""
-        results = manager.autocomplete_age("", organism="mouse")
-        assert len(results) > 0
-        # All results should be mouse stages
-        for stage, description in results:
-            # P0, E10.5, etc are mouse stages
-            assert (
-                stage.startswith("P")
-                or stage.startswith("E")
-                or "weeks" in stage
-                or "months" in stage
-            )
+        """Test that organism parameter doesn't filter (life stages are cross-organism).
 
-    def test_autocomplete_age_alias_query(self, manager: SearchFilterManager) -> None:
-        """Test autocomplete_age with alias like 'newborn'."""
+        Note: ENCODE's life_stage field is not organism-specific. The same stages
+        (adult, embryonic, etc.) apply across species. Unlike fabricated stages
+        like P60 (mouse-specific), real life stages are universal.
+        """
+        results_human = manager.autocomplete_age("", organism="human")
+        results_mouse = manager.autocomplete_age("", organism="mouse")
+        results_none = manager.autocomplete_age("")
+
+        # All should return the same results (organism doesn't filter life stages)
+        assert len(results_human) == len(results_none)
+        assert len(results_mouse) == len(results_none)
+
+    def test_autocomplete_age_newborn_query(self, manager: SearchFilterManager) -> None:
+        """Test autocomplete_age with 'newborn' query."""
         results = manager.autocomplete_age("newborn")
         assert len(results) > 0
+        stages = [r[0] for r in results]
+        assert "newborn" in stages
 
-    def test_autocomplete_age_filters_out_wrong_organism(
+    def test_autocomplete_age_returns_count_info(
         self, manager: SearchFilterManager
     ) -> None:
-        """Test that autocomplete_age filters out stages from wrong organism (line 420)."""
-        # Search for human-only stages while filtering for human
-        results_human = manager.autocomplete_age("adult", organism="human")
-        stages_human = [r[0] for r in results_human]
-
-        # Search for mouse-only stages while filtering for mouse
-        results_mouse = manager.autocomplete_age("P60", organism="mouse")
-        stages_mouse = [r[0] for r in results_mouse]
-
-        # P60 is a mouse stage, should appear when filtering for mouse
-        assert "P60" in stages_mouse
-
-        # "adult" is both a human stage and a common word, check we get results
-        assert len(results_human) > 0
+        """Test that autocomplete_age returns experiment counts in description."""
+        results = manager.autocomplete_age("")
+        assert len(results) > 0
+        # Second element should be count info like "25,196 experiments"
+        stage, count_info = results[0]
+        assert "experiments" in count_info
 
 
 class TestSearchFilterManagerAutocompleteLab:
@@ -722,7 +735,7 @@ class TestSearchFilterManagerMatchScore:
     def test_match_score_word_boundary_partial_match(
         self, manager: SearchFilterManager
     ) -> None:
-        """Test _match_score with word boundary match where word starts with query (line 505)."""
+        """Test _match_score with word boundary match (line 505)."""
         # Query "rna" matches word "rna" in "rna seq analysis"
         score = manager._match_score("rna", "rna seq analysis")
         assert score >= 0.65

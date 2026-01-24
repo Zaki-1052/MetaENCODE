@@ -19,13 +19,15 @@ from src.ml.similarity import SimilarityEngine
 from src.processing.metadata import MetadataProcessor
 from src.ui.search_filters import FilterState, SearchFilterManager
 from src.ui.vocabularies import (
-    ASSAY_TYPES,
     BODY_PARTS,
-    COMMON_LABS,
-    DEVELOPMENTAL_STAGES,
     HISTONE_MODIFICATIONS,
     ORGANISMS,
+    get_assay_display_name,
+    get_assay_types,
+    get_lab_names,
+    get_life_stages,
     get_organism_display,
+    get_targets,
 )
 from src.utils.cache import CacheManager
 from src.visualization.plots import DimensionalityReducer, PlotGenerator
@@ -166,8 +168,10 @@ def render_sidebar() -> dict:
         "Filters apply to both initial search and similar dataset results"
     )
 
-    # 1. Assay Type Selection
-    assay_options = [""] + sorted(ASSAY_TYPES.keys())
+    # 1. Assay Type Selection - ordered by popularity (from JSON)
+    assay_data = get_assay_types()  # Returns list of (name, count) tuples
+    assay_options = [""] + [name for name, count in assay_data]
+    assay_counts = {name: count for name, count in assay_data}
     current_assay = st.session_state.filter_state.assay_type or ""
 
     assay_type = st.sidebar.selectbox(
@@ -176,7 +180,11 @@ def render_sidebar() -> dict:
         index=(
             assay_options.index(current_assay) if current_assay in assay_options else 0
         ),
-        format_func=lambda x: "All assay types" if x == "" else ASSAY_TYPES.get(x, x),
+        format_func=lambda x: (
+            "All assay types"
+            if x == ""
+            else f"{get_assay_display_name(x)} ({assay_counts.get(x, 0):,})"
+        ),
         help="Filter by assay type (e.g., ChIP-seq, RNA-seq, Hi-C)",
         key="filter_assay_type",
     )
@@ -198,9 +206,27 @@ def render_sidebar() -> dict:
         key="filter_organism",
     )
 
-    # 3. Histone Modification / Target
-    target_options = [""] + sorted(HISTONE_MODIFICATIONS.keys())
+    # 3. Histone Modification / Target - ordered by popularity (from JSON)
+    # Get targets from JSON, but filter to show curated histone mods with descriptions
+    all_targets = get_targets()  # Returns list of (name, count) tuples
+    target_counts = {name: count for name, count in all_targets}
+
+    # Show curated histone mods first (with descriptions), then other popular targets
+    curated_targets = list(HISTONE_MODIFICATIONS.keys())
+    other_popular_targets = [
+        name for name, count in all_targets[:50] if name not in curated_targets
+    ]
+    target_options = [""] + curated_targets + other_popular_targets
     current_target = st.session_state.filter_state.target or ""
+
+    def format_target(x: str) -> str:
+        if x == "":
+            return "All targets"
+        count = target_counts.get(x, 0)
+        if x in HISTONE_MODIFICATIONS:
+            desc = HISTONE_MODIFICATIONS[x]["description"]
+            return f"{x} - {desc} ({count:,})"
+        return f"{x} ({count:,})"
 
     target = st.sidebar.selectbox(
         "Target / Histone Mark",
@@ -210,11 +236,7 @@ def render_sidebar() -> dict:
             if current_target in target_options
             else 0
         ),
-        format_func=lambda x: (
-            "All targets"
-            if x == ""
-            else f"{x} - {HISTONE_MODIFICATIONS[x]['description']}"
-        ),
+        format_func=format_target,
         help="Filter by ChIP-seq target (e.g., H3K27ac, CTCF)",
         key="filter_target",
     )
@@ -281,27 +303,22 @@ def render_sidebar() -> dict:
     # --- Age / Developmental Stage ---
     st.sidebar.subheader("Age / Stage")
 
-    # 6. Age/Developmental Stage
-    # Filter stages by organism if selected
-    if organism:
-        stage_options = [""] + [
-            k for k, v in DEVELOPMENTAL_STAGES.items() if v.get("species") == organism
-        ]
-    else:
-        stage_options = [""] + list(DEVELOPMENTAL_STAGES.keys())
+    # 6. Life Stage - ordered by popularity (from JSON)
+    # These are actual ENCODE life_stage values like "adult", "embryonic", "child"
+    life_stage_data = get_life_stages()  # Returns list of (name, count) tuples
+    stage_options = [""] + [name for name, count in life_stage_data]
+    stage_counts = {name: count for name, count in life_stage_data}
 
     current_age = st.session_state.filter_state.age_stage or ""
 
     age_stage = st.sidebar.selectbox(
-        "Developmental Stage",
+        "Life Stage",
         options=stage_options,
         index=stage_options.index(current_age) if current_age in stage_options else 0,
         format_func=lambda x: (
-            "All stages"
-            if x == ""
-            else f"{x} ({DEVELOPMENTAL_STAGES[x]['description']})"
+            "All stages" if x == "" else f"{x} ({stage_counts.get(x, 0):,})"
         ),
-        help="Filter by developmental stage (e.g., P60, E14.5, 8 weeks)",
+        help="Filter by life stage (e.g., adult, embryonic, child)",
         key="filter_age_stage",
     )
 
@@ -331,8 +348,9 @@ def render_sidebar() -> dict:
 
     # --- More Options (Collapsible) ---
     with st.sidebar.expander("More Options"):
-        # 7. Lab filter
-        lab_options = [""] + COMMON_LABS
+        # 7. Lab filter - ordered by popularity (from JSON)
+        lab_names = get_lab_names(limit=30)  # Top 30 labs
+        lab_options = [""] + lab_names
         current_lab = st.session_state.filter_state.lab or ""
 
         lab = st.selectbox(
@@ -900,10 +918,8 @@ def render_similar_tab() -> None:
 
             # Show filter status
             if len(filtered_similar) < len(similar):
-                st.caption(
-                    f"Showing {len(filtered_similar)} of {len(similar)} similar datasets "
-                    "(filtered by sidebar settings)"
-                )
+                msg = f"Showing {len(filtered_similar)} of {len(similar)}"
+                st.caption(f"{msg} similar datasets (filtered by sidebar settings)")
 
             if filtered_similar.empty:
                 st.warning(

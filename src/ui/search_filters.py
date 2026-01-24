@@ -6,23 +6,22 @@ and filter management for the MetaENCODE search interface.
 """
 
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from difflib import SequenceMatcher
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 import pandas as pd
 
 from src.ui.vocabularies import (
-    AGE_ALIASES,
     ASSAY_ALIASES,
     ASSAY_TYPES,
     BODY_PARTS,
-    COMMON_LABS,
-    DEVELOPMENTAL_STAGES,
     HISTONE_ALIASES,
     HISTONE_MODIFICATIONS,
     ORGANISMS,
     TISSUE_SYNONYMS,
+    get_lab_names,
+    get_life_stages,
 )
 
 
@@ -383,45 +382,35 @@ class SearchFilterManager:
     def autocomplete_age(
         self, query: str, organism: Optional[str] = None, limit: int = 15
     ) -> List[Tuple[str, str]]:
-        """Find developmental stages or ages matching the query.
+        """Find life stages matching the query.
+
+        Note: Returns actual ENCODE life stages (adult, embryonic, child, etc.),
+        not fabricated developmental stages like E14.5 or P56.
 
         Args:
-            query: User input (e.g., "P60", "8 weeks", "E14.5").
-            organism: Optional organism to filter stages.
+            query: User input (e.g., "adult", "embryonic", "child").
+            organism: Optional organism to filter stages (currently unused).
             limit: Maximum number of results.
 
         Returns:
-            List of (stage_key, description) tuples.
+            List of (stage_name, count_info) tuples.
         """
+        # Get life stages from JSON (ordered by experiment count)
+        life_stages = get_life_stages()
+
         if not query:
-            # Return common stages based on organism
-            stages = []
-            for key, info in DEVELOPMENTAL_STAGES.items():
-                if organism and info.get("species") != organism:
-                    continue
-                stages.append((key, info["description"]))
-            return stages[:limit]
+            # Return stages ordered by popularity
+            return [(name, f"{count:,} experiments") for name, count in life_stages][
+                :limit
+            ]
 
         query_lower = query.lower().strip()
         matches: List[Tuple[float, str, str]] = []
 
-        for key, info in DEVELOPMENTAL_STAGES.items():
-            if organism and info.get("species") != organism:
-                continue
-
-            score = max(
-                self._match_score(query_lower, key.lower()),
-                self._match_score(query_lower, info["description"].lower()),
-            )
-
-            # Check aliases
-            if key in AGE_ALIASES:
-                for alias in AGE_ALIASES[key]:
-                    alias_score = self._match_score(query_lower, alias)
-                    score = max(score, alias_score)
-
+        for name, count in life_stages:
+            score = self._match_score(query_lower, name.lower())
             if score > 0.3:
-                matches.append((score, key, info["description"]))
+                matches.append((score, name, f"{count:,} experiments"))
 
         matches.sort(key=lambda x: -x[0])
         return [(m[1], m[2]) for m in matches[:limit]]
@@ -434,15 +423,18 @@ class SearchFilterManager:
             limit: Maximum number of results.
 
         Returns:
-            List of lab names.
+            List of lab names (ordered by experiment count).
         """
+        # Get labs from JSON (ordered by experiment count)
+        labs = get_lab_names(limit=50)  # Get more than limit for filtering
+
         if not query:
-            return COMMON_LABS[:limit]
+            return labs[:limit]
 
         query_lower = query.lower().strip()
         matches: List[Tuple[float, str]] = []
 
-        for lab in COMMON_LABS:
+        for lab in labs:
             score = self._match_score(query_lower, lab.lower())
             if score > 0.2:
                 matches.append((score, lab))
@@ -501,7 +493,8 @@ class SearchFilterManager:
         tissue_lower = tissue.lower()
         if tissue_lower in self._tissue_to_body_part:
             bp_key = self._tissue_to_body_part[tissue_lower]
-            return BODY_PARTS[bp_key]["display_name"]
+            display: str = BODY_PARTS[bp_key]["display_name"]
+            return display
         return ""
 
     def apply_filters(

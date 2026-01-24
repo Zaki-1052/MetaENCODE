@@ -5,10 +5,12 @@ from src.ui.search_filters import SearchFilterManager
 from src.ui.vocabularies import (
     ASSAY_TYPES,
     BODY_PARTS,
-    DEVELOPMENTAL_STAGES,
     HISTONE_MODIFICATIONS,
+    LIFE_STAGES,
     ORGANISMS,
     TISSUE_SYNONYMS,
+    get_assay_types,
+    get_life_stages,
 )
 
 __all__ = [
@@ -18,5 +20,7 @@ __all__ = [
     "HISTONE_MODIFICATIONS",
     "BODY_PARTS",
     "TISSUE_SYNONYMS",
-    "DEVELOPMENTAL_STAGES",
+    "LIFE_STAGES",
+    "get_assay_types",
+    "get_life_stages",
 ]
