@@ -17,7 +17,7 @@ Output:
 
 import json
 import sys
-from collections import Counter
+from collections import Counter, defaultdict
 from datetime import datetime
 from pathlib import Path
 from urllib.parse import urlencode
@@ -55,6 +55,7 @@ def fetch_all_experiments_minimal() -> list[dict]:
         "accession",
         "assay_term_name",
         "biosample_ontology.term_name",
+        "biosample_ontology.organ_slims",
         "target.label",
         "lab.title",
         "status",
@@ -187,6 +188,35 @@ def count_field_values(experiments: list[dict]) -> dict[str, Counter]:
                             counters["organism"][sci_name] += 1
 
     return counters
+
+
+def build_organ_to_biosamples(experiments: list[dict]) -> dict[str, Counter]:
+    """Build mapping of organ_slim -> biosample term_names with counts.
+
+    This uses ENCODE's organ_slims from biosample_ontology, which are
+    UBERON ontology-derived standardized organ classifications.
+
+    Args:
+        experiments: List of experiment records with biosample_ontology.
+
+    Returns:
+        Dictionary mapping organ names to Counter of biosample term_names.
+    """
+    organ_to_biosamples: dict[str, Counter] = defaultdict(Counter)
+
+    for exp in experiments:
+        biosample_onto = exp.get("biosample_ontology", {})
+        if not isinstance(biosample_onto, dict):
+            continue
+
+        term_name = biosample_onto.get("term_name")
+        organ_slims = biosample_onto.get("organ_slims", [])
+
+        if term_name and organ_slims and isinstance(organ_slims, list):
+            for organ in organ_slims:
+                organ_to_biosamples[organ][term_name] += 1
+
+    return organ_to_biosamples
 
 
 def generate_vocabularies_code(counters: dict[str, Counter]) -> str:
@@ -352,12 +382,17 @@ def main():
     print("Counting unique values for each field...")
     counters = count_field_values(experiments)
 
+    # Build organ_slims -> biosample mapping
+    print("Building organ_slims to biosample mapping...")
+    organ_mapping = build_organ_to_biosamples(experiments)
+
     # Print summary
     print()
     print("Field value summary:")
     print("-" * 50)
     for field, counter in counters.items():
         print(f"  {field}: {len(counter)} unique values")
+    print(f"  organ_slims: {len(organ_mapping)} unique organs")
     print()
 
     # Save raw data for verification
@@ -371,6 +406,10 @@ def main():
         "field_counts": {
             field: [{"key": k, "count": v} for k, v in counter.most_common()]
             for field, counter in counters.items()
+        },
+        "organ_to_biosamples": {
+            organ: [{"key": k, "count": v} for k, v in counter.most_common()]
+            for organ, counter in sorted(organ_mapping.items())
         },
     }
 
@@ -420,6 +459,19 @@ def main():
         print("\nLife Stages:")
         for key, count in counters["life_stage"].most_common():
             print(f"  - {key}: {count} experiments")
+
+    if organ_mapping:
+        print("\nOrgan Systems (organ_slims):")
+        # Sort by total experiment count
+        organ_totals = [
+            (organ, sum(counter.values())) for organ, counter in organ_mapping.items()
+        ]
+        organ_totals.sort(key=lambda x: -x[1])
+        for i, (organ, total) in enumerate(organ_totals[:15], 1):
+            biosample_count = len(organ_mapping[organ])
+            print(
+                f"  {i:2}. {organ}: {total} experiments ({biosample_count} biosamples)"
+            )
 
     print()
     print("=" * 70)

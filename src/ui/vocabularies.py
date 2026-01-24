@@ -179,6 +179,112 @@ def get_facets_timestamp() -> str:
 
 
 # =============================================================================
+# ORGAN SYSTEMS (from ENCODE's organ_slims ontology)
+# =============================================================================
+
+
+@lru_cache(maxsize=1)
+def get_organ_systems() -> list[tuple[str, int]]:
+    """Return organ systems from ENCODE's organ_slims, ordered by total experiments.
+
+    Uses UBERON ontology-derived organ classifications from biosample_ontology.organ_slims.
+    Each organ system maps to multiple biosamples.
+
+    Returns:
+        List of (organ_name, total_experiment_count) tuples, ordered by experiment count.
+
+    Example:
+        >>> organs = get_organ_systems()
+        >>> organs[0]
+        ('bodily fluid', 6193)
+    """
+    data = _load_facets()
+    organ_data = data.get("organ_to_biosamples", {})
+    # Calculate total experiments per organ
+    organ_totals = []
+    for organ, biosamples in organ_data.items():
+        total = sum(item["count"] for item in biosamples)
+        organ_totals.append((organ, total))
+    return sorted(organ_totals, key=lambda x: -x[1])
+
+
+def get_organ_system_names() -> list[str]:
+    """Return organ system names ordered by popularity.
+
+    Returns:
+        List of organ names, most experiments first.
+    """
+    return [name for name, count in get_organ_systems()]
+
+
+@lru_cache(maxsize=64)
+def get_biosamples_for_organ(organ: str) -> list[tuple[str, int]]:
+    """Return biosamples for an organ system, ordered by experiment count.
+
+    Args:
+        organ: Organ system name (e.g., "brain", "heart", "liver").
+
+    Returns:
+        List of (biosample_name, experiment_count) tuples, ordered by count.
+        Empty list if organ not found.
+
+    Example:
+        >>> brain = get_biosamples_for_organ("brain")
+        >>> brain[0]
+        ('dorsolateral prefrontal cortex', 605)
+    """
+    data = _load_facets()
+    items = data.get("organ_to_biosamples", {}).get(organ, [])
+    return [(item["key"], item["count"]) for item in items]
+
+
+def get_biosample_names_for_organ(organ: str, limit: int | None = None) -> list[str]:
+    """Return biosample names for an organ system.
+
+    Args:
+        organ: Organ system name (e.g., "brain", "heart").
+        limit: Optional limit on number of biosamples to return.
+
+    Returns:
+        List of biosample names, most popular first. Empty list if organ not found.
+    """
+    biosamples = get_biosamples_for_organ(organ)
+    if limit:
+        biosamples = biosamples[:limit]
+    return [name for name, _ in biosamples]
+
+
+# Display name mappings for organ_slims (optional UI polish)
+ORGAN_DISPLAY_NAMES: dict[str, str] = {
+    "bodily fluid": "Blood / Bodily Fluid",
+    "musculature of body": "Muscle",
+    "large intestine": "Large Intestine",
+    "arterial blood vessel": "Arteries",
+    "connective tissue": "Connective Tissue",
+    "skin of body": "Skin",
+    "bone element": "Bone",
+    "bone marrow": "Bone Marrow",
+    "lymph node": "Lymph Nodes",
+    "urinary bladder": "Bladder",
+    "small intestine": "Small Intestine",
+    "exocrine gland": "Exocrine Glands",
+    "endocrine gland": "Endocrine Glands",
+}
+
+
+def get_organ_display_name(organ: str) -> str:
+    """Get UI-friendly display name for an organ system.
+
+    Args:
+        organ: Organ system name from organ_slims (e.g., "bodily fluid").
+
+    Returns:
+        Display name (e.g., "Blood / Bodily Fluid"), or title-cased original.
+    """
+    return ORGAN_DISPLAY_NAMES.get(organ, organ.replace("_", " ").title())
+
+
+# =============================================================================
 # CONVENIENCE FUNCTIONS FOR UI
 # =============================================================================
 

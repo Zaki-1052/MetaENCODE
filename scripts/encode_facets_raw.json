@@ -1,5 +1,5 @@
 {
-  "fetched_at": "2026-01-23T16:35:58.430340",
+  "fetched_at": "2026-01-23T19:37:58.761165",
   "total_experiments": 27398,
   "field_counts": {
     "assay_term_name": [
@@ -15706,6 +15706,5928 @@
       {
         "key": "dauer",
         "count": 4
+      }
+    ]
+  },
+  "organ_to_biosamples": {
+    "adipose tissue": [
+      {
+        "key": "omental fat pad",
+        "count": 39
+      },
+      {
+        "key": "subcutaneous abdominal adipose tissue",
+        "count": 39
+      },
+      {
+        "key": "subcutaneous adipose tissue",
+        "count": 31
+      },
+      {
+        "key": "adipose tissue",
+        "count": 11
+      },
+      {
+        "key": "mesenteric fat pad",
+        "count": 6
+      },
+      {
+        "key": "brown adipose tissue",
+        "count": 5
+      },
+      {
+        "key": "gonadal fat pad",
+        "count": 3
+      },
+      {
+        "key": "mesenchymal stem cell of adipose",
+        "count": 3
+      },
+      {
+        "key": "fat pad",
+        "count": 2
+      }
+    ],
+    "adrenal gland": [
+      {
+        "key": "adrenal gland",
+        "count": 320
+      }
+    ],
+    "arterial blood vessel": [
+      {
+        "key": "tibial artery",
+        "count": 39
+      },
+      {
+        "key": "aorta",
+        "count": 29
+      },
+      {
+        "key": "ascending aorta",
+        "count": 28
+      },
+      {
+        "key": "thoracic aorta",
+        "count": 25
+      },
+      {
+        "key": "coronary artery",
+        "count": 13
+      },
+      {
+        "key": "fibroblast of the aortic adventitia",
+        "count": 8
+      },
+      {
+        "key": "aortic smooth muscle cell",
+        "count": 8
+      },
+      {
+        "key": "pulmonary artery endothelial cell",
+        "count": 5
+      },
+      {
+        "key": "fibroblast of pulmonary artery",
+        "count": 5
+      },
+      {
+        "key": "thoracic aorta endothelial cell",
+        "count": 3
+      },
+      {
+        "key": "smooth muscle cell of the pulmonary artery",
+        "count": 1
+      },
+      {
+        "key": "endothelial cell of coronary artery",
+        "count": 1
+      },
+      {
+        "key": "epithelial cell of umbilical artery",
+        "count": 1
+      },
+      {
+        "key": "pulmonary artery",
+        "count": 1
+      },
+      {
+        "key": "right common carotid artery plus branches",
+        "count": 1
+      },
+      {
+        "key": "smooth muscle cell of the coronary artery",
+        "count": 1
+      },
+      {
+        "key": "smooth muscle cell of the umbilical artery",
+        "count": 1
+      },
+      {
+        "key": "left common carotid artery plus branches",
+        "count": 1
+      }
+    ],
+    "blood": [
+      {
+        "key": "K562",
+        "count": 2571
+      },
+      {
+        "key": "GM12878",
+        "count": 490
+      },
+      {
+        "key": "CD4-positive, alpha-beta T cell",
+        "count": 208
+      },
+      {
+        "key": "naive thymus-derived CD4-positive, alpha-beta T cell",
+        "count": 160
+      },
+      {
+        "key": "T-cell",
+        "count": 154
+      },
+      {
+        "key": "CD14-positive monocyte",
+        "count": 137
+      },
+      {
+        "key": "stimulated activated CD4-positive, alpha-beta T cell",
+        "count": 133
+      },
+      {
+        "key": "naive thymus-derived CD8-positive, alpha-beta T cell",
+        "count": 118
+      },
+      {
+        "key": "activated CD4-positive, alpha-beta T cell",
+        "count": 109
+      },
+      {
+        "key": "CD4-positive, alpha-beta memory T cell",
+        "count": 107
+      },
+      {
+        "key": "CD8-positive, alpha-beta T cell",
+        "count": 103
+      },
+      {
+        "key": "CD4-positive, CD25-positive, alpha-beta regulatory T cell",
+        "count": 96
+      },
+      {
+        "key": "activated CD8-positive, alpha-beta memory T cell",
+        "count": 89
+      },
+      {
+        "key": "activated T-cell",
+        "count": 89
+      },
+      {
+        "key": "B cell",
+        "count": 80
+      },
+      {
+        "key": "CD8-positive, alpha-beta memory T cell",
+        "count": 75
+      },
+      {
+        "key": "naive B cell",
+        "count": 73
+      },
+      {
+        "key": "CH12.LX",
+        "count": 66
+      },
+      {
+        "key": "activated naive CD4-positive, alpha-beta T cell",
+        "count": 65
+      },
+      {
+        "key": "natural killer cell",
+        "count": 63
+      },
+      {
+        "key": "peripheral blood mononuclear cell",
+        "count": 57
+      },
+      {
+        "key": "suppressor macrophage",
+        "count": 44
+      },
+      {
+        "key": "T-helper 17 cell",
+        "count": 42
+      },
+      {
+        "key": "activated naive CD8-positive, alpha-beta T cell",
+        "count": 41
+      },
+      {
+        "key": "inflammatory macrophage",
+        "count": 40
+      },
+      {
+        "key": "IgD-negative memory B cell",
+        "count": 38
+      },
+      {
+        "key": "OCI-LY7",
+        "count": 36
+      },
+      {
+        "key": "activated B cell",
+        "count": 35
+      },
+      {
+        "key": "T-helper 1 cell",
+        "count": 34
+      },
+      {
+        "key": "activated CD4-positive, CD25-positive, alpha-beta regulatory T cell",
+        "count": 34
+      },
+      {
+        "key": "T-helper 2 cell",
+        "count": 33
+      },
+      {
+        "key": "HL-60",
+        "count": 32
+      },
+      {
+        "key": "activated CD4-positive, alpha-beta memory T cell",
+        "count": 28
+      },
+      {
+        "key": "stimulated activated naive CD8-positive, alpha-beta T cell",
+        "count": 27
+      },
+      {
+        "key": "GM12891",
+        "count": 27
+      },
+      {
+        "key": "stimulated activated CD8-positive, alpha-beta memory T cell",
+        "count": 27
+      },
+      {
+        "key": "GM12892",
+        "count": 24
+      },
+      {
+        "key": "neutrophil",
+        "count": 23
+      },
+      {
+        "key": "effector memory CD8-positive, alpha-beta T cell",
+        "count": 21
+      },
+      {
+        "key": "Karpas-422",
+        "count": 20
+      },
+      {
+        "key": "DND-41",
+        "count": 19
+      },
+      {
+        "key": "MM.1S",
+        "count": 18
+      },
+      {
+        "key": "GM06990",
+        "count": 18
+      },
+      {
+        "key": "stimulated activated naive B cell",
+        "count": 17
+      },
+      {
+        "key": "hematopoietic multipotent progenitor cell",
+        "count": 17
+      },
+      {
+        "key": "activated T-helper 1 cell",
+        "count": 16
+      },
+      {
+        "key": "Loucy",
+        "count": 16
+      },
+      {
+        "key": "effector memory CD4-positive, alpha-beta T cell",
+        "count": 15
+      },
+      {
+        "key": "GM19239",
+        "count": 13
+      },
+      {
+        "key": "activated T-helper 2 cell",
+        "count": 11
+      },
+      {
+        "key": "activated T-helper 17 cell",
+        "count": 11
+      },
+      {
+        "key": "stimulated activated effector memory CD8-positive, alpha-beta T cell",
+        "count": 10
+      },
+      {
+        "key": "hematopoietic stem cell",
+        "count": 10
+      },
+      {
+        "key": "dendritic cell",
+        "count": 10
+      },
+      {
+        "key": "memory B cell",
+        "count": 10
+      },
+      {
+        "key": "Jurkat, Clone E6-1",
+        "count": 10
+      },
+      {
+        "key": "inflammation-experienced regulatory T-cells",
+        "count": 10
+      },
+      {
+        "key": "mononuclear cell",
+        "count": 9
+      },
+      {
+        "key": "GM19240",
+        "count": 9
+      },
+      {
+        "key": "mature B cell",
+        "count": 9
+      },
+      {
+        "key": "regulatory T cell",
+        "count": 9
+      },
+      {
+        "key": "monocyte",
+        "count": 8
+      },
+      {
+        "key": "GM18505",
+        "count": 8
+      },
+      {
+        "key": "GM12801",
+        "count": 8
+      },
+      {
+        "key": "stimulated activated memory B cell",
+        "count": 8
+      },
+      {
+        "key": "CMK",
+        "count": 8
+      },
+      {
+        "key": "Jurkat",
+        "count": 7
+      },
+      {
+        "key": "GM19238",
+        "count": 7
+      },
+      {
+        "key": "stimulated activated naive CD4-positive, alpha-beta T cell",
+        "count": 7
+      },
+      {
+        "key": "KOPT-K1",
+        "count": 7
+      },
+      {
+        "key": "activated effector memory CD4-positive, alpha-beta T cell",
+        "count": 7
+      },
+      {
+        "key": "HL-60/S4",
+        "count": 7
+      },
+      {
+        "key": "GM19099",
+        "count": 6
+      },
+      {
+        "key": "GM12813",
+        "count": 6
+      },
+      {
+        "key": "GM12812",
+        "count": 6
+      },
+      {
+        "key": "GM12864",
+        "count": 5
+      },
+      {
+        "key": "GM18951",
+        "count": 5
+      },
+      {
+        "key": "GM12865",
+        "count": 5
+      },
+      {
+        "key": "GM18526",
+        "count": 5
+      },
+      {
+        "key": "splenic B cell",
+        "count": 5
+      },
+      {
+        "key": "GM10248",
+        "count": 5
+      },
+      {
+        "key": "GM13977",
+        "count": 4
+      },
+      {
+        "key": "GM15510",
+        "count": 4
+      },
+      {
+        "key": "GM19193",
+        "count": 4
+      },
+      {
+        "key": "GM10847",
+        "count": 4
+      },
+      {
+        "key": "GM13976",
+        "count": 4
+      },
+      {
+        "key": "Kasumi-1",
+        "count": 4
+      },
+      {
+        "key": "THP-1",
+        "count": 3
+      },
+      {
+        "key": "activated gamma-delta T cell",
+        "count": 3
+      },
+      {
+        "key": "GM08714",
+        "count": 3
+      },
+      {
+        "key": "OCI-AML2",
+        "count": 3
+      },
+      {
+        "key": "GM10266",
+        "count": 3
+      },
+      {
+        "key": "GM12875",
+        "count": 3
+      },
+      {
+        "key": "GM20431",
+        "count": 3
+      },
+      {
+        "key": "GM20000",
+        "count": 3
+      },
+      {
+        "key": "CD8-positive naive resting alpha-beta T cell",
+        "count": 3
+      },
+      {
+        "key": "T-helper 9 cell",
+        "count": 3
+      },
+      {
+        "key": "GM12866",
+        "count": 2
+      },
+      {
+        "key": "GM12873",
+        "count": 2
+      },
+      {
+        "key": "GM12872",
+        "count": 2
+      },
+      {
+        "key": "activated T-helper 9 cell",
+        "count": 2
+      },
+      {
+        "key": "A20",
+        "count": 2
+      },
+      {
+        "key": "GM12874",
+        "count": 2
+      },
+      {
+        "key": "CD4-positive naive resting alpha-beta T cell",
+        "count": 2
+      },
+      {
+        "key": "SKM-1",
+        "count": 2
+      },
+      {
+        "key": "NAMALWA",
+        "count": 2
+      },
+      {
+        "key": "MSiPS",
+        "count": 1
+      },
+      {
+        "key": "MSLCL",
+        "count": 1
+      },
+      {
+        "key": "induced T-regulatory cell",
+        "count": 1
+      },
+      {
+        "key": "GM12870",
+        "count": 1
+      },
+      {
+        "key": "GM12871",
+        "count": 1
+      },
+      {
+        "key": "GM12868",
+        "count": 1
+      },
+      {
+        "key": "GM06999",
+        "count": 1
+      },
+      {
+        "key": "CD4-positive helper T cell",
+        "count": 1
+      },
+      {
+        "key": "GM12867",
+        "count": 1
+      },
+      {
+        "key": "L-1210 cell",
+        "count": 1
+      },
+      {
+        "key": "Pfeiffer",
+        "count": 1
+      },
+      {
+        "key": "OCI-M2",
+        "count": 1
+      },
+      {
+        "key": "GM12869",
+        "count": 1
+      },
+      {
+        "key": "OCI-M1",
+        "count": 1
+      },
+      {
+        "key": "C0202",
+        "count": 1
+      },
+      {
+        "key": "NC-NC",
+        "count": 1
+      },
+      {
+        "key": "GM21515",
+        "count": 1
+      },
+      {
+        "key": "HG02885",
+        "count": 1
+      },
+      {
+        "key": "HG02852",
+        "count": 1
+      },
+      {
+        "key": "HG02623",
+        "count": 1
+      },
+      {
+        "key": "HG03460",
+        "count": 1
+      },
+      {
+        "key": "HG03521",
+        "count": 1
+      },
+      {
+        "key": "HG03108",
+        "count": 1
+      },
+      {
+        "key": "HG03175",
+        "count": 1
+      },
+      {
+        "key": "HG03558",
+        "count": 1
+      },
+      {
+        "key": "HG02678",
+        "count": 1
+      },
+      {
+        "key": "HG03039",
+        "count": 1
+      },
+      {
+        "key": "HG03520",
+        "count": 1
+      },
+      {
+        "key": "HG02943",
+        "count": 1
+      },
+      {
+        "key": "GM21737",
+        "count": 1
+      },
+      {
+        "key": "HG03097",
+        "count": 1
+      },
+      {
+        "key": "HG02642",
+        "count": 1
+      },
+      {
+        "key": "HG03196",
+        "count": 1
+      },
+      {
+        "key": "HG03280",
+        "count": 1
+      },
+      {
+        "key": "HG03342",
+        "count": 1
+      },
+      {
+        "key": "HG02938",
+        "count": 1
+      },
+      {
+        "key": "HG03060",
+        "count": 1
+      },
+      {
+        "key": "HG03045",
+        "count": 1
+      },
+      {
+        "key": "HG02973",
+        "count": 1
+      },
+      {
+        "key": "HG03139",
+        "count": 1
+      },
+      {
+        "key": "HG03064",
+        "count": 1
+      },
+      {
+        "key": "HG03025",
+        "count": 1
+      },
+      {
+        "key": "T-helper 22 cell",
+        "count": 1
+      },
+      {
+        "key": "HG03575",
+        "count": 1
+      },
+      {
+        "key": "HG02610",
+        "count": 1
+      },
+      {
+        "key": "HG03432",
+        "count": 1
+      },
+      {
+        "key": "RPMI8226",
+        "count": 1
+      },
+      {
+        "key": "HG02588",
+        "count": 1
+      },
+      {
+        "key": "HG02759",
+        "count": 1
+      },
+      {
+        "key": "HG03565",
+        "count": 1
+      },
+      {
+        "key": "HG03439",
+        "count": 1
+      },
+      {
+        "key": "HG03571",
+        "count": 1
+      },
+      {
+        "key": "HG03103",
+        "count": 1
+      },
+      {
+        "key": "GM21786",
+        "count": 1
+      },
+      {
+        "key": "HG02840",
+        "count": 1
+      },
+      {
+        "key": "HG03159",
+        "count": 1
+      },
+      {
+        "key": "HG02763",
+        "count": 1
+      },
+      {
+        "key": "HG03095",
+        "count": 1
+      },
+      {
+        "key": "HG02884",
+        "count": 1
+      },
+      {
+        "key": "GM19043",
+        "count": 1
+      },
+      {
+        "key": "HG03457",
+        "count": 1
+      },
+      {
+        "key": "HG02870",
+        "count": 1
+      },
+      {
+        "key": "HG03135",
+        "count": 1
+      },
+      {
+        "key": "HG02970",
+        "count": 1
+      },
+      {
+        "key": "HG03442",
+        "count": 1
+      },
+      {
+        "key": "CD1c-positive myeloid dendritic cell",
+        "count": 1
+      },
+      {
+        "key": "HG02571",
+        "count": 1
+      },
+      {
+        "key": "HG03378",
+        "count": 1
+      },
+      {
+        "key": "GM19023",
+        "count": 1
+      },
+      {
+        "key": "GM19025",
+        "count": 1
+      },
+      {
+        "key": "HG02798",
+        "count": 1
+      },
+      {
+        "key": "HG03354",
+        "count": 1
+      },
+      {
+        "key": "HG03469",
+        "count": 1
+      },
+      {
+        "key": "HG02981",
+        "count": 1
+      },
+      {
+        "key": "HG03066",
+        "count": 1
+      }
+    ],
+    "blood vessel": [
+      {
+        "key": "endothelial cell of umbilical vein",
+        "count": 83
+      },
+      {
+        "key": "tibial artery",
+        "count": 39
+      },
+      {
+        "key": "aorta",
+        "count": 29
+      },
+      {
+        "key": "ascending aorta",
+        "count": 28
+      },
+      {
+        "key": "thoracic aorta",
+        "count": 25
+      },
+      {
+        "key": "posterior vena cava",
+        "count": 15
+      },
+      {
+        "key": "coronary artery",
+        "count": 13
+      },
+      {
+        "key": "brain microvascular endothelial cell",
+        "count": 11
+      },
+      {
+        "key": "dermis blood vessel endothelial cell",
+        "count": 9
+      },
+      {
+        "key": "fibroblast of the aortic adventitia",
+        "count": 8
+      },
+      {
+        "key": "aortic smooth muscle cell",
+        "count": 8
+      },
+      {
+        "key": "pulmonary artery endothelial cell",
+        "count": 5
+      },
+      {
+        "key": "lung microvascular endothelial cell",
+        "count": 5
+      },
+      {
+        "key": "fibroblast of pulmonary artery",
+        "count": 5
+      },
+      {
+        "key": "dermis microvascular lymphatic vessel endothelial cell",
+        "count": 5
+      },
+      {
+        "key": "thoracic aorta endothelial cell",
+        "count": 3
+      },
+      {
+        "key": "vein endothelial cell",
+        "count": 3
+      },
+      {
+        "key": "endometrial microvascular endothelial cells",
+        "count": 3
+      },
+      {
+        "key": "mammary microvascular endothelial cell",
+        "count": 2
+      },
+      {
+        "key": "GM11840",
+        "count": 2
+      },
+      {
+        "key": "smooth muscle cell of the pulmonary artery",
+        "count": 1
+      },
+      {
+        "key": "bladder microvascular endothelial cell",
+        "count": 1
+      },
+      {
+        "key": "endothelial cell of coronary artery",
+        "count": 1
+      },
+      {
+        "key": "epithelial cell of umbilical artery",
+        "count": 1
+      },
+      {
+        "key": "anterior vena cava",
+        "count": 1
+      },
+      {
+        "key": "pulmonary artery",
+        "count": 1
+      },
+      {
+        "key": "right common carotid artery plus branches",
+        "count": 1
+      },
+      {
+        "key": "smooth muscle cell of the coronary artery",
+        "count": 1
+      },
+      {
+        "key": "smooth muscle cell of the umbilical artery",
+        "count": 1
+      },
+      {
+        "key": "left common carotid artery plus branches",
+        "count": 1
+      },
+      {
+        "key": "endothelial cell of hepatic sinusoid",
+        "count": 1
+      },
+      {
+        "key": "kidney capillary endothelial cell",
+        "count": 1
+      }
+    ],
+    "bodily fluid": [
+      {
+        "key": "K562",
+        "count": 2571
+      },
+      {
+        "key": "GM12878",
+        "count": 490
+      },
+      {
+        "key": "CD4-positive, alpha-beta T cell",
+        "count": 208
+      },
+      {
+        "key": "naive thymus-derived CD4-positive, alpha-beta T cell",
+        "count": 160
+      },
+      {
+        "key": "T-cell",
+        "count": 154
+      },
+      {
+        "key": "CD14-positive monocyte",
+        "count": 137
+      },
+      {
+        "key": "stimulated activated CD4-positive, alpha-beta T cell",
+        "count": 133
+      },
+      {
+        "key": "naive thymus-derived CD8-positive, alpha-beta T cell",
+        "count": 118
+      },
+      {
+        "key": "activated CD4-positive, alpha-beta T cell",
+        "count": 109
+      },
+      {
+        "key": "CD4-positive, alpha-beta memory T cell",
+        "count": 107
+      },
+      {
+        "key": "CD8-positive, alpha-beta T cell",
+        "count": 103
+      },
+      {
+        "key": "CD4-positive, CD25-positive, alpha-beta regulatory T cell",
+        "count": 96
+      },
+      {
+        "key": "activated CD8-positive, alpha-beta memory T cell",
+        "count": 89
+      },
+      {
+        "key": "activated T-cell",
+        "count": 89
+      },
+      {
+        "key": "B cell",
+        "count": 80
+      },
+      {
+        "key": "CD8-positive, alpha-beta memory T cell",
+        "count": 75
+      },
+      {
+        "key": "naive B cell",
+        "count": 73
+      },
+      {
+        "key": "CH12.LX",
+        "count": 66
+      },
+      {
+        "key": "activated naive CD4-positive, alpha-beta T cell",
+        "count": 65
+      },
+      {
+        "key": "natural killer cell",
+        "count": 63
+      },
+      {
+        "key": "peripheral blood mononuclear cell",
+        "count": 57
+      },
+      {
+        "key": "suppressor macrophage",
+        "count": 44
+      },
+      {
+        "key": "T-helper 17 cell",
+        "count": 42
+      },
+      {
+        "key": "activated naive CD8-positive, alpha-beta T cell",
+        "count": 41
+      },
+      {
+        "key": "inflammatory macrophage",
+        "count": 40
+      },
+      {
+        "key": "IgD-negative memory B cell",
+        "count": 38
+      },
+      {
+        "key": "OCI-LY7",
+        "count": 36
+      },
+      {
+        "key": "activated B cell",
+        "count": 35
+      },
+      {
+        "key": "T-helper 1 cell",
+        "count": 34
+      },
+      {
+        "key": "activated CD4-positive, CD25-positive, alpha-beta regulatory T cell",
+        "count": 34
+      },
+      {
+        "key": "T-helper 2 cell",
+        "count": 33
+      },
+      {
+        "key": "HL-60",
+        "count": 32
+      },
+      {
+        "key": "activated CD4-positive, alpha-beta memory T cell",
+        "count": 28
+      },
+      {
+        "key": "stimulated activated naive CD8-positive, alpha-beta T cell",
+        "count": 27
+      },
+      {
+        "key": "GM12891",
+        "count": 27
+      },
+      {
+        "key": "stimulated activated CD8-positive, alpha-beta memory T cell",
+        "count": 27
+      },
+      {
+        "key": "GM12892",
+        "count": 24
+      },
+      {
+        "key": "neutrophil",
+        "count": 23
+      },
+      {
+        "key": "effector memory CD8-positive, alpha-beta T cell",
+        "count": 21
+      },
+      {
+        "key": "Karpas-422",
+        "count": 20
+      },
+      {
+        "key": "DND-41",
+        "count": 19
+      },
+      {
+        "key": "MM.1S",
+        "count": 18
+      },
+      {
+        "key": "GM06990",
+        "count": 18
+      },
+      {
+        "key": "stimulated activated naive B cell",
+        "count": 17
+      },
+      {
+        "key": "hematopoietic multipotent progenitor cell",
+        "count": 17
+      },
+      {
+        "key": "activated T-helper 1 cell",
+        "count": 16
+      },
+      {
+        "key": "Loucy",
+        "count": 16
+      },
+      {
+        "key": "effector memory CD4-positive, alpha-beta T cell",
+        "count": 15
+      },
+      {
+        "key": "GM19239",
+        "count": 13
+      },
+      {
+        "key": "activated T-helper 2 cell",
+        "count": 11
+      },
+      {
+        "key": "activated T-helper 17 cell",
+        "count": 11
+      },
+      {
+        "key": "stimulated activated effector memory CD8-positive, alpha-beta T cell",
+        "count": 10
+      },
+      {
+        "key": "hematopoietic stem cell",
+        "count": 10
+      },
+      {
+        "key": "dendritic cell",
+        "count": 10
+      },
+      {
+        "key": "memory B cell",
+        "count": 10
+      },
+      {
+        "key": "Jurkat, Clone E6-1",
+        "count": 10
+      },
+      {
+        "key": "inflammation-experienced regulatory T-cells",
+        "count": 10
+      },
+      {
+        "key": "mononuclear cell",
+        "count": 9
+      },
+      {
+        "key": "GM19240",
+        "count": 9
+      },
+      {
+        "key": "mature B cell",
+        "count": 9
+      },
+      {
+        "key": "regulatory T cell",
+        "count": 9
+      },
+      {
+        "key": "monocyte",
+        "count": 8
+      },
+      {
+        "key": "GM18505",
+        "count": 8
+      },
+      {
+        "key": "GM12801",
+        "count": 8
+      },
+      {
+        "key": "stimulated activated memory B cell",
+        "count": 8
+      },
+      {
+        "key": "CMK",
+        "count": 8
+      },
+      {
+        "key": "Jurkat",
+        "count": 7
+      },
+      {
+        "key": "GM19238",
+        "count": 7
+      },
+      {
+        "key": "stimulated activated naive CD4-positive, alpha-beta T cell",
+        "count": 7
+      },
+      {
+        "key": "KOPT-K1",
+        "count": 7
+      },
+      {
+        "key": "activated effector memory CD4-positive, alpha-beta T cell",
+        "count": 7
+      },
+      {
+        "key": "HL-60/S4",
+        "count": 7
+      },
+      {
+        "key": "GM19099",
+        "count": 6
+      },
+      {
+        "key": "GM12813",
+        "count": 6
+      },
+      {
+        "key": "GM12812",
+        "count": 6
+      },
+      {
+        "key": "GM12864",
+        "count": 5
+      },
+      {
+        "key": "GM18951",
+        "count": 5
+      },
+      {
+        "key": "GM12865",
+        "count": 5
+      },
+      {
+        "key": "GM18526",
+        "count": 5
+      },
+      {
+        "key": "splenic B cell",
+        "count": 5
+      },
+      {
+        "key": "GM10248",
+        "count": 5
+      },
+      {
+        "key": "GM13977",
+        "count": 4
+      },
+      {
+        "key": "GM15510",
+        "count": 4
+      },
+      {
+        "key": "GM19193",
+        "count": 4
+      },
+      {
+        "key": "GM10847",
+        "count": 4
+      },
+      {
+        "key": "GM13976",
+        "count": 4
+      },
+      {
+        "key": "Kasumi-1",
+        "count": 4
+      },
+      {
+        "key": "THP-1",
+        "count": 3
+      },
+      {
+        "key": "activated gamma-delta T cell",
+        "count": 3
+      },
+      {
+        "key": "GM08714",
+        "count": 3
+      },
+      {
+        "key": "OCI-AML2",
+        "count": 3
+      },
+      {
+        "key": "GM10266",
+        "count": 3
+      },
+      {
+        "key": "GM12875",
+        "count": 3
+      },
+      {
+        "key": "GM20431",
+        "count": 3
+      },
+      {
+        "key": "GM20000",
+        "count": 3
+      },
+      {
+        "key": "CD8-positive naive resting alpha-beta T cell",
+        "count": 3
+      },
+      {
+        "key": "T-helper 9 cell",
+        "count": 3
+      },
+      {
+        "key": "GM12866",
+        "count": 2
+      },
+      {
+        "key": "GM12873",
+        "count": 2
+      },
+      {
+        "key": "GM12872",
+        "count": 2
+      },
+      {
+        "key": "activated T-helper 9 cell",
+        "count": 2
+      },
+      {
+        "key": "A20",
+        "count": 2
+      },
+      {
+        "key": "GM12874",
+        "count": 2
+      },
+      {
+        "key": "CD4-positive naive resting alpha-beta T cell",
+        "count": 2
+      },
+      {
+        "key": "SKM-1",
+        "count": 2
+      },
+      {
+        "key": "NAMALWA",
+        "count": 2
+      },
+      {
+        "key": "MSiPS",
+        "count": 1
+      },
+      {
+        "key": "MSLCL",
+        "count": 1
+      },
+      {
+        "key": "induced T-regulatory cell",
+        "count": 1
+      },
+      {
+        "key": "GM12870",
+        "count": 1
+      },
+      {
+        "key": "GM12871",
+        "count": 1
+      },
+      {
+        "key": "GM12868",
+        "count": 1
+      },
+      {
+        "key": "GM06999",
+        "count": 1
+      },
+      {
+        "key": "CD4-positive helper T cell",
+        "count": 1
+      },
+      {
+        "key": "GM12867",
+        "count": 1
+      },
+      {
+        "key": "L-1210 cell",
+        "count": 1
+      },
+      {
+        "key": "Pfeiffer",
+        "count": 1
+      },
+      {
+        "key": "OCI-M2",
+        "count": 1
+      },
+      {
+        "key": "GM12869",
+        "count": 1
+      },
+      {
+        "key": "OCI-M1",
+        "count": 1
+      },
+      {
+        "key": "C0202",
+        "count": 1
+      },
+      {
+        "key": "NC-NC",
+        "count": 1
+      },
+      {
+        "key": "GM21515",
+        "count": 1
+      },
+      {
+        "key": "HG02885",
+        "count": 1
+      },
+      {
+        "key": "HG02852",
+        "count": 1
+      },
+      {
+        "key": "HG02623",
+        "count": 1
+      },
+      {
+        "key": "HG03460",
+        "count": 1
+      },
+      {
+        "key": "HG03521",
+        "count": 1
+      },
+      {
+        "key": "HG03108",
+        "count": 1
+      },
+      {
+        "key": "HG03175",
+        "count": 1
+      },
+      {
+        "key": "HG03558",
+        "count": 1
+      },
+      {
+        "key": "HG02678",
+        "count": 1
+      },
+      {
+        "key": "HG03039",
+        "count": 1
+      },
+      {
+        "key": "HG03520",
+        "count": 1
+      },
+      {
+        "key": "HG02943",
+        "count": 1
+      },
+      {
+        "key": "GM21737",
+        "count": 1
+      },
+      {
+        "key": "HG03097",
+        "count": 1
+      },
+      {
+        "key": "HG02642",
+        "count": 1
+      },
+      {
+        "key": "HG03196",
+        "count": 1
+      },
+      {
+        "key": "HG03280",
+        "count": 1
+      },
+      {
+        "key": "HG03342",
+        "count": 1
+      },
+      {
+        "key": "HG02938",
+        "count": 1
+      },
+      {
+        "key": "HG03060",
+        "count": 1
+      },
+      {
+        "key": "HG03045",
+        "count": 1
+      },
+      {
+        "key": "HG02973",
+        "count": 1
+      },
+      {
+        "key": "HG03139",
+        "count": 1
+      },
+      {
+        "key": "HG03064",
+        "count": 1
+      },
+      {
+        "key": "HG03025",
+        "count": 1
+      },
+      {
+        "key": "T-helper 22 cell",
+        "count": 1
+      },
+      {
+        "key": "HG03575",
+        "count": 1
+      },
+      {
+        "key": "HG02610",
+        "count": 1
+      },
+      {
+        "key": "HG03432",
+        "count": 1
+      },
+      {
+        "key": "RPMI8226",
+        "count": 1
+      },
+      {
+        "key": "HG02588",
+        "count": 1
+      },
+      {
+        "key": "HG02759",
+        "count": 1
+      },
+      {
+        "key": "HG03565",
+        "count": 1
+      },
+      {
+        "key": "HG03439",
+        "count": 1
+      },
+      {
+        "key": "HG03571",
+        "count": 1
+      },
+      {
+        "key": "HG03103",
+        "count": 1
+      },
+      {
+        "key": "GM21786",
+        "count": 1
+      },
+      {
+        "key": "HG02840",
+        "count": 1
+      },
+      {
+        "key": "HG03159",
+        "count": 1
+      },
+      {
+        "key": "HG02763",
+        "count": 1
+      },
+      {
+        "key": "HG03095",
+        "count": 1
+      },
+      {
+        "key": "HG02884",
+        "count": 1
+      },
+      {
+        "key": "GM19043",
+        "count": 1
+      },
+      {
+        "key": "HG03457",
+        "count": 1
+      },
+      {
+        "key": "HG02870",
+        "count": 1
+      },
+      {
+        "key": "HG03135",
+        "count": 1
+      },
+      {
+        "key": "HG02970",
+        "count": 1
+      },
+      {
+        "key": "HG03442",
+        "count": 1
+      },
+      {
+        "key": "CD1c-positive myeloid dendritic cell",
+        "count": 1
+      },
+      {
+        "key": "HG02571",
+        "count": 1
+      },
+      {
+        "key": "HG03378",
+        "count": 1
+      },
+      {
+        "key": "GM19023",
+        "count": 1
+      },
+      {
+        "key": "GM19025",
+        "count": 1
+      },
+      {
+        "key": "HG02798",
+        "count": 1
+      },
+      {
+        "key": "HG03354",
+        "count": 1
+      },
+      {
+        "key": "HG03469",
+        "count": 1
+      },
+      {
+        "key": "HG02981",
+        "count": 1
+      },
+      {
+        "key": "HG03066",
+        "count": 1
+      }
+    ],
+    "bone element": [
+      {
+        "key": "BLaER1",
+        "count": 144
+      },
+      {
+        "key": "macrophage",
+        "count": 98
+      },
+      {
+        "key": "immature natural killer cell",
+        "count": 89
+      },
+      {
+        "key": "common myeloid progenitor, CD34-positive",
+        "count": 83
+      },
+      {
+        "key": "erythroblast",
+        "count": 21
+      },
+      {
+        "key": "NCI-H929",
+        "count": 16
+      },
+      {
+        "key": "OCI-LY1",
+        "count": 16
+      },
+      {
+        "key": "osteocyte",
+        "count": 15
+      },
+      {
+        "key": "OCI-LY3",
+        "count": 15
+      },
+      {
+        "key": "NB4",
+        "count": 14
+      },
+      {
+        "key": "KMS-11",
+        "count": 14
+      },
+      {
+        "key": "SJSA1",
+        "count": 13
+      },
+      {
+        "key": "megakaryocyte",
+        "count": 13
+      },
+      {
+        "key": "HAP-1",
+        "count": 10
+      },
+      {
+        "key": "bone marrow",
+        "count": 10
+      },
+      {
+        "key": "MG63",
+        "count": 9
+      },
+      {
+        "key": "U2OS",
+        "count": 8
+      },
+      {
+        "key": "CMK",
+        "count": 8
+      },
+      {
+        "key": "bone marrow macrophage",
+        "count": 7
+      },
+      {
+        "key": "erythroid progenitor cell",
+        "count": 5
+      },
+      {
+        "key": "megakaryocyte-erythroid progenitor cell",
+        "count": 4
+      },
+      {
+        "key": "common myeloid progenitor",
+        "count": 3
+      },
+      {
+        "key": "mesenchymal stem cell of the bone marrow",
+        "count": 3
+      },
+      {
+        "key": "megakaryocyte progenitor cell",
+        "count": 3
+      },
+      {
+        "key": "SH-SY5Y",
+        "count": 3
+      },
+      {
+        "key": "granulocyte monocyte progenitor cell",
+        "count": 3
+      },
+      {
+        "key": "416B",
+        "count": 2
+      },
+      {
+        "key": "UCH-1",
+        "count": 2
+      },
+      {
+        "key": "KBM-7",
+        "count": 2
+      },
+      {
+        "key": "COR-L47",
+        "count": 2
+      },
+      {
+        "key": "myeloid cell",
+        "count": 2
+      },
+      {
+        "key": "L1-S8",
+        "count": 1
+      },
+      {
+        "key": "left hindlimb",
+        "count": 1
+      },
+      {
+        "key": "stromal cell of bone marrow",
+        "count": 1
+      },
+      {
+        "key": "L1-S8R",
+        "count": 1
+      },
+      {
+        "key": "right hindlimb",
+        "count": 1
+      },
+      {
+        "key": "HS-27A",
+        "count": 1
+      },
+      {
+        "key": "femur",
+        "count": 1
+      },
+      {
+        "key": "right forelimb",
+        "count": 1
+      },
+      {
+        "key": "left forelimb",
+        "count": 1
+      },
+      {
+        "key": "HS-5",
+        "count": 1
+      }
+    ],
+    "bone marrow": [
+      {
+        "key": "BLaER1",
+        "count": 144
+      },
+      {
+        "key": "macrophage",
+        "count": 98
+      },
+      {
+        "key": "immature natural killer cell",
+        "count": 89
+      },
+      {
+        "key": "common myeloid progenitor, CD34-positive",
+        "count": 83
+      },
+      {
+        "key": "erythroblast",
+        "count": 21
+      },
+      {
+        "key": "NCI-H929",
+        "count": 16
+      },
+      {
+        "key": "OCI-LY1",
+        "count": 16
+      },
+      {
+        "key": "OCI-LY3",
+        "count": 15
+      },
+      {
+        "key": "NB4",
+        "count": 14
+      },
+      {
+        "key": "megakaryocyte",
+        "count": 13
+      },
+      {
+        "key": "HAP-1",
+        "count": 10
+      },
+      {
+        "key": "bone marrow",
+        "count": 10
+      },
+      {
+        "key": "CMK",
+        "count": 8
+      },
+      {
+        "key": "bone marrow macrophage",
+        "count": 7
+      },
+      {
+        "key": "erythroid progenitor cell",
+        "count": 5
+      },
+      {
+        "key": "megakaryocyte-erythroid progenitor cell",
+        "count": 4
+      },
+      {
+        "key": "common myeloid progenitor",
+        "count": 3
+      },
+      {
+        "key": "mesenchymal stem cell of the bone marrow",
+        "count": 3
+      },
+      {
+        "key": "megakaryocyte progenitor cell",
+        "count": 3
+      },
+      {
+        "key": "SH-SY5Y",
+        "count": 3
+      },
+      {
+        "key": "granulocyte monocyte progenitor cell",
+        "count": 3
+      },
+      {
+        "key": "416B",
+        "count": 2
+      },
+      {
+        "key": "KBM-7",
+        "count": 2
+      },
+      {
+        "key": "COR-L47",
+        "count": 2
+      },
+      {
+        "key": "myeloid cell",
+        "count": 2
+      },
+      {
+        "key": "L1-S8",
+        "count": 1
+      },
+      {
+        "key": "stromal cell of bone marrow",
+        "count": 1
+      },
+      {
+        "key": "L1-S8R",
+        "count": 1
+      },
+      {
+        "key": "HS-27A",
+        "count": 1
+      },
+      {
+        "key": "HS-5",
+        "count": 1
+      }
+    ],
+    "brain": [
+      {
+        "key": "dorsolateral prefrontal cortex",
+        "count": 605
+      },
+      {
+        "key": "SK-N-SH",
+        "count": 196
+      },
+      {
+        "key": "layer of hippocampus",
+        "count": 193
+      },
+      {
+        "key": "left cerebral cortex",
+        "count": 133
+      },
+      {
+        "key": "forebrain",
+        "count": 127
+      },
+      {
+        "key": "brain",
+        "count": 127
+      },
+      {
+        "key": "midbrain",
+        "count": 119
+      },
+      {
+        "key": "hindbrain",
+        "count": 116
+      },
+      {
+        "key": "cerebellum",
+        "count": 111
+      },
+      {
+        "key": "head of caudate nucleus",
+        "count": 87
+      },
+      {
+        "key": "caudate nucleus",
+        "count": 79
+      },
+      {
+        "key": "substantia nigra",
+        "count": 66
+      },
+      {
+        "key": "motor neuron",
+        "count": 62
+      },
+      {
+        "key": "putamen",
+        "count": 60
+      },
+      {
+        "key": "anterior cingulate cortex",
+        "count": 58
+      },
+      {
+        "key": "amygdala",
+        "count": 56
+      },
+      {
+        "key": "nucleus accumbens",
+        "count": 56
+      },
+      {
+        "key": "Ammon's horn",
+        "count": 54
+      },
+      {
+        "key": "posterior cingulate gyrus",
+        "count": 51
+      },
+      {
+        "key": "hypothalamus",
+        "count": 51
+      },
+      {
+        "key": "astrocyte",
+        "count": 45
+      },
+      {
+        "key": "ML-DmBG3-c2",
+        "count": 35
+      },
+      {
+        "key": "bipolar neuron",
+        "count": 31
+      },
+      {
+        "key": "SK-N-MC",
+        "count": 26
+      },
+      {
+        "key": "pyramidal neuron",
+        "count": 22
+      },
+      {
+        "key": "temporal lobe",
+        "count": 20
+      },
+      {
+        "key": "germinal matrix",
+        "count": 20
+      },
+      {
+        "key": "frontal cortex",
+        "count": 18
+      },
+      {
+        "key": "BE2C",
+        "count": 16
+      },
+      {
+        "key": "cingulate gyrus",
+        "count": 16
+      },
+      {
+        "key": "angular gyrus",
+        "count": 15
+      },
+      {
+        "key": "right cerebral cortex",
+        "count": 14
+      },
+      {
+        "key": "SK-N-DZ",
+        "count": 14
+      },
+      {
+        "key": "PFSK-1",
+        "count": 14
+      },
+      {
+        "key": "U-87 MG",
+        "count": 11
+      },
+      {
+        "key": "brain microvascular endothelial cell",
+        "count": 11
+      },
+      {
+        "key": "choroid plexus epithelial cell",
+        "count": 10
+      },
+      {
+        "key": "olfactory bulb",
+        "count": 8
+      },
+      {
+        "key": "cortical plate",
+        "count": 8
+      },
+      {
+        "key": "astrocyte of the cerebellum",
+        "count": 6
+      },
+      {
+        "key": "H54",
+        "count": 6
+      },
+      {
+        "key": "H4",
+        "count": 5
+      },
+      {
+        "key": "A172",
+        "count": 5
+      },
+      {
+        "key": "D721Med",
+        "count": 5
+      },
+      {
+        "key": "M059J",
+        "count": 5
+      },
+      {
+        "key": "Daoy",
+        "count": 5
+      },
+      {
+        "key": "occipital lobe",
+        "count": 5
+      },
+      {
+        "key": "globus pallidus",
+        "count": 5
+      },
+      {
+        "key": "parietal lobe",
+        "count": 3
+      },
+      {
+        "key": "cerebral cortex",
+        "count": 3
+      },
+      {
+        "key": "brain pericyte",
+        "count": 3
+      },
+      {
+        "key": "diencephalon",
+        "count": 3
+      },
+      {
+        "key": "area 11 of Brodmann",
+        "count": 3
+      },
+      {
+        "key": "insula",
+        "count": 2
+      },
+      {
+        "key": "smooth muscle cell of the brain vasculature",
+        "count": 2
+      },
+      {
+        "key": "telencephalon",
+        "count": 2
+      },
+      {
+        "key": "astrocyte of the hippocampus",
+        "count": 2
+      },
+      {
+        "key": "cerebellar nuclear complex",
+        "count": 2
+      },
+      {
+        "key": "hippocampal formation",
+        "count": 2
+      },
+      {
+        "key": "cerebellar granule layer",
+        "count": 2
+      },
+      {
+        "key": "cerebellar cortex",
+        "count": 2
+      },
+      {
+        "key": "cerebral cortex, layer 5",
+        "count": 1
+      },
+      {
+        "key": "D341Med",
+        "count": 1
+      },
+      {
+        "key": "pons",
+        "count": 1
+      },
+      {
+        "key": "superior temporal gyrus",
+        "count": 1
+      },
+      {
+        "key": "middle frontal gyrus",
+        "count": 1
+      },
+      {
+        "key": "medulla oblongata",
+        "count": 1
+      },
+      {
+        "key": "inferior parietal cortex",
+        "count": 1
+      },
+      {
+        "key": "posterior cingulate cortex",
+        "count": 1
+      }
+    ],
+    "breast": [
+      {
+        "key": "breast epithelium",
+        "count": 61
+      },
+      {
+        "key": "fibroblast of breast",
+        "count": 19
+      },
+      {
+        "key": "breast",
+        "count": 5
+      },
+      {
+        "key": "mammary microvascular endothelial cell",
+        "count": 2
+      },
+      {
+        "key": "3134",
+        "count": 1
+      }
+    ],
+    "bronchus": [
+      {
+        "key": "bronchial epithelial cell",
+        "count": 17
+      },
+      {
+        "key": "bronchus fibroblast of lung",
+        "count": 2
+      },
+      {
+        "key": "bronchial smooth muscle cell",
+        "count": 1
+      },
+      {
+        "key": "bronchial lymph node",
+        "count": 1
+      },
+      {
+        "key": "bronchus",
+        "count": 1
+      }
+    ],
+    "colon": [
+      {
+        "key": "HCT116",
+        "count": 442
+      },
+      {
+        "key": "transverse colon",
+        "count": 114
+      },
+      {
+        "key": "sigmoid colon",
+        "count": 112
+      },
+      {
+        "key": "Caco-2",
+        "count": 44
+      },
+      {
+        "key": "colonic mucosa",
+        "count": 41
+      },
+      {
+        "key": "mucosa of descending colon",
+        "count": 29
+      },
+      {
+        "key": "left colon",
+        "count": 18
+      },
+      {
+        "key": "muscle layer of colon",
+        "count": 15
+      },
+      {
+        "key": "colon",
+        "count": 5
+      },
+      {
+        "key": "HT-29",
+        "count": 4
+      },
+      {
+        "key": "SW480",
+        "count": 1
+      },
+      {
+        "key": "DLD1",
+        "count": 1
+      },
+      {
+        "key": "RKO",
+        "count": 1
+      },
+      {
+        "key": "HCEC 1CT",
+        "count": 1
+      },
+      {
+        "key": "LoVo",
+        "count": 1
+      }
+    ],
+    "connective tissue": [
+      {
+        "key": "WTC11",
+        "count": 152
+      },
+      {
+        "key": "IMR-90",
+        "count": 114
+      },
+      {
+        "key": "mesenchymal stem cell",
+        "count": 78
+      },
+      {
+        "key": "foreskin fibroblast",
+        "count": 50
+      },
+      {
+        "key": "chondrocyte",
+        "count": 49
+      },
+      {
+        "key": "omental fat pad",
+        "count": 39
+      },
+      {
+        "key": "subcutaneous abdominal adipose tissue",
+        "count": 39
+      },
+      {
+        "key": "subcutaneous adipose tissue",
+        "count": 31
+      },
+      {
+        "key": "GM23248",
+        "count": 30
+      },
+      {
+        "key": "fibroblast of lung",
+        "count": 30
+      },
+      {
+        "key": "BJ",
+        "count": 23
+      },
+      {
+        "key": "AG04450",
+        "count": 20
+      },
+      {
+        "key": "osteoblast",
+        "count": 19
+      },
+      {
+        "key": "fibroblast of dermis",
+        "count": 19
+      },
+      {
+        "key": "HFFc6",
+        "count": 19
+      },
+      {
+        "key": "osteocyte",
+        "count": 15
+      },
+      {
+        "key": "SJCRH30",
+        "count": 15
+      },
+      {
+        "key": "PFSK-1",
+        "count": 14
+      },
+      {
+        "key": "cardiac fibroblast",
+        "count": 13
+      },
+      {
+        "key": "HT1080",
+        "count": 12
+      },
+      {
+        "key": "AG09319",
+        "count": 12
+      },
+      {
+        "key": "adipocyte",
+        "count": 11
+      },
+      {
+        "key": "Patski",
+        "count": 11
+      },
+      {
+        "key": "adipose tissue",
+        "count": 11
+      },
+      {
+        "key": "AG04449",
+        "count": 11
+      },
+      {
+        "key": "AG10803",
+        "count": 9
+      },
+      {
+        "key": "AG09309",
+        "count": 9
+      },
+      {
+        "key": "WI38",
+        "count": 9
+      },
+      {
+        "key": "embryonic fibroblast",
+        "count": 8
+      },
+      {
+        "key": "fibroblast of villous mesenchyme",
+        "count": 8
+      },
+      {
+        "key": "fibroblast of the aortic adventitia",
+        "count": 8
+      },
+      {
+        "key": "HGPS cell",
+        "count": 7
+      },
+      {
+        "key": "fibroblast",
+        "count": 7
+      },
+      {
+        "key": "mesenteric fat pad",
+        "count": 6
+      },
+      {
+        "key": "HFF-Myc",
+        "count": 5
+      },
+      {
+        "key": "fibroblast of pulmonary artery",
+        "count": 5
+      },
+      {
+        "key": "fibroblast of mammary gland",
+        "count": 5
+      },
+      {
+        "key": "brown adipose tissue",
+        "count": 5
+      },
+      {
+        "key": "AG08470",
+        "count": 5
+      },
+      {
+        "key": "fibroblast of skin of abdomen",
+        "count": 4
+      },
+      {
+        "key": "fibroblast of skin of scalp",
+        "count": 4
+      },
+      {
+        "key": "subcutaneous preadipocyte",
+        "count": 3
+      },
+      {
+        "key": "mesenchymal stem cell of Wharton's jelly",
+        "count": 3
+      },
+      {
+        "key": "mesenchymal stem cell of the bone marrow",
+        "count": 3
+      },
+      {
+        "key": "GM03348",
+        "count": 3
+      },
+      {
+        "key": "gonadal fat pad",
+        "count": 3
+      },
+      {
+        "key": "placental pericyte",
+        "count": 3
+      },
+      {
+        "key": "hair follicle dermal papilla cell",
+        "count": 3
+      },
+      {
+        "key": "brain pericyte",
+        "count": 3
+      },
+      {
+        "key": "articular chondrocyte of knee joint",
+        "count": 3
+      },
+      {
+        "key": "mesenchymal stem cell of adipose",
+        "count": 3
+      },
+      {
+        "key": "fibroblast of skin of back",
+        "count": 3
+      },
+      {
+        "key": "hepatic stellate cell",
+        "count": 2
+      },
+      {
+        "key": "C3H10T1/2",
+        "count": 2
+      },
+      {
+        "key": "fat pad",
+        "count": 2
+      },
+      {
+        "key": "CWRU1",
+        "count": 2
+      },
+      {
+        "key": "COLO829",
+        "count": 2
+      },
+      {
+        "key": "AG20443",
+        "count": 2
+      },
+      {
+        "key": "fibroblast of peridontal ligament",
+        "count": 2
+      },
+      {
+        "key": "AG08396",
+        "count": 2
+      },
+      {
+        "key": "NIH3T3",
+        "count": 2
+      },
+      {
+        "key": "AG08395",
+        "count": 2
+      },
+      {
+        "key": "fibroblast of the conjunctiva",
+        "count": 2
+      },
+      {
+        "key": "amniotic stem cell",
+        "count": 2
+      },
+      {
+        "key": "cardiac atrium fibroblast",
+        "count": 2
+      },
+      {
+        "key": "pericardium fibroblast",
+        "count": 2
+      },
+      {
+        "key": "fibroblast of gingiva",
+        "count": 2
+      },
+      {
+        "key": "mesangial cell",
+        "count": 2
+      },
+      {
+        "key": "bronchus fibroblast of lung",
+        "count": 2
+      },
+      {
+        "key": "cardiac ventricle fibroblast",
+        "count": 2
+      },
+      {
+        "key": "fibroblast of upper back skin",
+        "count": 2
+      },
+      {
+        "key": "skin fibroblast",
+        "count": 1
+      },
+      {
+        "key": "3T3-L1",
+        "count": 1
+      },
+      {
+        "key": "EL",
+        "count": 1
+      },
+      {
+        "key": "GM04504",
+        "count": 1
+      },
+      {
+        "key": "stromal cell of bone marrow",
+        "count": 1
+      },
+      {
+        "key": "dedifferentiated amniotic fluid mesenchymal stem cell",
+        "count": 1
+      },
+      {
+        "key": "GM04503",
+        "count": 1
+      },
+      {
+        "key": "EH",
+        "count": 1
+      },
+      {
+        "key": "HS-5",
+        "count": 1
+      },
+      {
+        "key": "ELR",
+        "count": 1
+      }
+    ],
+    "ear": [
+      {
+        "key": "bipolar neuron",
+        "count": 31
+      }
+    ],
+    "embryo": [
+      {
+        "key": "H1",
+        "count": 234
+      },
+      {
+        "key": "S2",
+        "count": 86
+      },
+      {
+        "key": "embryonic facial prominence",
+        "count": 86
+      },
+      {
+        "key": "H9",
+        "count": 85
+      },
+      {
+        "key": "neural tube",
+        "count": 75
+      },
+      {
+        "key": "endodermal cell",
+        "count": 60
+      },
+      {
+        "key": "neuronal stem cell",
+        "count": 48
+      },
+      {
+        "key": "trophoblast cell",
+        "count": 46
+      },
+      {
+        "key": "Kc167",
+        "count": 45
+      },
+      {
+        "key": "S2R+",
+        "count": 41
+      },
+      {
+        "key": "chorionic villus",
+        "count": 38
+      },
+      {
+        "key": "G1E-ER4",
+        "count": 34
+      },
+      {
+        "key": "mesendoderm",
+        "count": 34
+      },
+      {
+        "key": "trophoblast",
+        "count": 24
+      },
+      {
+        "key": "H7",
+        "count": 23
+      },
+      {
+        "key": "ES-E14",
+        "count": 20
+      },
+      {
+        "key": "mesodermal cell",
+        "count": 18
+      },
+      {
+        "key": "neural crest cell",
+        "count": 17
+      },
+      {
+        "key": "G1E",
+        "count": 17
+      },
+      {
+        "key": "ectodermal cell",
+        "count": 15
+      },
+      {
+        "key": "HUES64",
+        "count": 15
+      },
+      {
+        "key": "ES-Bruce4",
+        "count": 12
+      },
+      {
+        "key": "ML-DmD17-c3",
+        "count": 12
+      },
+      {
+        "key": "UCSF-4",
+        "count": 11
+      },
+      {
+        "key": "F121-9",
+        "count": 10
+      },
+      {
+        "key": "HUES6",
+        "count": 10
+      },
+      {
+        "key": "HUES48",
+        "count": 10
+      },
+      {
+        "key": "E14TG2a.4",
+        "count": 9
+      },
+      {
+        "key": "ES-I3",
+        "count": 9
+      },
+      {
+        "key": "embryonic stem cell",
+        "count": 8
+      },
+      {
+        "key": "BG02",
+        "count": 8
+      },
+      {
+        "key": "embryonic fibroblast",
+        "count": 8
+      },
+      {
+        "key": "radial glial cell",
+        "count": 7
+      },
+      {
+        "key": "neuroepithelial stem cell",
+        "count": 7
+      },
+      {
+        "key": "embryo",
+        "count": 6
+      },
+      {
+        "key": "embryoid body cell",
+        "count": 6
+      },
+      {
+        "key": "HTR-8/SVneo",
+        "count": 5
+      },
+      {
+        "key": "ZHBTc4",
+        "count": 4
+      },
+      {
+        "key": "splanchnic mesodermal cell",
+        "count": 3
+      },
+      {
+        "key": "Sg4",
+        "count": 2
+      },
+      {
+        "key": "GM2",
+        "count": 2
+      },
+      {
+        "key": "WW6",
+        "count": 2
+      },
+      {
+        "key": "C3H10T1/2",
+        "count": 2
+      },
+      {
+        "key": "1182-4H",
+        "count": 2
+      },
+      {
+        "key": "CME-W2",
+        "count": 2
+      },
+      {
+        "key": "NIH3T3",
+        "count": 2
+      },
+      {
+        "key": "mbn2",
+        "count": 2
+      },
+      {
+        "key": "epiblast cell",
+        "count": 2
+      },
+      {
+        "key": "R1",
+        "count": 2
+      },
+      {
+        "key": "S1",
+        "count": 2
+      },
+      {
+        "key": "S3",
+        "count": 2
+      },
+      {
+        "key": "mouse embryonic stem cell",
+        "count": 2
+      },
+      {
+        "key": "BG01",
+        "count": 1
+      },
+      {
+        "key": "TT2",
+        "count": 1
+      },
+      {
+        "key": "CyT49",
+        "count": 1
+      },
+      {
+        "key": "neurectodermal cell",
+        "count": 1
+      },
+      {
+        "key": "mesoderm",
+        "count": 1
+      },
+      {
+        "key": "hindlimb bud",
+        "count": 1
+      },
+      {
+        "key": "HUES1",
+        "count": 1
+      },
+      {
+        "key": "ES-D3",
+        "count": 1
+      },
+      {
+        "key": "46C",
+        "count": 1
+      },
+      {
+        "key": "J185a",
+        "count": 1
+      },
+      {
+        "key": "forelimb bud",
+        "count": 1
+      },
+      {
+        "key": "definitive endodermal cell",
+        "count": 1
+      },
+      {
+        "key": "primitive gut cell",
+        "count": 1
+      },
+      {
+        "key": "HUES44",
+        "count": 1
+      },
+      {
+        "key": "ES-CJ7",
+        "count": 1
+      },
+      {
+        "key": "3T3-L1",
+        "count": 1
+      },
+      {
+        "key": "lateral mesodermal cell",
+        "count": 1
+      },
+      {
+        "key": "HUES28",
+        "count": 1
+      },
+      {
+        "key": "HUES8",
+        "count": 1
+      },
+      {
+        "key": "HUES49",
+        "count": 1
+      },
+      {
+        "key": "HUES3",
+        "count": 1
+      },
+      {
+        "key": "HUES62",
+        "count": 1
+      },
+      {
+        "key": "HUES63",
+        "count": 1
+      },
+      {
+        "key": "HUES65",
+        "count": 1
+      },
+      {
+        "key": "HUES66",
+        "count": 1
+      },
+      {
+        "key": "HUES45",
+        "count": 1
+      },
+      {
+        "key": "HUES13",
+        "count": 1
+      },
+      {
+        "key": "HUES53",
+        "count": 1
+      },
+      {
+        "key": "HUES9",
+        "count": 1
+      },
+      {
+        "key": "ELF-1",
+        "count": 1
+      }
+    ],
+    "endocrine gland": [
+      {
+        "key": "HepG2",
+        "count": 1793
+      },
+      {
+        "key": "adrenal gland",
+        "count": 320
+      },
+      {
+        "key": "liver",
+        "count": 286
+      },
+      {
+        "key": "right lobe of liver",
+        "count": 86
+      },
+      {
+        "key": "thyroid gland",
+        "count": 79
+      },
+      {
+        "key": "thymus",
+        "count": 66
+      },
+      {
+        "key": "hepatocyte",
+        "count": 33
+      },
+      {
+        "key": "type B pancreatic cell",
+        "count": 15
+      },
+      {
+        "key": "progenitor cell of endocrine pancreas",
+        "count": 15
+      },
+      {
+        "key": "left lobe of liver",
+        "count": 6
+      },
+      {
+        "key": "HuH-7.5",
+        "count": 2
+      },
+      {
+        "key": "hepatic stellate cell",
+        "count": 2
+      },
+      {
+        "key": "HuH-7",
+        "count": 2
+      },
+      {
+        "key": "K1",
+        "count": 1
+      },
+      {
+        "key": "TTC549",
+        "count": 1
+      },
+      {
+        "key": "endocrine cell",
+        "count": 1
+      },
+      {
+        "key": "endothelial cell of hepatic sinusoid",
+        "count": 1
+      }
+    ],
+    "epithelium": [
+      {
+        "key": "HepG2",
+        "count": 1793
+      },
+      {
+        "key": "HCT116",
+        "count": 442
+      },
+      {
+        "key": "MCF-7",
+        "count": 356
+      },
+      {
+        "key": "HEK293",
+        "count": 291
+      },
+      {
+        "key": "HeLa-S3",
+        "count": 159
+      },
+      {
+        "key": "foreskin keratinocyte",
+        "count": 99
+      },
+      {
+        "key": "T47D",
+        "count": 91
+      },
+      {
+        "key": "endothelial cell of umbilical vein",
+        "count": 83
+      },
+      {
+        "key": "neural tube",
+        "count": 75
+      },
+      {
+        "key": "mammary epithelial cell",
+        "count": 73
+      },
+      {
+        "key": "esophagus squamous epithelium",
+        "count": 70
+      },
+      {
+        "key": "breast epithelium",
+        "count": 61
+      },
+      {
+        "key": "keratinocyte",
+        "count": 59
+      },
+      {
+        "key": "skin epidermis",
+        "count": 53
+      },
+      {
+        "key": "MCF 10A",
+        "count": 52
+      },
+      {
+        "key": "Panc1",
+        "count": 47
+      },
+      {
+        "key": "hepatocyte",
+        "count": 33
+      },
+      {
+        "key": "myoepithelial cell of mammary gland",
+        "count": 31
+      },
+      {
+        "key": "HEK293T",
+        "count": 27
+      },
+      {
+        "key": "nephron",
+        "count": 27
+      },
+      {
+        "key": "SK-N-MC",
+        "count": 26
+      },
+      {
+        "key": "luminal epithelial cell of mammary gland",
+        "count": 23
+      },
+      {
+        "key": "LNCaP clone FGC",
+        "count": 21
+      },
+      {
+        "key": "NT2/D1",
+        "count": 18
+      },
+      {
+        "key": "bronchial epithelial cell",
+        "count": 17
+      },
+      {
+        "key": "NCI-H460",
+        "count": 16
+      },
+      {
+        "key": "mesothelial cell of epicardium",
+        "count": 15
+      },
+      {
+        "key": "type B pancreatic cell",
+        "count": 15
+      },
+      {
+        "key": "CME-W1-Cl.8+",
+        "count": 14
+      },
+      {
+        "key": "kidney epithelial cell",
+        "count": 14
+      },
+      {
+        "key": "endothelial cell",
+        "count": 14
+      },
+      {
+        "key": "SK-MEL-5",
+        "count": 13
+      },
+      {
+        "key": "HT1080",
+        "count": 12
+      },
+      {
+        "key": "epithelial cell of proximal tubule",
+        "count": 12
+      },
+      {
+        "key": "ML-DmD17-c3",
+        "count": 12
+      },
+      {
+        "key": "RWPE2",
+        "count": 11
+      },
+      {
+        "key": "U-87 MG",
+        "count": 11
+      },
+      {
+        "key": "brain microvascular endothelial cell",
+        "count": 11
+      },
+      {
+        "key": "choroid plexus epithelial cell",
+        "count": 10
+      },
+      {
+        "key": "retinal pigment epithelial cell",
+        "count": 10
+      },
+      {
+        "key": "dermis blood vessel endothelial cell",
+        "count": 9
+      },
+      {
+        "key": "ACC112",
+        "count": 8
+      },
+      {
+        "key": "epithelial cell of esophagus",
+        "count": 8
+      },
+      {
+        "key": "U2OS",
+        "count": 8
+      },
+      {
+        "key": "epithelial cell of prostate",
+        "count": 8
+      },
+      {
+        "key": "renal cortical epithelial cell",
+        "count": 8
+      },
+      {
+        "key": "Caki2",
+        "count": 8
+      },
+      {
+        "key": "epithelial cell of alveolus of lung",
+        "count": 7
+      },
+      {
+        "key": "non-pigmented ciliary epithelial cell",
+        "count": 7
+      },
+      {
+        "key": "RWPE1",
+        "count": 7
+      },
+      {
+        "key": "iris pigment epithelial cell",
+        "count": 7
+      },
+      {
+        "key": "neuroepithelial stem cell",
+        "count": 7
+      },
+      {
+        "key": "amniotic epithelial cell",
+        "count": 6
+      },
+      {
+        "key": "RPMI7951",
+        "count": 6
+      },
+      {
+        "key": "urothelium cell line",
+        "count": 6
+      },
+      {
+        "key": "VCaP",
+        "count": 6
+      },
+      {
+        "key": "pulmonary artery endothelial cell",
+        "count": 5
+      },
+      {
+        "key": "imaginal disc",
+        "count": 5
+      },
+      {
+        "key": "H4",
+        "count": 5
+      },
+      {
+        "key": "lung microvascular endothelial cell",
+        "count": 5
+      },
+      {
+        "key": "dermis microvascular lymphatic vessel endothelial cell",
+        "count": 5
+      },
+      {
+        "key": "epidermal melanocyte",
+        "count": 4
+      },
+      {
+        "key": "glomerular endothelial cell",
+        "count": 4
+      },
+      {
+        "key": "HT-29",
+        "count": 4
+      },
+      {
+        "key": "hTERT RPE-1",
+        "count": 3
+      },
+      {
+        "key": "placental epithelial cell",
+        "count": 3
+      },
+      {
+        "key": "thoracic aorta endothelial cell",
+        "count": 3
+      },
+      {
+        "key": "vein endothelial cell",
+        "count": 3
+      },
+      {
+        "key": "OVCAR3",
+        "count": 3
+      },
+      {
+        "key": "SH-SY5Y",
+        "count": 3
+      },
+      {
+        "key": "kidney tubule cell",
+        "count": 3
+      },
+      {
+        "key": "endometrial microvascular endothelial cells",
+        "count": 3
+      },
+      {
+        "key": "ML-DmD32",
+        "count": 2
+      },
+      {
+        "key": "ML-DmD21",
+        "count": 2
+      },
+      {
+        "key": "airway epithelial cell",
+        "count": 2
+      },
+      {
+        "key": "mammary microvascular endothelial cell",
+        "count": 2
+      },
+      {
+        "key": "HuH-7.5",
+        "count": 2
+      },
+      {
+        "key": "Mel-2183",
+        "count": 2
+      },
+      {
+        "key": "mesothelial cell",
+        "count": 2
+      },
+      {
+        "key": "stem cell of epidermis",
+        "count": 2
+      },
+      {
+        "key": "tracheal epithelial cell",
+        "count": 2
+      },
+      {
+        "key": "HuH-7",
+        "count": 2
+      },
+      {
+        "key": "ML-DmD20-c5",
+        "count": 2
+      },
+      {
+        "key": "CME-W2",
+        "count": 2
+      },
+      {
+        "key": "ML-DmD16-c3",
+        "count": 2
+      },
+      {
+        "key": "HPDE6-E6E7",
+        "count": 2
+      },
+      {
+        "key": "ML-DmD8",
+        "count": 2
+      },
+      {
+        "key": "ML-DmD9",
+        "count": 2
+      },
+      {
+        "key": "NCI-H345",
+        "count": 2
+      },
+      {
+        "key": "kidney glomerular epithelial cell",
+        "count": 2
+      },
+      {
+        "key": "NCI-H510A",
+        "count": 2
+      },
+      {
+        "key": "RCC 7860",
+        "count": 2
+      },
+      {
+        "key": "mesangial cell",
+        "count": 2
+      },
+      {
+        "key": "hair follicular keratinocyte",
+        "count": 2
+      },
+      {
+        "key": "NCI-H889",
+        "count": 2
+      },
+      {
+        "key": "NCI-H146",
+        "count": 2
+      },
+      {
+        "key": "ARPE-19",
+        "count": 1
+      },
+      {
+        "key": "DU 145",
+        "count": 1
+      },
+      {
+        "key": "dermis lymphatic vessel endothelial cell",
+        "count": 1
+      },
+      {
+        "key": "nasal cavity respiratory epithelium epithelial cell of viscerocranial mucosa",
+        "count": 1
+      },
+      {
+        "key": "C803",
+        "count": 1
+      },
+      {
+        "key": "A204.1",
+        "count": 1
+      },
+      {
+        "key": "hTERT-HME1",
+        "count": 1
+      },
+      {
+        "key": "yolk sac",
+        "count": 1
+      },
+      {
+        "key": "G401.6",
+        "count": 1
+      },
+      {
+        "key": "TTC549",
+        "count": 1
+      },
+      {
+        "key": "bladder microvascular endothelial cell",
+        "count": 1
+      },
+      {
+        "key": "endothelial cell of coronary artery",
+        "count": 1
+      },
+      {
+        "key": "glomerular visceral epithelial cell",
+        "count": 1
+      },
+      {
+        "key": "epithelial cell of umbilical artery",
+        "count": 1
+      },
+      {
+        "key": "NCI-H209",
+        "count": 1
+      },
+      {
+        "key": "ML-DmD20-c2",
+        "count": 1
+      },
+      {
+        "key": "HK-2",
+        "count": 1
+      },
+      {
+        "key": "endothelial cell of hepatic sinusoid",
+        "count": 1
+      },
+      {
+        "key": "SW480",
+        "count": 1
+      },
+      {
+        "key": "HS-27A",
+        "count": 1
+      },
+      {
+        "key": "DLD1",
+        "count": 1
+      },
+      {
+        "key": "RKO",
+        "count": 1
+      },
+      {
+        "key": "LoVo",
+        "count": 1
+      },
+      {
+        "key": "kidney capillary endothelial cell",
+        "count": 1
+      }
+    ],
+    "esophagus": [
+      {
+        "key": "esophagus muscularis mucosa",
+        "count": 76
+      },
+      {
+        "key": "esophagus squamous epithelium",
+        "count": 70
+      },
+      {
+        "key": "esophagus",
+        "count": 20
+      },
+      {
+        "key": "epithelial cell of esophagus",
+        "count": 8
+      },
+      {
+        "key": "esophagus mucosa",
+        "count": 3
+      }
+    ],
+    "exocrine gland": [
+      {
+        "key": "HepG2",
+        "count": 1793
+      },
+      {
+        "key": "MCF-7",
+        "count": 356
+      },
+      {
+        "key": "liver",
+        "count": 286
+      },
+      {
+        "key": "T47D",
+        "count": 91
+      },
+      {
+        "key": "right lobe of liver",
+        "count": 86
+      },
+      {
+        "key": "mammary epithelial cell",
+        "count": 73
+      },
+      {
+        "key": "MCF 10A",
+        "count": 52
+      },
+      {
+        "key": "hepatocyte",
+        "count": 33
+      },
+      {
+        "key": "myoepithelial cell of mammary gland",
+        "count": 31
+      },
+      {
+        "key": "luminal epithelial cell of mammary gland",
+        "count": 23
+      },
+      {
+        "key": "mammary stem cell",
+        "count": 15
+      },
+      {
+        "key": "salivary gland",
+        "count": 8
+      },
+      {
+        "key": "ACC112",
+        "count": 8
+      },
+      {
+        "key": "left lobe of liver",
+        "count": 6
+      },
+      {
+        "key": "fibroblast of mammary gland",
+        "count": 5
+      },
+      {
+        "key": "HuH-7.5",
+        "count": 2
+      },
+      {
+        "key": "hepatic stellate cell",
+        "count": 2
+      },
+      {
+        "key": "HuH-7",
+        "count": 2
+      },
+      {
+        "key": "HPDE6-E6E7",
+        "count": 2
+      },
+      {
+        "key": "mammary gland",
+        "count": 1
+      },
+      {
+        "key": "hTERT-HME1",
+        "count": 1
+      },
+      {
+        "key": "TTC549",
+        "count": 1
+      },
+      {
+        "key": "parotid gland",
+        "count": 1
+      },
+      {
+        "key": "endothelial cell of hepatic sinusoid",
+        "count": 1
+      }
+    ],
+    "extraembryonic component": [
+      {
+        "key": "placenta",
+        "count": 85
+      },
+      {
+        "key": "endothelial cell of umbilical vein",
+        "count": 83
+      },
+      {
+        "key": "trophoblast cell",
+        "count": 46
+      },
+      {
+        "key": "chorionic villus",
+        "count": 38
+      },
+      {
+        "key": "chorion",
+        "count": 25
+      },
+      {
+        "key": "placental basal plate",
+        "count": 17
+      },
+      {
+        "key": "amnion",
+        "count": 15
+      },
+      {
+        "key": "fibroblast of villous mesenchyme",
+        "count": 8
+      },
+      {
+        "key": "amniotic epithelial cell",
+        "count": 6
+      },
+      {
+        "key": "HTR-8/SVneo",
+        "count": 5
+      },
+      {
+        "key": "placental epithelial cell",
+        "count": 3
+      },
+      {
+        "key": "umbilical cord",
+        "count": 3
+      },
+      {
+        "key": "mesenchymal stem cell of Wharton's jelly",
+        "count": 3
+      },
+      {
+        "key": "placental pericyte",
+        "count": 3
+      },
+      {
+        "key": "amniotic stem cell",
+        "count": 2
+      },
+      {
+        "key": "yolk sac",
+        "count": 1
+      },
+      {
+        "key": "epithelial cell of umbilical artery",
+        "count": 1
+      },
+      {
+        "key": "smooth muscle cell of the umbilical artery",
+        "count": 1
+      },
+      {
+        "key": "dedifferentiated amniotic fluid mesenchymal stem cell",
+        "count": 1
+      }
+    ],
+    "eye": [
+      {
+        "key": "bipolar neuron",
+        "count": 31
+      },
+      {
+        "key": "WERI-Rb-1",
+        "count": 12
+      },
+      {
+        "key": "retinal pigment epithelial cell",
+        "count": 10
+      },
+      {
+        "key": "iris pigment epithelial cell",
+        "count": 7
+      },
+      {
+        "key": "retina",
+        "count": 7
+      },
+      {
+        "key": "hTERT RPE-1",
+        "count": 3
+      },
+      {
+        "key": "eye",
+        "count": 2
+      },
+      {
+        "key": "ML-DmD11",
+        "count": 2
+      },
+      {
+        "key": "fibroblast of the conjunctiva",
+        "count": 2
+      },
+      {
+        "key": "camera-type eye",
+        "count": 2
+      },
+      {
+        "key": "ARPE-19",
+        "count": 1
+      }
+    ],
+    "gallbladder": [
+      {
+        "key": "mucosa of gallbladder",
+        "count": 5
+      },
+      {
+        "key": "gallbladder",
+        "count": 1
+      }
+    ],
+    "gonad": [
+      {
+        "key": "ovary",
+        "count": 117
+      },
+      {
+        "key": "testis",
+        "count": 66
+      },
+      {
+        "key": "NT2/D1",
+        "count": 18
+      },
+      {
+        "key": "gonadal fat pad",
+        "count": 3
+      },
+      {
+        "key": "OVCAR3",
+        "count": 3
+      },
+      {
+        "key": "OSC",
+        "count": 1
+      },
+      {
+        "key": "OSS",
+        "count": 1
+      },
+      {
+        "key": "fGS/OSS",
+        "count": 1
+      }
+    ],
+    "hair follicle": [
+      {
+        "key": "hair follicular keratinocyte",
+        "count": 2
+      }
+    ],
+    "heart": [
+      {
+        "key": "heart",
+        "count": 328
+      },
+      {
+        "key": "heart left ventricle",
+        "count": 313
+      },
+      {
+        "key": "heart right ventricle",
+        "count": 170
+      },
+      {
+        "key": "right cardiac atrium",
+        "count": 40
+      },
+      {
+        "key": "right atrium auricular region",
+        "count": 35
+      },
+      {
+        "key": "cardiac muscle cell",
+        "count": 29
+      },
+      {
+        "key": "left cardiac atrium",
+        "count": 22
+      },
+      {
+        "key": "left ventricle myocardium inferior",
+        "count": 15
+      },
+      {
+        "key": "mesothelial cell of epicardium",
+        "count": 15
+      },
+      {
+        "key": "cardiac fibroblast",
+        "count": 13
+      },
+      {
+        "key": "coronary artery",
+        "count": 13
+      },
+      {
+        "key": "Right ventricle myocardium inferior",
+        "count": 8
+      },
+      {
+        "key": "Right ventricle myocardium superior",
+        "count": 8
+      },
+      {
+        "key": "left ventricle myocardium superior",
+        "count": 8
+      },
+      {
+        "key": "cardiac septum",
+        "count": 7
+      },
+      {
+        "key": "cardiac myoblast",
+        "count": 6
+      },
+      {
+        "key": "cardiac atrium fibroblast",
+        "count": 2
+      },
+      {
+        "key": "right ventricle myocardium",
+        "count": 2
+      },
+      {
+        "key": "cardiac ventricle fibroblast",
+        "count": 2
+      },
+      {
+        "key": "left ventricle myocardium",
+        "count": 1
+      },
+      {
+        "key": "regular cardiac myocyte",
+        "count": 1
+      },
+      {
+        "key": "endothelial cell of coronary artery",
+        "count": 1
+      },
+      {
+        "key": "smooth muscle cell of the coronary artery",
+        "count": 1
+      }
+    ],
+    "immune organ": [
+      {
+        "key": "spleen",
+        "count": 196
+      },
+      {
+        "key": "MEL",
+        "count": 94
+      },
+      {
+        "key": "thymus",
+        "count": 66
+      },
+      {
+        "key": "OCI-LY3",
+        "count": 15
+      },
+      {
+        "key": "SU-DHL-2",
+        "count": 2
+      },
+      {
+        "key": "MEL-GATA-1-ER",
+        "count": 1
+      },
+      {
+        "key": "paraaortic lymph node",
+        "count": 1
+      },
+      {
+        "key": "SU-DHL-4",
+        "count": 1
+      },
+      {
+        "key": "bronchial lymph node",
+        "count": 1
+      },
+      {
+        "key": "colic lymph node",
+        "count": 1
+      },
+      {
+        "key": "pulmonary lymph node",
+        "count": 1
+      }
+    ],
+    "intestine": [
+      {
+        "key": "HCT116",
+        "count": 442
+      },
+      {
+        "key": "transverse colon",
+        "count": 114
+      },
+      {
+        "key": "sigmoid colon",
+        "count": 112
+      },
+      {
+        "key": "small intestine",
+        "count": 73
+      },
+      {
+        "key": "Peyer's patch",
+        "count": 64
+      },
+      {
+        "key": "intestine",
+        "count": 58
+      },
+      {
+        "key": "Caco-2",
+        "count": 44
+      },
+      {
+        "key": "colonic mucosa",
+        "count": 41
+      },
+      {
+        "key": "large intestine",
+        "count": 39
+      },
+      {
+        "key": "mucosa of descending colon",
+        "count": 29
+      },
+      {
+        "key": "mucosa of rectum",
+        "count": 20
+      },
+      {
+        "key": "left colon",
+        "count": 18
+      },
+      {
+        "key": "duodenal mucosa",
+        "count": 18
+      },
+      {
+        "key": "muscle layer of colon",
+        "count": 15
+      },
+      {
+        "key": "muscle layer of duodenum",
+        "count": 13
+      },
+      {
+        "key": "rectal smooth muscle tissue",
+        "count": 10
+      },
+      {
+        "key": "colon",
+        "count": 5
+      },
+      {
+        "key": "jejunum",
+        "count": 4
+      },
+      {
+        "key": "HT-29",
+        "count": 4
+      },
+      {
+        "key": "rectum",
+        "count": 2
+      },
+      {
+        "key": "duodenum",
+        "count": 2
+      },
+      {
+        "key": "vermiform appendix",
+        "count": 1
+      },
+      {
+        "key": "ileum",
+        "count": 1
+      },
+      {
+        "key": "SW480",
+        "count": 1
+      },
+      {
+        "key": "DLD1",
+        "count": 1
+      },
+      {
+        "key": "RKO",
+        "count": 1
+      },
+      {
+        "key": "HCEC 1CT",
+        "count": 1
+      },
+      {
+        "key": "LoVo",
+        "count": 1
+      }
+    ],
+    "kidney": [
+      {
+        "key": "HEK293",
+        "count": 291
+      },
+      {
+        "key": "kidney",
+        "count": 156
+      },
+      {
+        "key": "HEK293T",
+        "count": 27
+      },
+      {
+        "key": "nephron",
+        "count": 27
+      },
+      {
+        "key": "renal cortex interstitium",
+        "count": 18
+      },
+      {
+        "key": "right kidney",
+        "count": 15
+      },
+      {
+        "key": "renal pelvis",
+        "count": 15
+      },
+      {
+        "key": "kidney epithelial cell",
+        "count": 14
+      },
+      {
+        "key": "left kidney",
+        "count": 14
+      },
+      {
+        "key": "epithelial cell of proximal tubule",
+        "count": 12
+      },
+      {
+        "key": "Patski",
+        "count": 11
+      },
+      {
+        "key": "nephron progenitor cell",
+        "count": 10
+      },
+      {
+        "key": "renal cortical epithelial cell",
+        "count": 8
+      },
+      {
+        "key": "Caki2",
+        "count": 8
+      },
+      {
+        "key": "left renal pelvis",
+        "count": 8
+      },
+      {
+        "key": "left renal cortex interstitium",
+        "count": 8
+      },
+      {
+        "key": "right renal pelvis",
+        "count": 8
+      },
+      {
+        "key": "G401",
+        "count": 7
+      },
+      {
+        "key": "ureter",
+        "count": 6
+      },
+      {
+        "key": "right renal cortex interstitium",
+        "count": 6
+      },
+      {
+        "key": "glomerular endothelial cell",
+        "count": 4
+      },
+      {
+        "key": "metanephros",
+        "count": 3
+      },
+      {
+        "key": "kidney tubule cell",
+        "count": 3
+      },
+      {
+        "key": "RCC",
+        "count": 2
+      },
+      {
+        "key": "kidney glomerular epithelial cell",
+        "count": 2
+      },
+      {
+        "key": "RCC 7860",
+        "count": 2
+      },
+      {
+        "key": "mesangial cell",
+        "count": 2
+      },
+      {
+        "key": "ACHN",
+        "count": 2
+      },
+      {
+        "key": "G401.6",
+        "count": 1
+      },
+      {
+        "key": "glomerular visceral epithelial cell",
+        "count": 1
+      },
+      {
+        "key": "cortex of kidney",
+        "count": 1
+      },
+      {
+        "key": "HK-2",
+        "count": 1
+      },
+      {
+        "key": "kidney capillary endothelial cell",
+        "count": 1
+      }
+    ],
+    "large intestine": [
+      {
+        "key": "HCT116",
+        "count": 442
+      },
+      {
+        "key": "transverse colon",
+        "count": 114
+      },
+      {
+        "key": "sigmoid colon",
+        "count": 112
+      },
+      {
+        "key": "Caco-2",
+        "count": 44
+      },
+      {
+        "key": "colonic mucosa",
+        "count": 41
+      },
+      {
+        "key": "large intestine",
+        "count": 39
+      },
+      {
+        "key": "mucosa of descending colon",
+        "count": 29
+      },
+      {
+        "key": "mucosa of rectum",
+        "count": 20
+      },
+      {
+        "key": "left colon",
+        "count": 18
+      },
+      {
+        "key": "muscle layer of colon",
+        "count": 15
+      },
+      {
+        "key": "rectal smooth muscle tissue",
+        "count": 10
+      },
+      {
+        "key": "colon",
+        "count": 5
+      },
+      {
+        "key": "HT-29",
+        "count": 4
+      },
+      {
+        "key": "rectum",
+        "count": 2
+      },
+      {
+        "key": "vermiform appendix",
+        "count": 1
+      },
+      {
+        "key": "SW480",
+        "count": 1
+      },
+      {
+        "key": "DLD1",
+        "count": 1
+      },
+      {
+        "key": "RKO",
+        "count": 1
+      },
+      {
+        "key": "HCEC 1CT",
+        "count": 1
+      },
+      {
+        "key": "LoVo",
+        "count": 1
+      }
+    ],
+    "limb": [
+      {
+        "key": "gastrocnemius",
+        "count": 151
+      },
+      {
+        "key": "limb",
+        "count": 96
+      },
+      {
+        "key": "gastrocnemius medialis",
+        "count": 79
+      },
+      {
+        "key": "tibial nerve",
+        "count": 69
+      },
+      {
+        "key": "lower leg skin",
+        "count": 42
+      },
+      {
+        "key": "tibial artery",
+        "count": 39
+      },
+      {
+        "key": "muscle of leg",
+        "count": 34
+      },
+      {
+        "key": "muscle of arm",
+        "count": 31
+      },
+      {
+        "key": "GM23248",
+        "count": 30
+      },
+      {
+        "key": "forelimb",
+        "count": 11
+      },
+      {
+        "key": "articular chondrocyte of knee joint",
+        "count": 3
+      },
+      {
+        "key": "CME-W2",
+        "count": 2
+      },
+      {
+        "key": "CME-L1",
+        "count": 2
+      },
+      {
+        "key": "forelimb muscle",
+        "count": 2
+      },
+      {
+        "key": "hindlimb muscle",
+        "count": 2
+      },
+      {
+        "key": "forelimb stylopod",
+        "count": 1
+      },
+      {
+        "key": "left hindlimb",
+        "count": 1
+      },
+      {
+        "key": "forelimb zygopod",
+        "count": 1
+      },
+      {
+        "key": "autopod region",
+        "count": 1
+      },
+      {
+        "key": "right hindlimb",
+        "count": 1
+      },
+      {
+        "key": "femur",
+        "count": 1
+      },
+      {
+        "key": "right forelimb",
+        "count": 1
+      },
+      {
+        "key": "left forelimb",
+        "count": 1
+      }
+    ],
+    "liver": [
+      {
+        "key": "HepG2",
+        "count": 1793
+      },
+      {
+        "key": "liver",
+        "count": 286
+      },
+      {
+        "key": "right lobe of liver",
+        "count": 86
+      },
+      {
+        "key": "hepatocyte",
+        "count": 33
+      },
+      {
+        "key": "left lobe of liver",
+        "count": 6
+      },
+      {
+        "key": "HuH-7.5",
+        "count": 2
+      },
+      {
+        "key": "hepatic stellate cell",
+        "count": 2
+      },
+      {
+        "key": "HuH-7",
+        "count": 2
+      },
+      {
+        "key": "TTC549",
+        "count": 1
+      },
+      {
+        "key": "endothelial cell of hepatic sinusoid",
+        "count": 1
+      }
+    ],
+    "lung": [
+      {
+        "key": "A549",
+        "count": 538
+      },
+      {
+        "key": "lung",
+        "count": 165
+      },
+      {
+        "key": "IMR-90",
+        "count": 114
+      },
+      {
+        "key": "upper lobe of left lung",
+        "count": 96
+      },
+      {
+        "key": "left lung",
+        "count": 57
+      },
+      {
+        "key": "lower lobe of left lung",
+        "count": 38
+      },
+      {
+        "key": "PC-9",
+        "count": 31
+      },
+      {
+        "key": "fibroblast of lung",
+        "count": 30
+      },
+      {
+        "key": "AG04450",
+        "count": 20
+      },
+      {
+        "key": "right lung",
+        "count": 20
+      },
+      {
+        "key": "lower lobe of right lung",
+        "count": 19
+      },
+      {
+        "key": "upper lobe of right lung",
+        "count": 17
+      },
+      {
+        "key": "bronchial epithelial cell",
+        "count": 17
+      },
+      {
+        "key": "NCI-H460",
+        "count": 16
+      },
+      {
+        "key": "WI38",
+        "count": 9
+      },
+      {
+        "key": "epithelial cell of alveolus of lung",
+        "count": 7
+      },
+      {
+        "key": "lung microvascular endothelial cell",
+        "count": 5
+      },
+      {
+        "key": "NCI-H446",
+        "count": 4
+      },
+      {
+        "key": "NCI-H2081",
+        "count": 3
+      },
+      {
+        "key": "NCI-H187",
+        "count": 3
+      },
+      {
+        "key": "NCI-H524",
+        "count": 3
+      },
+      {
+        "key": "SHP77",
+        "count": 3
+      },
+      {
+        "key": "AG08396",
+        "count": 2
+      },
+      {
+        "key": "NCI-H2107",
+        "count": 2
+      },
+      {
+        "key": "NCI-H1436",
+        "count": 2
+      },
+      {
+        "key": "NCI-H1092",
+        "count": 2
+      },
+      {
+        "key": "NCI-H82",
+        "count": 2
+      },
+      {
+        "key": "NCI-H2171",
+        "count": 2
+      },
+      {
+        "key": "NCI-H1694",
+        "count": 2
+      },
+      {
+        "key": "NCI-H1930",
+        "count": 2
+      },
+      {
+        "key": "NCI-H345",
+        "count": 2
+      },
+      {
+        "key": "NCI-H748",
+        "count": 2
+      },
+      {
+        "key": "NCI-H510A",
+        "count": 2
+      },
+      {
+        "key": "NCI-H226",
+        "count": 2
+      },
+      {
+        "key": "NCI-H889",
+        "count": 2
+      },
+      {
+        "key": "NCI-H146",
+        "count": 2
+      },
+      {
+        "key": "NCI-H2196",
+        "count": 2
+      },
+      {
+        "key": "bronchus fibroblast of lung",
+        "count": 2
+      },
+      {
+        "key": "NCI-H1437",
+        "count": 1
+      },
+      {
+        "key": "COLO668",
+        "count": 1
+      },
+      {
+        "key": "bronchial smooth muscle cell",
+        "count": 1
+      },
+      {
+        "key": "NCI-H69",
+        "count": 1
+      },
+      {
+        "key": "NCI-H209",
+        "count": 1
+      }
+    ],
+    "lymph node": [
+      {
+        "key": "immature natural killer cell",
+        "count": 89
+      },
+      {
+        "key": "CH12.LX",
+        "count": 66
+      },
+      {
+        "key": "Karpas-422",
+        "count": 20
+      },
+      {
+        "key": "OCI-LY3",
+        "count": 15
+      },
+      {
+        "key": "KOPT-K1",
+        "count": 7
+      },
+      {
+        "key": "SU-DHL-2",
+        "count": 2
+      },
+      {
+        "key": "paraaortic lymph node",
+        "count": 1
+      },
+      {
+        "key": "SU-DHL-4",
+        "count": 1
+      },
+      {
+        "key": "bronchial lymph node",
+        "count": 1
+      },
+      {
+        "key": "colic lymph node",
+        "count": 1
+      },
+      {
+        "key": "pulmonary lymph node",
+        "count": 1
+      }
+    ],
+    "lymphatic vessel": [
+      {
+        "key": "dermis microvascular lymphatic vessel endothelial cell",
+        "count": 5
+      },
+      {
+        "key": "dermis lymphatic vessel endothelial cell",
+        "count": 1
+      }
+    ],
+    "lymphoid tissue": [
+      {
+        "key": "Peyer's patch",
+        "count": 64
+      },
+      {
+        "key": "GM18507",
+        "count": 3
+      },
+      {
+        "key": "Raji",
+        "count": 2
+      },
+      {
+        "key": "germinal center",
+        "count": 1
+      }
+    ],
+    "major salivary gland": [
+      {
+        "key": "parotid gland",
+        "count": 1
+      }
+    ],
+    "mammary gland": [
+      {
+        "key": "MCF-7",
+        "count": 356
+      },
+      {
+        "key": "T47D",
+        "count": 91
+      },
+      {
+        "key": "mammary epithelial cell",
+        "count": 73
+      },
+      {
+        "key": "MCF 10A",
+        "count": 52
+      },
+      {
+        "key": "myoepithelial cell of mammary gland",
+        "count": 31
+      },
+      {
+        "key": "luminal epithelial cell of mammary gland",
+        "count": 23
+      },
+      {
+        "key": "mammary stem cell",
+        "count": 15
+      },
+      {
+        "key": "fibroblast of mammary gland",
+        "count": 5
+      },
+      {
+        "key": "mammary gland",
+        "count": 1
+      },
+      {
+        "key": "hTERT-HME1",
+        "count": 1
+      }
+    ],
+    "mouth": [
+      {
+        "key": "AG09319",
+        "count": 12
+      },
+      {
+        "key": "salivary gland",
+        "count": 8
+      },
+      {
+        "key": "ACC112",
+        "count": 8
+      },
+      {
+        "key": "tongue",
+        "count": 5
+      },
+      {
+        "key": "fibroblast of peridontal ligament",
+        "count": 2
+      },
+      {
+        "key": "fibroblast of gingiva",
+        "count": 2
+      },
+      {
+        "key": "parotid gland",
+        "count": 1
+      }
+    ],
+    "musculature of body": [
+      {
+        "key": "gastrocnemius",
+        "count": 151
+      },
+      {
+        "key": "gastrocnemius medialis",
+        "count": 79
+      },
+      {
+        "key": "esophagus muscularis mucosa",
+        "count": 76
+      },
+      {
+        "key": "gastroesophageal sphincter",
+        "count": 69
+      },
+      {
+        "key": "psoas muscle",
+        "count": 61
+      },
+      {
+        "key": "skeletal muscle tissue",
+        "count": 43
+      },
+      {
+        "key": "myotube",
+        "count": 35
+      },
+      {
+        "key": "muscle of leg",
+        "count": 34
+      },
+      {
+        "key": "myocyte",
+        "count": 33
+      },
+      {
+        "key": "skeletal muscle myoblast",
+        "count": 31
+      },
+      {
+        "key": "muscle of arm",
+        "count": 31
+      },
+      {
+        "key": "cardiac muscle cell",
+        "count": 29
+      },
+      {
+        "key": "smooth muscle cell",
+        "count": 28
+      },
+      {
+        "key": "C2C12",
+        "count": 28
+      },
+      {
+        "key": "A673",
+        "count": 25
+      },
+      {
+        "key": "muscle of back",
+        "count": 25
+      },
+      {
+        "key": "stomach smooth muscle",
+        "count": 17
+      },
+      {
+        "key": "SJCRH30",
+        "count": 15
+      },
+      {
+        "key": "muscle of trunk",
+        "count": 13
+      },
+      {
+        "key": "skeletal muscle satellite cell",
+        "count": 11
+      },
+      {
+        "key": "rectal smooth muscle tissue",
+        "count": 10
+      },
+      {
+        "key": "aortic smooth muscle cell",
+        "count": 8
+      },
+      {
+        "key": "skeletal muscle cell",
+        "count": 7
+      },
+      {
+        "key": "myoblast",
+        "count": 7
+      },
+      {
+        "key": "cardiac myoblast",
+        "count": 6
+      },
+      {
+        "key": "LHCN-M2",
+        "count": 4
+      },
+      {
+        "key": "right ventricle myocardium",
+        "count": 2
+      },
+      {
+        "key": "forelimb muscle",
+        "count": 2
+      },
+      {
+        "key": "hindlimb muscle",
+        "count": 2
+      },
+      {
+        "key": "A204.1",
+        "count": 1
+      },
+      {
+        "key": "left ventricle myocardium",
+        "count": 1
+      },
+      {
+        "key": "regular cardiac myocyte",
+        "count": 1
+      },
+      {
+        "key": "sternocleidomastoid",
+        "count": 1
+      },
+      {
+        "key": "thoracic segment muscle",
+        "count": 1
+      }
+    ],
+    "nerve": [
+      {
+        "key": "tibial nerve",
+        "count": 69
+      },
+      {
+        "key": "sciatic nerve",
+        "count": 9
+      }
+    ],
+    "nose": [
+      {
+        "key": "nasal cavity respiratory epithelium epithelial cell of viscerocranial mucosa",
+        "count": 1
+      },
+      {
+        "key": "C803",
+        "count": 1
+      }
+    ],
+    "ovary": [
+      {
+        "key": "ovary",
+        "count": 117
+      },
+      {
+        "key": "OVCAR3",
+        "count": 3
+      },
+      {
+        "key": "OSC",
+        "count": 1
+      },
+      {
+        "key": "OSS",
+        "count": 1
+      },
+      {
+        "key": "fGS/OSS",
+        "count": 1
+      }
+    ],
+    "pancreas": [
+      {
+        "key": "pancreas",
+        "count": 108
+      },
+      {
+        "key": "body of pancreas",
+        "count": 72
+      },
+      {
+        "key": "Panc1",
+        "count": 47
+      },
+      {
+        "key": "endocrine pancreas",
+        "count": 22
+      },
+      {
+        "key": "type B pancreatic cell",
+        "count": 15
+      },
+      {
+        "key": "progenitor cell of endocrine pancreas",
+        "count": 15
+      },
+      {
+        "key": "islet of Langerhans",
+        "count": 3
+      },
+      {
+        "key": "8988T",
+        "count": 2
+      },
+      {
+        "key": "islet precursor cell",
+        "count": 2
+      },
+      {
+        "key": "HPDE6-E6E7",
+        "count": 2
+      }
+    ],
+    "paraythroid gland": [
+      {
+        "key": "parathyroid adenoma",
+        "count": 19
+      }
+    ],
+    "penis": [
+      {
+        "key": "foreskin keratinocyte",
+        "count": 99
+      },
+      {
+        "key": "foreskin fibroblast",
+        "count": 50
+      },
+      {
+        "key": "foreskin melanocyte",
+        "count": 38
+      },
+      {
+        "key": "BJ",
+        "count": 23
+      },
+      {
+        "key": "HFFc6",
+        "count": 19
+      },
+      {
+        "key": "iPS DF 6.9",
+        "count": 13
+      },
+      {
+        "key": "iPS DF 19.11",
+        "count": 13
+      },
+      {
+        "key": "HFF-Myc",
+        "count": 5
+      },
+      {
+        "key": "penis",
+        "count": 2
+      },
+      {
+        "key": "iPS DF 19.7",
+        "count": 2
+      },
+      {
+        "key": "EL",
+        "count": 1
+      },
+      {
+        "key": "EH",
+        "count": 1
+      },
+      {
+        "key": "iPS DF 4.7",
+        "count": 1
+      },
+      {
+        "key": "ELR",
+        "count": 1
+      }
+    ],
+    "pericardium": [
+      {
+        "key": "mesothelial cell of epicardium",
+        "count": 15
+      },
+      {
+        "key": "pericardium",
+        "count": 2
+      },
+      {
+        "key": "pericardium fibroblast",
+        "count": 2
+      }
+    ],
+    "placenta": [
+      {
+        "key": "placenta",
+        "count": 85
+      },
+      {
+        "key": "endothelial cell of umbilical vein",
+        "count": 83
+      },
+      {
+        "key": "chorionic villus",
+        "count": 38
+      },
+      {
+        "key": "placental basal plate",
+        "count": 17
+      },
+      {
+        "key": "amnion",
+        "count": 15
+      },
+      {
+        "key": "fibroblast of villous mesenchyme",
+        "count": 8
+      },
+      {
+        "key": "amniotic epithelial cell",
+        "count": 6
+      },
+      {
+        "key": "HTR-8/SVneo",
+        "count": 5
+      },
+      {
+        "key": "placental epithelial cell",
+        "count": 3
+      },
+      {
+        "key": "placental pericyte",
+        "count": 3
+      },
+      {
+        "key": "epithelial cell of umbilical artery",
+        "count": 1
+      },
+      {
+        "key": "smooth muscle cell of the umbilical artery",
+        "count": 1
+      }
+    ],
+    "prostate gland": [
+      {
+        "key": "prostate gland",
+        "count": 52
+      },
+      {
+        "key": "PC-3",
+        "count": 33
+      },
+      {
+        "key": "LNCaP clone FGC",
+        "count": 21
+      },
+      {
+        "key": "RWPE2",
+        "count": 11
+      },
+      {
+        "key": "epithelial cell of prostate",
+        "count": 8
+      },
+      {
+        "key": "RWPE1",
+        "count": 7
+      },
+      {
+        "key": "LNCAP",
+        "count": 6
+      },
+      {
+        "key": "VCaP",
+        "count": 6
+      },
+      {
+        "key": "22Rv1",
+        "count": 6
+      },
+      {
+        "key": "C4-2B",
+        "count": 6
+      },
+      {
+        "key": "DU 145",
+        "count": 1
+      }
+    ],
+    "skeleton": [
+      {
+        "key": "UCH-1",
+        "count": 2
+      },
+      {
+        "key": "left hindlimb",
+        "count": 1
+      },
+      {
+        "key": "right hindlimb",
+        "count": 1
+      },
+      {
+        "key": "femur",
+        "count": 1
+      },
+      {
+        "key": "right forelimb",
+        "count": 1
+      },
+      {
+        "key": "left forelimb",
+        "count": 1
+      }
+    ],
+    "skin of body": [
+      {
+        "key": "WTC11",
+        "count": 152
+      },
+      {
+        "key": "foreskin keratinocyte",
+        "count": 99
+      },
+      {
+        "key": "GM23338",
+        "count": 62
+      },
+      {
+        "key": "keratinocyte",
+        "count": 59
+      },
+      {
+        "key": "suprapubic skin",
+        "count": 54
+      },
+      {
+        "key": "skin epidermis",
+        "count": 53
+      },
+      {
+        "key": "foreskin fibroblast",
+        "count": 50
+      },
+      {
+        "key": "lower leg skin",
+        "count": 42
+      },
+      {
+        "key": "GM23248",
+        "count": 30
+      },
+      {
+        "key": "BJ",
+        "count": 23
+      },
+      {
+        "key": "fibroblast of dermis",
+        "count": 19
+      },
+      {
+        "key": "iPS-20b",
+        "count": 17
+      },
+      {
+        "key": "SK-MEL-5",
+        "count": 13
+      },
+      {
+        "key": "iPS DF 6.9",
+        "count": 13
+      },
+      {
+        "key": "iPS DF 19.11",
+        "count": 13
+      },
+      {
+        "key": "AG04449",
+        "count": 11
+      },
+      {
+        "key": "iPS-18c",
+        "count": 10
+      },
+      {
+        "key": "iPS-15b",
+        "count": 10
+      },
+      {
+        "key": "AG10803",
+        "count": 9
+      },
+      {
+        "key": "dermis blood vessel endothelial cell",
+        "count": 9
+      },
+      {
+        "key": "AG09309",
+        "count": 9
+      },
+      {
+        "key": "iPS-18a",
+        "count": 9
+      },
+      {
+        "key": "HGPS cell",
+        "count": 7
+      },
+      {
+        "key": "melanocyte of skin",
+        "count": 6
+      },
+      {
+        "key": "RPMI7951",
+        "count": 6
+      },
+      {
+        "key": "skin of body",
+        "count": 5
+      },
+      {
+        "key": "dermis microvascular lymphatic vessel endothelial cell",
+        "count": 5
+      },
+      {
+        "key": "AG08470",
+        "count": 5
+      },
+      {
+        "key": "epidermal melanocyte",
+        "count": 4
+      },
+      {
+        "key": "fibroblast of skin of abdomen",
+        "count": 4
+      },
+      {
+        "key": "iPS-18b",
+        "count": 4
+      },
+      {
+        "key": "fibroblast of skin of scalp",
+        "count": 4
+      },
+      {
+        "key": "A375",
+        "count": 3
+      },
+      {
+        "key": "GM03348",
+        "count": 3
+      },
+      {
+        "key": "hair follicle dermal papilla cell",
+        "count": 3
+      },
+      {
+        "key": "mole",
+        "count": 3
+      },
+      {
+        "key": "iPS-11a",
+        "count": 3
+      },
+      {
+        "key": "fibroblast of skin of back",
+        "count": 3
+      },
+      {
+        "key": "Mel-2183",
+        "count": 2
+      },
+      {
+        "key": "stem cell of epidermis",
+        "count": 2
+      },
+      {
+        "key": "iPS-NIHi7",
+        "count": 2
+      },
+      {
+        "key": "COLO829",
+        "count": 2
+      },
+      {
+        "key": "AG20443",
+        "count": 2
+      },
+      {
+        "key": "iPS-NIHi11",
+        "count": 2
+      },
+      {
+        "key": "AG08395",
+        "count": 2
+      },
+      {
+        "key": "iPS DF 19.7",
+        "count": 2
+      },
+      {
+        "key": "hair follicular keratinocyte",
+        "count": 2
+      },
+      {
+        "key": "zone of skin",
+        "count": 2
+      },
+      {
+        "key": "fibroblast of upper back skin",
+        "count": 2
+      },
+      {
+        "key": "fibroblast of skin of left quadriceps",
+        "count": 2
+      },
+      {
+        "key": "fibroblast of skin of left biceps",
+        "count": 2
+      },
+      {
+        "key": "dermis lymphatic vessel endothelial cell",
+        "count": 1
+      },
+      {
+        "key": "skin fibroblast",
+        "count": 1
+      },
+      {
+        "key": "iPS-5",
+        "count": 1
+      },
+      {
+        "key": "hFib2-iPS4",
+        "count": 1
+      },
+      {
+        "key": "iPS-27b",
+        "count": 1
+      },
+      {
+        "key": "iPS-17a",
+        "count": 1
+      },
+      {
+        "key": "iPS-11b",
+        "count": 1
+      },
+      {
+        "key": "iPS-11c",
+        "count": 1
+      },
+      {
+        "key": "GM04504",
+        "count": 1
+      },
+      {
+        "key": "iPS-17b",
+        "count": 1
+      },
+      {
+        "key": "iPS-27e",
+        "count": 1
+      },
+      {
+        "key": "GM04503",
+        "count": 1
+      },
+      {
+        "key": "iPS DF 4.7",
+        "count": 1
+      },
+      {
+        "key": "fibroblast of skin of right quadriceps",
+        "count": 1
+      },
+      {
+        "key": "fibroblast of skin of right biceps",
+        "count": 1
+      }
+    ],
+    "skin of prepuce of penis": [
+      {
+        "key": "iPS DF 6.9",
+        "count": 13
+      },
+      {
+        "key": "iPS DF 19.11",
+        "count": 13
+      },
+      {
+        "key": "iPS DF 19.7",
+        "count": 2
+      },
+      {
+        "key": "iPS DF 4.7",
+        "count": 1
+      }
+    ],
+    "small intestine": [
+      {
+        "key": "small intestine",
+        "count": 73
+      },
+      {
+        "key": "duodenal mucosa",
+        "count": 18
+      },
+      {
+        "key": "muscle layer of duodenum",
+        "count": 13
+      },
+      {
+        "key": "jejunum",
+        "count": 4
+      },
+      {
+        "key": "duodenum",
+        "count": 2
+      },
+      {
+        "key": "ileum",
+        "count": 1
+      }
+    ],
+    "spinal cord": [
+      {
+        "key": "motor neuron",
+        "count": 62
+      },
+      {
+        "key": "astrocyte",
+        "count": 45
+      },
+      {
+        "key": "bipolar neuron",
+        "count": 31
+      },
+      {
+        "key": "spinal cord",
+        "count": 21
+      },
+      {
+        "key": "C1 segment of cervical spinal cord",
+        "count": 14
+      },
+      {
+        "key": "astrocyte of the spinal cord",
+        "count": 6
+      },
+      {
+        "key": "MN1",
+        "count": 2
+      }
+    ],
+    "spleen": [
+      {
+        "key": "spleen",
+        "count": 196
+      },
+      {
+        "key": "MEL",
+        "count": 94
+      },
+      {
+        "key": "immature natural killer cell",
+        "count": 89
+      },
+      {
+        "key": "splenic B cell",
+        "count": 5
+      },
+      {
+        "key": "MEL-GATA-1-ER",
+        "count": 1
+      }
+    ],
+    "stomach": [
+      {
+        "key": "stomach",
+        "count": 208
+      },
+      {
+        "key": "gastroesophageal sphincter",
+        "count": 69
+      },
+      {
+        "key": "stomach smooth muscle",
+        "count": 17
+      },
+      {
+        "key": "mucosa of stomach",
+        "count": 9
+      }
+    ],
+    "testis": [
+      {
+        "key": "testis",
+        "count": 66
+      },
+      {
+        "key": "NT2/D1",
+        "count": 18
+      },
+      {
+        "key": "sperm",
+        "count": 4
+      }
+    ],
+    "thymus": [
+      {
+        "key": "immature natural killer cell",
+        "count": 89
+      },
+      {
+        "key": "thymus",
+        "count": 66
+      }
+    ],
+    "thyroid gland": [
+      {
+        "key": "thyroid gland",
+        "count": 79
+      },
+      {
+        "key": "K1",
+        "count": 1
+      }
+    ],
+    "tongue": [
+      {
+        "key": "tongue",
+        "count": 5
+      }
+    ],
+    "trachea": [
+      {
+        "key": "tracheal epithelial cell",
+        "count": 2
+      },
+      {
+        "key": "trachea",
+        "count": 1
+      },
+      {
+        "key": "smooth muscle cell of trachea",
+        "count": 1
+      }
+    ],
+    "ureter": [
+      {
+        "key": "left renal pelvis",
+        "count": 8
+      },
+      {
+        "key": "right renal pelvis",
+        "count": 8
+      },
+      {
+        "key": "ureter",
+        "count": 6
+      }
+    ],
+    "urinary bladder": [
+      {
+        "key": "urinary bladder",
+        "count": 31
+      },
+      {
+        "key": "mucosa of urinary bladder",
+        "count": 4
+      },
+      {
+        "key": "KU-19-19",
+        "count": 1
+      },
+      {
+        "key": "smooth muscle cell of bladder",
+        "count": 1
+      },
+      {
+        "key": "HT-1376",
+        "count": 1
+      },
+      {
+        "key": "HT-1197",
+        "count": 1
+      },
+      {
+        "key": "bladder microvascular endothelial cell",
+        "count": 1
+      }
+    ],
+    "uterus": [
+      {
+        "key": "HeLa-S3",
+        "count": 159
+      },
+      {
+        "key": "uterus",
+        "count": 52
+      },
+      {
+        "key": "Ishikawa",
+        "count": 37
+      },
+      {
+        "key": "hTERT-HM",
+        "count": 4
+      },
+      {
+        "key": "endometrial microvascular endothelial cells",
+        "count": 3
+      },
+      {
+        "key": "myometrial cell",
+        "count": 2
+      },
+      {
+        "key": "endometrium",
+        "count": 1
+      },
+      {
+        "key": "uterine smooth muscle cell",
+        "count": 1
+      }
+    ],
+    "vagina": [
+      {
+        "key": "vagina",
+        "count": 40
+      }
+    ],
+    "vasculature": [
+      {
+        "key": "endothelial cell of umbilical vein",
+        "count": 83
+      },
+      {
+        "key": "tibial artery",
+        "count": 39
+      },
+      {
+        "key": "aorta",
+        "count": 29
+      },
+      {
+        "key": "ascending aorta",
+        "count": 28
+      },
+      {
+        "key": "thoracic aorta",
+        "count": 25
+      },
+      {
+        "key": "posterior vena cava",
+        "count": 15
+      },
+      {
+        "key": "coronary artery",
+        "count": 13
+      },
+      {
+        "key": "brain microvascular endothelial cell",
+        "count": 11
+      },
+      {
+        "key": "choroid plexus epithelial cell",
+        "count": 10
+      },
+      {
+        "key": "dermis blood vessel endothelial cell",
+        "count": 9
+      },
+      {
+        "key": "fibroblast of the aortic adventitia",
+        "count": 8
+      },
+      {
+        "key": "aortic smooth muscle cell",
+        "count": 8
+      },
+      {
+        "key": "pulmonary artery endothelial cell",
+        "count": 5
+      },
+      {
+        "key": "lung microvascular endothelial cell",
+        "count": 5
+      },
+      {
+        "key": "fibroblast of pulmonary artery",
+        "count": 5
+      },
+      {
+        "key": "dermis microvascular lymphatic vessel endothelial cell",
+        "count": 5
+      },
+      {
+        "key": "glomerular endothelial cell",
+        "count": 4
+      },
+      {
+        "key": "thoracic aorta endothelial cell",
+        "count": 3
+      },
+      {
+        "key": "vein endothelial cell",
+        "count": 3
+      },
+      {
+        "key": "endometrial microvascular endothelial cells",
+        "count": 3
+      },
+      {
+        "key": "mammary microvascular endothelial cell",
+        "count": 2
+      },
+      {
+        "key": "GM11840",
+        "count": 2
+      },
+      {
+        "key": "smooth muscle cell of the brain vasculature",
+        "count": 2
+      },
+      {
+        "key": "dermis lymphatic vessel endothelial cell",
+        "count": 1
+      },
+      {
+        "key": "smooth muscle cell of the pulmonary artery",
+        "count": 1
+      },
+      {
+        "key": "bladder microvascular endothelial cell",
+        "count": 1
+      },
+      {
+        "key": "endothelial cell of coronary artery",
+        "count": 1
+      },
+      {
+        "key": "epithelial cell of umbilical artery",
+        "count": 1
+      },
+      {
+        "key": "anterior vena cava",
+        "count": 1
+      },
+      {
+        "key": "pulmonary artery",
+        "count": 1
+      },
+      {
+        "key": "right common carotid artery plus branches",
+        "count": 1
+      },
+      {
+        "key": "smooth muscle cell of the coronary artery",
+        "count": 1
+      },
+      {
+        "key": "smooth muscle cell of the umbilical artery",
+        "count": 1
+      },
+      {
+        "key": "left common carotid artery plus branches",
+        "count": 1
+      },
+      {
+        "key": "endothelial cell of hepatic sinusoid",
+        "count": 1
+      },
+      {
+        "key": "kidney capillary endothelial cell",
+        "count": 1
+      }
+    ],
+    "vein": [
+      {
+        "key": "endothelial cell of umbilical vein",
+        "count": 83
+      },
+      {
+        "key": "posterior vena cava",
+        "count": 15
+      },
+      {
+        "key": "vein endothelial cell",
+        "count": 3
+      },
+      {
+        "key": "GM11840",
+        "count": 2
+      },
+      {
+        "key": "anterior vena cava",
+        "count": 1
       }
     ]
   }

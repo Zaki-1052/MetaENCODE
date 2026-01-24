@@ -13,6 +13,7 @@ from src.ui.vocabularies import (
     HISTONE_ALIASES,
     HISTONE_MODIFICATIONS,
     LIFE_STAGES,
+    ORGAN_DISPLAY_NAMES,
     ORGANISMS,
     TISSUE_SYNONYMS,
     TOP_BIOSAMPLES,
@@ -24,9 +25,14 @@ from src.ui.vocabularies import (
     get_all_organisms,
     get_assay_display_name,
     get_assay_types,
+    get_biosample_names_for_organ,
     get_biosamples,
+    get_biosamples_for_organ,
     get_labs,
     get_life_stages,
+    get_organ_display_name,
+    get_organ_system_names,
+    get_organ_systems,
     get_organism_display,
     get_targets,
     get_tissues_for_body_part,
@@ -442,3 +448,107 @@ class TestVocabularyConsistency:
         json_targets = get_targets()[:40]
         json_names = [name for name, count in json_targets]
         assert top_targets == json_names
+
+
+class TestOrganSystems:
+    """Tests for organ_slims-based functions."""
+
+    def test_get_organ_systems_returns_list(self) -> None:
+        """Test that get_organ_systems returns ordered list of tuples."""
+        organs = get_organ_systems()
+        assert isinstance(organs, list)
+        assert len(organs) > 0
+        # Should be (name, count) tuples
+        name, count = organs[0]
+        assert isinstance(name, str)
+        assert isinstance(count, int)
+        assert count > 0
+
+    def test_get_organ_systems_ordered_by_count(self) -> None:
+        """Test that organ systems are ordered by experiment count (descending)."""
+        organs = get_organ_systems()
+        counts = [count for name, count in organs]
+        assert counts == sorted(counts, reverse=True)
+
+    def test_get_organ_systems_contains_common_organs(self) -> None:
+        """Test that common organs are present."""
+        organs = get_organ_systems()
+        organ_names = [name for name, count in organs]
+        common_organs = ["brain", "heart", "liver", "lung", "kidney", "blood"]
+        for organ in common_organs:
+            assert organ in organ_names, f"Expected {organ} in organ systems"
+
+    def test_get_organ_system_names(self) -> None:
+        """Test that get_organ_system_names returns list of strings."""
+        names = get_organ_system_names()
+        assert isinstance(names, list)
+        assert len(names) > 0
+        assert all(isinstance(n, str) for n in names)
+        # Should match the names from get_organ_systems
+        full_data = get_organ_systems()
+        expected_names = [name for name, count in full_data]
+        assert names == expected_names
+
+    def test_get_biosamples_for_organ_brain(self) -> None:
+        """Test getting biosamples for brain organ."""
+        biosamples = get_biosamples_for_organ("brain")
+        assert isinstance(biosamples, list)
+        # Brain should have multiple biosamples
+        assert len(biosamples) > 5
+        # Check structure
+        name, count = biosamples[0]
+        assert isinstance(name, str)
+        assert isinstance(count, int)
+        assert count > 0
+        # Common brain tissues should be present
+        biosample_names = [name for name, count in biosamples]
+        assert any("cortex" in name.lower() for name in biosample_names)
+
+    def test_get_biosamples_for_organ_ordered_by_count(self) -> None:
+        """Test that biosamples for an organ are ordered by count."""
+        biosamples = get_biosamples_for_organ("brain")
+        counts = [count for name, count in biosamples]
+        assert counts == sorted(counts, reverse=True)
+
+    def test_get_biosamples_for_invalid_organ(self) -> None:
+        """Test that invalid organ returns empty list."""
+        biosamples = get_biosamples_for_organ("nonexistent_organ")
+        assert biosamples == []
+
+    def test_get_biosample_names_for_organ(self) -> None:
+        """Test getting biosample names (without counts) for an organ."""
+        names = get_biosample_names_for_organ("heart")
+        assert isinstance(names, list)
+        assert len(names) > 0
+        assert all(isinstance(n, str) for n in names)
+
+    def test_get_biosample_names_for_organ_with_limit(self) -> None:
+        """Test that limit parameter works correctly."""
+        all_names = get_biosample_names_for_organ("brain")
+        limited = get_biosample_names_for_organ("brain", limit=5)
+        assert len(limited) == 5
+        assert limited == all_names[:5]
+
+    def test_get_organ_display_name_known(self) -> None:
+        """Test display name for known organ mappings."""
+        # "bodily fluid" -> "Blood / Bodily Fluid"
+        assert get_organ_display_name("bodily fluid") == "Blood / Bodily Fluid"
+        # "musculature of body" -> "Muscle"
+        assert get_organ_display_name("musculature of body") == "Muscle"
+
+    def test_get_organ_display_name_unknown(self) -> None:
+        """Test display name for organs without custom mapping."""
+        # Should title-case and replace underscores
+        assert get_organ_display_name("brain") == "Brain"
+        assert get_organ_display_name("test_organ") == "Test Organ"
+
+    def test_organ_display_names_not_empty(self) -> None:
+        """Test that ORGAN_DISPLAY_NAMES contains entries."""
+        assert len(ORGAN_DISPLAY_NAMES) > 0
+
+    def test_multiple_organs_have_biosamples(self) -> None:
+        """Test that major organs all have biosample data."""
+        organs_to_check = ["brain", "heart", "liver", "lung", "kidney"]
+        for organ in organs_to_check:
+            biosamples = get_biosamples_for_organ(organ)
+            assert len(biosamples) > 0, f"Expected biosamples for {organ}"

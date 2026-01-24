@@ -1,5 +1,5 @@
 # Auto-generated from ENCODE API experiment data
-# Generated: 2026-01-23T16:35:58.437480
+# Generated: 2026-01-23T19:37:58.772476
 # Source: ENCODE API /search/?type=Experiment (all experiments)
 # Values are ordered by experiment count (most popular first)
 
@@ -161,7 +161,7 @@ BIOSAMPLES_FROM_ENCODE: list[tuple[str, int]] = [
     ("CH12.LX", 66),
     ("substantia nigra", 66),
     ("activated naive CD4-positive, alpha-beta T cell", 65),
-    ("Peyer's patch", 64),
+    ("Peyer\'s patch", 64),
     ("natural killer cell", 63),
     ("neurosphere", 63),
     ("motor neuron", 62),
@@ -179,7 +179,7 @@ BIOSAMPLES_FROM_ENCODE: list[tuple[str, int]] = [
     ("amygdala", 56),
     ("nucleus accumbens", 56),
     ("suprapubic skin", 54),
-    ("Ammon's horn", 54),
+    ("Ammon\'s horn", 54),
     ("skin epidermis", 53),
     ("uterus", 52),
     ("MCF 10A", 52),
@@ -558,7 +558,7 @@ BIOSAMPLES_FROM_ENCODE: list[tuple[str, int]] = [
     ("parietal lobe", 3),
     ("umbilical cord", 3),
     ("vein endothelial cell", 3),
-    ("mesenchymal stem cell of Wharton's jelly", 3),
+    ("mesenchymal stem cell of Wharton\'s jelly", 3),
     ("mesenchymal stem cell of the bone marrow", 3),
     ("cerebral cortex", 3),
     ("GM18507", 3),
