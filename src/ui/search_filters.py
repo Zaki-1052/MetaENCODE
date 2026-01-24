@@ -212,7 +212,11 @@ class SearchFilterManager:
             # Score based on matching scientific name, common name, or assembly
             score = max(
                 self._match_score(query_lower, sci_name.lower()),
-                self._match_score(query_lower, common_name.lower()) if common_name else 0,
+                (
+                    self._match_score(query_lower, common_name.lower())
+                    if common_name
+                    else 0
+                ),
                 self._match_score(query_lower, short_name.lower()) if short_name else 0,
                 self._match_score(query_lower, assembly.lower()) if assembly else 0,
             )
@@ -501,6 +505,63 @@ class SearchFilterManager:
         ratio = SequenceMatcher(None, query, target).ratio()
         return ratio * 0.5
 
+    def _fuzzy_text_search(
+        self, df: pd.DataFrame, search_terms: List[str], threshold: float = 0.75
+    ) -> pd.Series:
+        """Search text columns with fuzzy matching fallback.
+
+        Args:
+            df: DataFrame to search.
+            search_terms: List of search terms (already lowercased).
+            threshold: Minimum SequenceMatcher ratio for fuzzy matching (0.0-1.0).
+                       Default 0.75 balances catching typos vs false positives.
+
+        Returns:
+            Boolean mask of matching rows.
+        """
+        # Columns to search (in priority order)
+        search_cols = [
+            "description",
+            "title",
+            "combined_text",
+            "assay_term_name",
+            "biosample_term_name",
+            "organism",
+            "lab",
+        ]
+        available_cols = [c for c in search_cols if c in df.columns]
+
+        if not available_cols:
+            return pd.Series(True, index=df.index)
+
+        # Build combined search text per row
+        def combine_text(row: pd.Series) -> str:
+            return " ".join(str(row.get(c, "") or "") for c in available_cols).lower()
+
+        combined = df.apply(combine_text, axis=1)
+
+        # For each term, find matches
+        mask = pd.Series(True, index=df.index)
+        for term in search_terms:
+            # Fast path: exact substring match
+            term_mask = combined.str.contains(term, case=False, na=False, regex=False)
+
+            # Fuzzy fallback for non-matches
+            if not term_mask.all():
+                for idx in df.index[~term_mask]:
+                    text = combined.loc[idx]
+                    # Check each word for fuzzy match
+                    for word in text.split():
+                        # Use SequenceMatcher directly (not _match_score)
+                        ratio = SequenceMatcher(None, term, word).ratio()
+                        if ratio >= threshold:
+                            term_mask.loc[idx] = True
+                            break
+
+            mask = mask & term_mask
+
+        return mask
+
     def _get_body_part_display(self, tissue: str) -> str:
         """Get the display name of the body part containing a tissue."""
         tissue_lower = tissue.lower()
@@ -588,18 +649,10 @@ class SearchFilterManager:
                 result["life_stage"].str.lower() == filters.age_stage.lower()
             ]
 
-        # Description search
+        # Description search with fuzzy matching
         if filters.description_search:
             search_terms = filters.description_search.lower().split()
-            mask = pd.Series(True, index=result.index)
-            for term in search_terms:
-                term_mask = pd.Series(False, index=result.index)
-                for col in ["description", "title", "combined_text"]:
-                    if col in result.columns:
-                        term_mask = term_mask | result[col].str.contains(
-                            term, case=False, na=False
-                        )
-                mask = mask & term_mask
+            mask = self._fuzzy_text_search(result, search_terms, threshold=0.75)
             result = result[mask]
 
         # Lab filter

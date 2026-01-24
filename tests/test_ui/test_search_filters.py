@@ -959,6 +959,59 @@ class TestSearchFilterManagerApplyFilters:
         result = manager.apply_filters(sample_df_for_filtering, filters)
         assert len(result) == 0
 
+    def test_apply_filters_description_search_assay_column(
+        self, manager: SearchFilterManager, sample_df_for_filtering: pd.DataFrame
+    ) -> None:
+        """Test description search matches assay_term_name column."""
+        filters = FilterState(description_search="ATAC-seq")
+        result = manager.apply_filters(sample_df_for_filtering, filters)
+        assert len(result) == 1
+        assert result.iloc[0]["assay_term_name"] == "ATAC-seq"
+
+    def test_apply_filters_description_search_biosample_column(
+        self, manager: SearchFilterManager, sample_df_for_filtering: pd.DataFrame
+    ) -> None:
+        """Test description search matches biosample_term_name column."""
+        # Search for K562 which appears in biosample_term_name
+        filters = FilterState(description_search="K562")
+        result = manager.apply_filters(sample_df_for_filtering, filters)
+        assert len(result) == 1
+        assert result.iloc[0]["biosample_term_name"] == "K562"
+
+    def test_apply_filters_description_search_organism_column(
+        self, manager: SearchFilterManager, sample_df_for_filtering: pd.DataFrame
+    ) -> None:
+        """Test description search matches organism column."""
+        # "mouse" appears in organism column AND in description
+        filters = FilterState(description_search="mouse")
+        result = manager.apply_filters(sample_df_for_filtering, filters)
+        # Matches: ENC002 (mouse), ENC003 (description), ENC004 (mouse)
+        assert len(result) == 3
+        # Verify that it matched rows by organism or description containing "mouse"
+        for _, row in result.iterrows():
+            has_mouse = (
+                "mouse" in str(row.get("organism", "")).lower()
+                or "mouse" in str(row.get("description", "")).lower()
+            )
+            assert has_mouse
+
+    def test_apply_filters_description_search_fuzzy_match(
+        self, manager: SearchFilterManager, sample_df_for_filtering: pd.DataFrame
+    ) -> None:
+        """Test description search with typo uses fuzzy matching."""
+        # "cerebelum" is a typo for "cerebellum"
+        filters = FilterState(description_search="cerebelum")
+        result = manager.apply_filters(sample_df_for_filtering, filters)
+        # Should match both cerebellum (biosample_term_name or description)
+        assert len(result) >= 1
+        # Verify at least one matched row has cerebellum
+        has_cerebellum = any(
+            "cerebellum" in str(row.get("biosample_term_name", "")).lower()
+            or "cerebellum" in str(row.get("description", "")).lower()
+            for _, row in result.iterrows()
+        )
+        assert has_cerebellum
+
 
 class TestSearchFilterManagerApplyFiltersEdgeCases:
     """Edge case tests for apply_filters method."""

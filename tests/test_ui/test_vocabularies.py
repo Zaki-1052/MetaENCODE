@@ -695,7 +695,9 @@ class TestBiosampleToOrganMapping:
             if len(organs) > 1:
                 multi_organ_sample = biosample
                 break
-        assert multi_organ_sample is not None, "Should have at least one multi-organ biosample"
+        assert (
+            multi_organ_sample is not None
+        ), "Should have at least one multi-organ biosample"
         organs = get_all_organs_for_biosample(multi_organ_sample)
         assert len(organs) > 1
 
@@ -708,9 +710,7 @@ class TestBiosampleToOrganMapping:
         """Test that organs are ordered by experiment count (most popular first)."""
         # Get a biosample that maps to multiple organs
         mapping = build_biosample_to_organs()
-        organ_counts = {
-            name: count for name, count in get_organ_systems()
-        }
+        organ_counts = {name: count for name, count in get_organ_systems()}
 
         for biosample, organs in list(mapping.items())[:20]:
             if len(organs) > 1:

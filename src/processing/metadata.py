@@ -34,6 +34,7 @@ class MetadataProcessor:
         "organism",
         "biosample_term_name",
         "lab",
+        "life_stage",
     ]
     NUMERIC_FIELDS = ["replicate_count", "file_count"]
 
@@ -106,11 +107,17 @@ class MetadataProcessor:
 
         # Add organ column derived from biosample_term_name
         if "biosample_term_name" in result.columns:
-            result["organ"] = result["biosample_term_name"].apply(
-                lambda x: get_primary_organ_for_biosample(x)
-                if pd.notna(x) and x != "unknown"
-                else None
-            ).fillna("unknown")
+            result["organ"] = (
+                result["biosample_term_name"]
+                .apply(
+                    lambda x: (
+                        get_primary_organ_for_biosample(x)
+                        if pd.notna(x) and x != "unknown"
+                        else None
+                    )
+                )
+                .fillna("unknown")
+            )
 
         return result
 

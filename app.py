@@ -24,8 +24,8 @@ from src.ui.vocabularies import (
     ORGANISMS,
     get_assay_display_name,
     get_assay_types,
-    get_biosamples_for_organ,
     get_biosample_names,
+    get_biosamples_for_organ,
     get_lab_names,
     get_life_stages,
     get_organ_display_name,
@@ -276,9 +276,7 @@ def render_sidebar() -> dict:
     body_part = st.sidebar.selectbox(
         "Organ / System",
         options=organ_options,
-        index=(
-            organ_options.index(current_bp) if current_bp in organ_options else 0
-        ),
+        index=(organ_options.index(current_bp) if current_bp in organ_options else 0),
         format_func=lambda x: (
             "All organs/systems"
             if x == ""
@@ -444,13 +442,14 @@ def render_sidebar() -> dict:
                         limit=max(max_results * 5, 200),  # Fetch more for filtering
                     )
 
-                    # Apply post-filtering for body_part, target, age, etc.
+                    # Apply post-filtering for body_part, target, etc.
+                    # Note: age_stage is NOT included here because API already filtered by it
                     if not results.empty:
-                        # Apply non-API filters (body_part, target, age, description)
+                        # Apply non-API filters (body_part, description, lab, replicates)
                         post_filter_state = FilterState(
                             body_part=filter_state.body_part,
                             target=filter_state.target,
-                            age_stage=filter_state.age_stage,
+                            # age_stage excluded - API already filtered by life_stage
                             lab=filter_state.lab,
                             min_replicates=filter_state.min_replicates,
                             description_search=filter_state.description_search,
