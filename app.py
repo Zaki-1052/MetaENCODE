@@ -31,6 +31,7 @@ from src.ui.vocabularies import (
     get_organ_display_name,
     get_organ_systems,
     get_organism_display,
+    get_organisms,
     get_primary_organ_for_biosample,
     get_targets,
 )
@@ -194,8 +195,10 @@ def render_sidebar() -> dict:
         key="filter_assay_type",
     )
 
-    # 2. Organism Selection with genome assembly
-    organism_options = [""] + list(ORGANISMS.keys())
+    # 2. Organism Selection - Dynamic from ENCODE with experiment counts
+    organism_data = get_organisms()  # Returns [(scientific_name, count), ...]
+    organism_options = [""] + [name for name, _ in organism_data]
+    organism_counts = {name: count for name, count in organism_data}
     current_org = st.session_state.filter_state.organism or ""
 
     organism = st.sidebar.selectbox(
@@ -206,8 +209,12 @@ def render_sidebar() -> dict:
             if current_org in organism_options
             else 0
         ),
-        format_func=lambda x: "All organisms" if x == "" else get_organism_display(x),
-        help="Filter by organism (shows genome assembly)",
+        format_func=lambda x: (
+            "All organisms"
+            if x == ""
+            else f"{get_organism_display(x)} ({organism_counts.get(x, 0):,})"
+        ),
+        help="Filter by organism (shows genome assembly for known organisms)",
         key="filter_organism",
     )
 
@@ -434,19 +441,21 @@ def render_sidebar() -> dict:
                             filter_state.organism, filter_state.organism
                         )
 
-                    # Use fetch_experiments with only the core API parameters
-                    # Don't use life_stage or target at API level - too restrictive
+                    # Use fetch_experiments with all available API parameters
                     results = client.fetch_experiments(
                         assay_type=filter_state.assay_type,
                         organism=organism_scientific,
                         biosample=filter_state.biosample,
+                        target=filter_state.target,
+                        life_stage=filter_state.age_stage,
                         limit=max(max_results * 5, 200),  # Fetch more for filtering
                     )
 
-                    # Apply post-filtering for target, age, etc.
+                    # Apply post-filtering for body_part, target, age, etc.
                     if not results.empty:
-                        # Only apply non-API filters (target, age, description)
+                        # Apply non-API filters (body_part, target, age, description)
                         post_filter_state = FilterState(
+                            body_part=filter_state.body_part,
                             target=filter_state.target,
                             age_stage=filter_state.age_stage,
                             lab=filter_state.lab,
@@ -757,89 +766,22 @@ def render_search_tab() -> None:
             st.json(dataset)
 
 
-def apply_filters(
-    similar_df: pd.DataFrame,
-    organism: str | None = None,
-    assay_type: str | None = None,
-    filter_state: FilterState | None = None,
-) -> pd.DataFrame:
-    """Apply filters to similarity results.
-
-    Filters are applied AFTER similarity computation for responsive UX.
-    For similarity results, only organism and assay_type filters are applied
-    to avoid being too restrictive (other filters like age, target are not
-    useful for post-filtering similarity results).
-
-    Args:
-        similar_df: DataFrame with similarity results (must have organism,
-                   assay_term_name columns).
-        organism: Filter by organism (e.g., "human", "mouse").
-        assay_type: Filter by assay type (e.g., "ChIP-seq", "RNA-seq").
-        filter_state: Optional FilterState (only organism/assay used).
-
-    Returns:
-        Filtered DataFrame.
-    """
-    if similar_df.empty:
-        return similar_df
-
-    filtered = similar_df.copy()
-
-    # Get organism and assay_type from filter_state if provided
-    org = organism
-    assay = assay_type
-    if filter_state is not None:
-        org = filter_state.organism or organism
-        assay = filter_state.assay_type or assay_type
-
-    # Apply organism filter
-    if org is not None and "organism" in filtered.columns:
-        filtered = filtered[filtered["organism"].str.lower() == org.lower()]
-
-    # Apply assay type filter
-    if assay is not None and "assay_term_name" in filtered.columns:
-        # Handle HiC variants (ENCODE uses "HiC")
-        if assay.lower() in ("hi-c", "hic"):
-            filtered = filtered[
-                filtered["assay_term_name"]
-                .str.lower()
-                .isin(["hi-c", "hic", "in situ hi-c"])
-            ]
-        else:
-            filtered = filtered[
-                filtered["assay_term_name"].str.lower() == assay.lower()
-            ]
-
-    # Apply organ/body_part filter
-    bp = filter_state.body_part if filter_state else None
-    if bp and "biosample_term_name" in filtered.columns:
-        organ_biosamples = get_biosamples_for_organ(bp)
-        valid_biosamples = {name.lower() for name, _ in organ_biosamples}
-        filtered = filtered[
-            filtered["biosample_term_name"].str.lower().isin(valid_biosamples)
-        ]
-
-    return filtered
-
-
 def format_organism_display(organism: str) -> str:
     """Format organism name with genome assembly label.
 
+    Delegates to get_organism_display for consistent formatting
+    across all organisms, including those not in the known list.
+
     Args:
-        organism: Organism name (e.g., "human", "mouse").
+        organism: Organism name (common or scientific).
 
     Returns:
-        Formatted string with assembly (e.g., "Human [hg38]").
+        Formatted string with assembly (e.g., "Human [hg38]") or
+        just the organism name if no assembly info available.
     """
     if not organism:
         return "N/A"
-
-    org_lower = organism.lower()
-    if org_lower in ORGANISMS:
-        info = ORGANISMS[org_lower]
-        return f"{organism.capitalize()} [{info['assembly']}]"
-
-    return organism.capitalize()
+    return get_organism_display(organism)
 
 
 def render_similar_tab() -> None:
@@ -926,13 +868,15 @@ def render_similar_tab() -> None:
         if not similar.empty:
             st.subheader("Most Similar Datasets")
 
-            # Apply filters using the new filter state
-            filtered_similar = apply_filters(
-                similar,
+            # Apply filters using unified filter manager
+            filter_mgr = SearchFilterManager()
+            sim_filter_state = FilterState(
                 organism=filter_state.organism,
                 assay_type=filter_state.assay_type,
-                filter_state=filter_state,
+                body_part=filter_state.body_part,
+                biosample=filter_state.biosample,
             )
+            filtered_similar = filter_mgr.apply_filters(similar, sim_filter_state)
 
             # Limit to max_results
             filtered_similar = filtered_similar.head(top_n)

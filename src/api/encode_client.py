@@ -292,6 +292,18 @@ class EncodeClient:
             elif isinstance(organism_top, str):
                 organism = organism_top
 
+        # Extract life_stage from replicates structure
+        # Path: replicates[0].library.biosample.life_stage
+        life_stage = ""
+        if replicates and isinstance(replicates, list) and len(replicates) > 0:
+            rep = replicates[0]
+            if isinstance(rep, dict):
+                library = rep.get("library", {})
+                if isinstance(library, dict):
+                    biosample = library.get("biosample", {})
+                    if isinstance(biosample, dict):
+                        life_stage = str(biosample.get("life_stage", "") or "")
+
         return {
             "accession": data.get("accession", ""),
             "description": data.get("description", ""),
@@ -299,6 +311,7 @@ class EncodeClient:
             "assay_term_name": data.get("assay_term_name", ""),
             "biosample_term_name": biosample_term_name,
             "organism": organism,
+            "life_stage": life_stage,
             "lab": lab,
             "status": data.get("status", ""),
             "replicate_count": len(replicates),

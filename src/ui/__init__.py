@@ -7,15 +7,19 @@ from src.ui.vocabularies import (
     BODY_PARTS,
     HISTONE_MODIFICATIONS,
     LIFE_STAGES,
+    ORGANISM_ASSEMBLIES,
     ORGANISMS,
     TISSUE_SYNONYMS,
     get_assay_types,
     get_life_stages,
+    get_organism_display,
+    get_organisms,
 )
 
 __all__ = [
     "SearchFilterManager",
     "ASSAY_TYPES",
+    "ORGANISM_ASSEMBLIES",
     "ORGANISMS",
     "HISTONE_MODIFICATIONS",
     "BODY_PARTS",
@@ -23,4 +27,6 @@ __all__ = [
     "LIFE_STAGES",
     "get_assay_types",
     "get_life_stages",
+    "get_organism_display",
+    "get_organisms",
 ]

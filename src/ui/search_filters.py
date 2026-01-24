@@ -18,10 +18,12 @@ from src.ui.vocabularies import (
     BODY_PARTS,
     HISTONE_ALIASES,
     HISTONE_MODIFICATIONS,
-    ORGANISMS,
+    ORGANISM_ASSEMBLIES,
     TISSUE_SYNONYMS,
     get_lab_names,
     get_life_stages,
+    get_organism_display,
+    get_organisms,
 )
 
 
@@ -177,35 +179,46 @@ class SearchFilterManager:
     ) -> List[Tuple[str, str]]:
         """Find organisms matching the query.
 
+        Uses dynamic organism list from ENCODE API, with assembly info
+        for known model organisms.
+
         Args:
             query: User input to match against.
             limit: Maximum number of results.
 
         Returns:
-            List of (key, display_with_assembly) tuples.
+            List of (scientific_name, display) tuples.
         """
+        # Get all organisms from ENCODE (ordered by experiment count)
+        all_organisms = get_organisms()  # [(scientific_name, count), ...]
+
         if not query:
+            # Return top organisms by experiment count
             return [
-                (
-                    k,
-                    f"{v['display_name']} [{v['assembly']}]",
-                )
-                for k, v in ORGANISMS.items()
+                (sci_name, get_organism_display(sci_name))
+                for sci_name, _ in all_organisms
             ][:limit]
 
         query_lower = query.lower().strip()
         matches: List[Tuple[float, str, str]] = []
 
-        for key, info in ORGANISMS.items():
+        for sci_name, count in all_organisms:
+            # Get common name if available
+            assembly_info = ORGANISM_ASSEMBLIES.get(sci_name, {})
+            common_name = assembly_info.get("common_name", "")
+            short_name = assembly_info.get("short_name", "")
+            assembly = assembly_info.get("assembly", "")
+
+            # Score based on matching scientific name, common name, or assembly
             score = max(
-                self._match_score(query_lower, key),
-                self._match_score(query_lower, info["display_name"].lower()),
-                self._match_score(query_lower, info["scientific_name"].lower()),
-                self._match_score(query_lower, info["assembly"].lower()),
+                self._match_score(query_lower, sci_name.lower()),
+                self._match_score(query_lower, common_name.lower()) if common_name else 0,
+                self._match_score(query_lower, short_name.lower()) if short_name else 0,
+                self._match_score(query_lower, assembly.lower()) if assembly else 0,
             )
             if score > 0.3:
-                display = f"{info['display_name']} [{info['assembly']}]"
-                matches.append((score, key, display))
+                display = get_organism_display(sci_name)
+                matches.append((score, sci_name, display))
 
         matches.sort(key=lambda x: -x[0])
         return [(m[1], m[2]) for m in matches[:limit]]
@@ -547,6 +560,17 @@ class SearchFilterManager:
             result = result[
                 result["biosample_term_name"].str.lower().isin(related_lower)
             ]
+
+        # Body part / organ filter (filters to all biosamples under that organ)
+        if filters.body_part and "biosample_term_name" in result.columns:
+            from src.ui.vocabularies import get_biosamples_for_organ
+
+            organ_biosamples = get_biosamples_for_organ(filters.body_part)
+            valid_biosamples = {name.lower() for name, _ in organ_biosamples}
+            if valid_biosamples:
+                result = result[
+                    result["biosample_term_name"].str.lower().isin(valid_biosamples)
+                ]
 
         # Target (histone mod) filter - search in description
         if filters.target:

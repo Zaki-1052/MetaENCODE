@@ -540,97 +540,140 @@ def normalize_search_term(term: str, alias_dict: dict[str, list[str]]) -> str | 
 
 
 # =============================================================================
-# ORGANISM METADATA (Genome assemblies, scientific names)
-# Common names are keys, scientific names must match ENCODE JSON
+# ORGANISM METADATA (Dynamic from JSON + assembly info for known organisms)
 # =============================================================================
 
-ORGANISMS: dict[str, dict[str, str]] = {
-    "human": {
-        "display_name": "Human (Homo sapiens)",
-        "scientific_name": "Homo sapiens",
+# Assembly info for well-known model organisms (not available in ENCODE API)
+# This is metadata about genome builds, not a filter restriction
+ORGANISM_ASSEMBLIES: dict[str, dict[str, str]] = {
+    "Homo sapiens": {
+        "common_name": "human",
+        "short_name": "Human",
         "assembly": "hg38",
         "alt_assembly": "GRCh38",
-        "previous_assembly": "hg19",
     },
-    "mouse": {
-        "display_name": "Mouse (Mus musculus)",
-        "scientific_name": "Mus musculus",
+    "Mus musculus": {
+        "common_name": "mouse",
+        "short_name": "Mouse",
         "assembly": "mm10",
         "alt_assembly": "GRCm38",
-        "newer_assembly": "mm39",
     },
-    "fly": {
-        "display_name": "D. melanogaster",
-        "scientific_name": "Drosophila melanogaster",
+    "Drosophila melanogaster": {
+        "common_name": "fly",
+        "short_name": "D. melanogaster",
         "assembly": "dm6",
         "alt_assembly": "BDGP6",
     },
-    "worm": {
-        "display_name": "C. elegans",
-        "scientific_name": "Caenorhabditis elegans",
+    "Caenorhabditis elegans": {
+        "common_name": "worm",
+        "short_name": "C. elegans",
         "assembly": "ce11",
         "alt_assembly": "WBcel235",
     },
 }
 
-# Reverse mapping: scientific name -> common name key
-_SCIENTIFIC_TO_COMMON: dict[str, str] = {
-    info["scientific_name"]: key for key, info in ORGANISMS.items()
-}
+
+def get_organisms() -> list[tuple[str, int]]:
+    """Return organisms from ENCODE, ordered by experiment count.
+
+    Returns:
+        List of (scientific_name, count) tuples, most popular first.
+    """
+    data = _load_facets()
+    return [(item["key"], item["count"]) for item in data["field_counts"]["organism"]]
+
+
+def get_organism_names(limit: int | None = None) -> list[str]:
+    """Return list of organism scientific names ordered by popularity.
+
+    Args:
+        limit: Optional limit on number of organisms to return.
+
+    Returns:
+        List of scientific names, most popular first.
+    """
+    organisms = get_organisms()
+    if limit:
+        organisms = organisms[:limit]
+    return [name for name, _ in organisms]
 
 
 def get_organism_common_name(scientific_name: str) -> str | None:
-    """Get common name key from scientific name.
+    """Get common name for a scientific name (if known).
 
     Args:
         scientific_name: Scientific name (e.g., "Homo sapiens").
 
     Returns:
-        Common name key (e.g., "human") or None if not found.
+        Common name (e.g., "human") or None if not a known organism.
     """
-    return _SCIENTIFIC_TO_COMMON.get(scientific_name)
+    info = ORGANISM_ASSEMBLIES.get(scientific_name)
+    return info["common_name"] if info else None
 
 
-def get_organism_scientific_name(common_name: str) -> str:
+def get_organism_scientific_name(common_or_scientific: str) -> str:
     """Get scientific name for filtering ENCODE API.
 
     Args:
-        common_name: Common name key (e.g., "human").
+        common_or_scientific: Common name (e.g., "human") or scientific name.
 
     Returns:
         Scientific name (e.g., "Homo sapiens").
     """
-    if common_name in ORGANISMS:
-        return ORGANISMS[common_name]["scientific_name"]
-    return common_name
+    # Check if it's already a scientific name
+    if common_or_scientific in ORGANISM_ASSEMBLIES:
+        return common_or_scientific
+
+    # Check if it's a common name
+    for sci_name, info in ORGANISM_ASSEMBLIES.items():
+        if info["common_name"] == common_or_scientific:
+            return sci_name
+
+    # Return as-is (might be a scientific name not in our assembly dict)
+    return common_or_scientific
 
 
 def get_organism_display(organism: str) -> str:
     """Get display name with genome assembly for an organism.
 
     Args:
-        organism: Organism key (e.g., "human") or scientific name.
+        organism: Common name (e.g., "human") or scientific name.
 
     Returns:
-        Display string like "Human (Homo sapiens) [hg38]".
+        Display string like "Human [hg38]" or just the scientific name.
     """
-    # Check if it's a common name key
-    if organism in ORGANISMS:
-        info = ORGANISMS[organism]
-        return f"{info['display_name']} [{info['assembly']}]"
+    # First, resolve to scientific name
+    sci_name = get_organism_scientific_name(organism)
 
-    # Check if it's a scientific name
-    common = get_organism_common_name(organism)
-    if common and common in ORGANISMS:
-        info = ORGANISMS[common]
-        return f"{info['display_name']} [{info['assembly']}]"
+    # Check if we have assembly info
+    if sci_name in ORGANISM_ASSEMBLIES:
+        info = ORGANISM_ASSEMBLIES[sci_name]
+        return f"{info['short_name']} [{info['assembly']}]"
 
-    return organism
+    # For unknown organisms, just return the scientific name
+    return sci_name
 
 
 def get_all_organisms() -> list[str]:
-    """Return list of organism keys (common names)."""
-    return list(ORGANISMS.keys())
+    """Return list of all organism scientific names from ENCODE.
+
+    Returns:
+        List of scientific names ordered by experiment count.
+    """
+    return get_organism_names()
+
+
+# Legacy ORGANISMS dict for backward compatibility
+# Maps common name -> organism info (same structure as before)
+ORGANISMS: dict[str, dict[str, str]] = {
+    info["common_name"]: {
+        "display_name": f"{info['short_name']} ({sci_name})",
+        "scientific_name": sci_name,
+        "assembly": info["assembly"],
+        "alt_assembly": info.get("alt_assembly", ""),
+    }
+    for sci_name, info in ORGANISM_ASSEMBLIES.items()
+}
 
 
 # =============================================================================

@@ -318,12 +318,13 @@ class TestSearchFilterManagerAutocompleteOrganism:
     def test_autocomplete_organism_empty_query(
         self, manager: SearchFilterManager
     ) -> None:
-        """Test autocomplete_organism with empty query returns all organisms."""
+        """Test autocomplete_organism with empty query returns organisms."""
         results = manager.autocomplete_organism("")
         assert len(results) > 0
         keys = [r[0] for r in results]
-        assert "human" in keys
-        assert "mouse" in keys
+        # Now returns scientific names
+        assert "Homo sapiens" in keys
+        assert "Mus musculus" in keys
 
     def test_autocomplete_organism_human_query(
         self, manager: SearchFilterManager
@@ -332,7 +333,8 @@ class TestSearchFilterManagerAutocompleteOrganism:
         results = manager.autocomplete_organism("human")
         assert len(results) > 0
         keys = [r[0] for r in results]
-        assert "human" in keys
+        # Returns scientific name when searching for common name
+        assert "Homo sapiens" in keys
 
     def test_autocomplete_organism_mouse_query(
         self, manager: SearchFilterManager
@@ -341,7 +343,8 @@ class TestSearchFilterManagerAutocompleteOrganism:
         results = manager.autocomplete_organism("mouse")
         assert len(results) > 0
         keys = [r[0] for r in results]
-        assert "mouse" in keys
+        # Returns scientific name when searching for common name
+        assert "Mus musculus" in keys
 
     def test_autocomplete_organism_assembly_query(
         self, manager: SearchFilterManager
@@ -350,7 +353,8 @@ class TestSearchFilterManagerAutocompleteOrganism:
         results = manager.autocomplete_organism("hg38")
         assert len(results) > 0
         keys = [r[0] for r in results]
-        assert "human" in keys
+        # Returns scientific name when searching by assembly
+        assert "Homo sapiens" in keys
 
     def test_autocomplete_organism_includes_assembly_in_display(
         self, manager: SearchFilterManager
@@ -358,9 +362,9 @@ class TestSearchFilterManagerAutocompleteOrganism:
         """Test that organism display includes genome assembly."""
         results = manager.autocomplete_organism("human")
         assert len(results) > 0
-        # Find the human result
+        # Find the Homo sapiens result
         for key, display in results:
-            if key == "human":
+            if key == "Homo sapiens":
                 assert "hg38" in display
 
 

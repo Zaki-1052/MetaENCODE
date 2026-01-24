@@ -14,6 +14,7 @@ from src.ui.vocabularies import (
     HISTONE_MODIFICATIONS,
     LIFE_STAGES,
     ORGAN_DISPLAY_NAMES,
+    ORGANISM_ASSEMBLIES,
     ORGANISMS,
     TISSUE_SYNONYMS,
     TOP_BIOSAMPLES,
@@ -35,7 +36,11 @@ from src.ui.vocabularies import (
     get_organ_display_name,
     get_organ_system_names,
     get_organ_systems,
+    get_organism_common_name,
     get_organism_display,
+    get_organism_names,
+    get_organism_scientific_name,
+    get_organisms,
     get_primary_organ_for_biosample,
     get_targets,
     get_tissues_for_body_part,
@@ -202,6 +207,76 @@ class TestOrganisms:
         assert ORGANISMS["mouse"]["assembly"] == "mm10"
 
 
+class TestDynamicOrganisms:
+    """Tests for dynamic organism loading from ENCODE JSON."""
+
+    def test_get_organisms_returns_list_of_tuples(self) -> None:
+        """Test that get_organisms returns list of (name, count) tuples."""
+        result = get_organisms()
+        assert isinstance(result, list)
+        assert len(result) > 0
+        # Each item should be (scientific_name, count)
+        for item in result:
+            assert isinstance(item, tuple)
+            assert len(item) == 2
+            assert isinstance(item[0], str)
+            assert isinstance(item[1], int)
+
+    def test_get_organisms_includes_main_model_organisms(self) -> None:
+        """Test that main model organisms are in the dynamic list."""
+        organisms = get_organisms()
+        sci_names = [name for name, _ in organisms]
+        assert "Homo sapiens" in sci_names
+        assert "Mus musculus" in sci_names
+        assert "Drosophila melanogaster" in sci_names
+        assert "Caenorhabditis elegans" in sci_names
+
+    def test_get_organisms_includes_minor_species(self) -> None:
+        """Test that minor species from ENCODE are included."""
+        organisms = get_organisms()
+        sci_names = [name for name, _ in organisms]
+        # There should be more than the 4 main model organisms
+        assert len(sci_names) > 4
+
+    def test_get_organism_names_returns_strings(self) -> None:
+        """Test that get_organism_names returns list of strings."""
+        result = get_organism_names()
+        assert isinstance(result, list)
+        assert all(isinstance(name, str) for name in result)
+        assert "Homo sapiens" in result
+
+    def test_get_organism_names_with_limit(self) -> None:
+        """Test that limit parameter works."""
+        result = get_organism_names(limit=3)
+        assert len(result) == 3
+
+    def test_organism_assemblies_structure(self) -> None:
+        """Test ORGANISM_ASSEMBLIES has correct structure."""
+        assert "Homo sapiens" in ORGANISM_ASSEMBLIES
+        assert "Mus musculus" in ORGANISM_ASSEMBLIES
+
+        human = ORGANISM_ASSEMBLIES["Homo sapiens"]
+        assert human["common_name"] == "human"
+        assert human["short_name"] == "Human"
+        assert human["assembly"] == "hg38"
+
+    def test_get_organism_common_name(self) -> None:
+        """Test get_organism_common_name function."""
+        assert get_organism_common_name("Homo sapiens") == "human"
+        assert get_organism_common_name("Mus musculus") == "mouse"
+        assert get_organism_common_name("Unknown species") is None
+
+    def test_get_organism_scientific_name(self) -> None:
+        """Test get_organism_scientific_name function."""
+        # From common name
+        assert get_organism_scientific_name("human") == "Homo sapiens"
+        assert get_organism_scientific_name("mouse") == "Mus musculus"
+        # Scientific name passes through
+        assert get_organism_scientific_name("Homo sapiens") == "Homo sapiens"
+        # Unknown passes through
+        assert get_organism_scientific_name("unknown") == "unknown"
+
+
 class TestHistoneModifications:
     """Tests for HISTONE_MODIFICATIONS dictionary."""
 
@@ -357,18 +432,26 @@ class TestHelperFunctions:
         assert result[0] == "ChIP-seq"
 
     def test_get_all_organisms_returns_list(self) -> None:
-        """Test that get_all_organisms returns a list."""
+        """Test that get_all_organisms returns scientific names from ENCODE."""
         result = get_all_organisms()
         assert isinstance(result, list)
-        assert len(result) == len(ORGANISMS)
-        assert "human" in result
-        assert "mouse" in result
+        # Should include all organisms from ENCODE JSON (more than 4 main ones)
+        assert len(result) >= 4
+        # Returns scientific names, not common names
+        assert "Homo sapiens" in result
+        assert "Mus musculus" in result
 
     def test_get_organism_display_known_organism(self) -> None:
         """Test get_organism_display for known organisms."""
+        # Test with common name
         human_display = get_organism_display("human")
         assert "Human" in human_display
         assert "hg38" in human_display
+
+        # Test with scientific name
+        human_display2 = get_organism_display("Homo sapiens")
+        assert "Human" in human_display2
+        assert "hg38" in human_display2
 
         mouse_display = get_organism_display("mouse")
         assert "Mouse" in mouse_display
@@ -376,8 +459,13 @@ class TestHelperFunctions:
 
     def test_get_organism_display_unknown_organism(self) -> None:
         """Test get_organism_display for unknown organisms."""
+        # Unknown organisms just return the input
         result = get_organism_display("unknown_organism")
         assert result == "unknown_organism"
+
+        # Scientific names not in assembly dict return as-is
+        result2 = get_organism_display("Drosophila simulans")
+        assert result2 == "Drosophila simulans"
 
     def test_get_all_histone_mods_returns_list(self) -> None:
         """Test that get_all_histone_mods returns a list."""
