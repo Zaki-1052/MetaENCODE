@@ -61,8 +61,7 @@ def query_encode(params: dict[str, Any], limit: int = 0) -> dict:
 
         if limit > 0:
             result["samples"] = [
-                exp.get("accession", "N/A")
-                for exp in data.get("@graph", [])[:5]
+                exp.get("accession", "N/A") for exp in data.get("@graph", [])[:5]
             ]
 
         return result
@@ -81,12 +80,18 @@ def test_assay_types():
     results = []
     for assay_name in ASSAY_TYPES.keys():
         result = query_encode({"assay_term_name": assay_name})
-        results.append({
-            "assay": assay_name,
-            "count": result["count"],
-            "error": result.get("error"),
-        })
-        status = f"{result['count']:6d}" if result["count"] >= 0 else f"ERROR: {result.get('error', 'unknown')}"
+        results.append(
+            {
+                "assay": assay_name,
+                "count": result["count"],
+                "error": result.get("error"),
+            }
+        )
+        status = (
+            f"{result['count']:6d}"
+            if result["count"] >= 0
+            else f"ERROR: {result.get('error', 'unknown')}"
+        )
         print(f"  {assay_name:50s} -> {status}")
         time.sleep(0.2)  # Rate limiting
 
@@ -188,19 +193,36 @@ def test_biosamples():
 
     # Common cell lines and tissues
     biosamples = [
-        "K562", "GM12878", "H1-hESC", "HepG2", "A549",
-        "HeLa-S3", "MCF-7", "IMR-90", "HUVEC", "SK-N-SH",
-        "cerebellum", "liver", "heart", "kidney", "lung",
-        "brain", "spleen", "thymus", "whole blood",
+        "K562",
+        "GM12878",
+        "H1-hESC",
+        "HepG2",
+        "A549",
+        "HeLa-S3",
+        "MCF-7",
+        "IMR-90",
+        "HUVEC",
+        "SK-N-SH",
+        "cerebellum",
+        "liver",
+        "heart",
+        "kidney",
+        "lung",
+        "brain",
+        "spleen",
+        "thymus",
+        "whole blood",
     ]
 
     results = []
     for biosample in biosamples:
         result = query_encode({"biosample_ontology.term_name": biosample})
-        results.append({
-            "biosample": biosample,
-            "count": result["count"],
-        })
+        results.append(
+            {
+                "biosample": biosample,
+                "count": result["count"],
+            }
+        )
         status = f"{result['count']:6d}" if result["count"] >= 0 else "ERROR"
         print(f"  {biosample:30s} -> {status}")
         time.sleep(0.2)
@@ -230,7 +252,7 @@ def test_combined_query():
                 "assay_term_name": "ChIP-seq",
                 "replicates.library.biosample.donor.organism.scientific_name": "Mus musculus",
                 "biosample_ontology.term_name": "cerebellum",
-            }
+            },
         },
         {
             "name": "ChIP-seq + mouse + CTCF",
@@ -238,7 +260,7 @@ def test_combined_query():
                 "assay_term_name": "ChIP-seq",
                 "replicates.library.biosample.donor.organism.scientific_name": "Mus musculus",
                 "target.label": "CTCF",
-            }
+            },
         },
         {
             "name": "RNA-seq + human + K562",
@@ -246,7 +268,7 @@ def test_combined_query():
                 "assay_term_name": "RNA-seq",
                 "replicates.library.biosample.donor.organism.scientific_name": "Homo sapiens",
                 "biosample_ontology.term_name": "K562",
-            }
+            },
         },
         {
             "name": "ATAC-seq + mouse + adult",
@@ -254,7 +276,7 @@ def test_combined_query():
                 "assay_term_name": "ATAC-seq",
                 "replicates.library.biosample.donor.organism.scientific_name": "Mus musculus",
                 "replicates.library.biosample.life_stage": "adult",
-            }
+            },
         },
     ]
 

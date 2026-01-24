@@ -173,7 +173,9 @@ def render_sidebar() -> dict:
     assay_type = st.sidebar.selectbox(
         "Assay Type",
         options=assay_options,
-        index=assay_options.index(current_assay) if current_assay in assay_options else 0,
+        index=(
+            assay_options.index(current_assay) if current_assay in assay_options else 0
+        ),
         format_func=lambda x: "All assay types" if x == "" else ASSAY_TYPES.get(x, x),
         help="Filter by assay type (e.g., ChIP-seq, RNA-seq, Hi-C)",
         key="filter_assay_type",
@@ -186,7 +188,11 @@ def render_sidebar() -> dict:
     organism = st.sidebar.selectbox(
         "Organism",
         options=organism_options,
-        index=organism_options.index(current_org) if current_org in organism_options else 0,
+        index=(
+            organism_options.index(current_org)
+            if current_org in organism_options
+            else 0
+        ),
         format_func=lambda x: "All organisms" if x == "" else get_organism_display(x),
         help="Filter by organism (shows genome assembly)",
         key="filter_organism",
@@ -199,7 +205,11 @@ def render_sidebar() -> dict:
     target = st.sidebar.selectbox(
         "Target / Histone Mark",
         options=target_options,
-        index=target_options.index(current_target) if current_target in target_options else 0,
+        index=(
+            target_options.index(current_target)
+            if current_target in target_options
+            else 0
+        ),
         format_func=lambda x: (
             "All targets"
             if x == ""
@@ -221,11 +231,13 @@ def render_sidebar() -> dict:
     body_part = st.sidebar.selectbox(
         "Organ / System",
         options=body_part_options,
-        index=body_part_options.index(current_bp) if current_bp in body_part_options else 0,
+        index=(
+            body_part_options.index(current_bp)
+            if current_bp in body_part_options
+            else 0
+        ),
         format_func=lambda x: (
-            "All organs/systems"
-            if x == ""
-            else BODY_PARTS[x]["display_name"]
+            "All organs/systems" if x == "" else BODY_PARTS[x]["display_name"]
         ),
         help="Select organ system to filter tissues",
         key="filter_body_part",
@@ -273,9 +285,7 @@ def render_sidebar() -> dict:
     # Filter stages by organism if selected
     if organism:
         stage_options = [""] + [
-            k
-            for k, v in DEVELOPMENTAL_STAGES.items()
-            if v.get("species") == organism
+            k for k, v in DEVELOPMENTAL_STAGES.items() if v.get("species") == organism
         ]
     else:
         stage_options = [""] + list(DEVELOPMENTAL_STAGES.keys())
@@ -625,7 +635,9 @@ def render_search_tab() -> None:
                 "description": "Description",
             }
             display_df = display_df.rename(
-                columns={k: v for k, v in column_labels.items() if k in display_df.columns}
+                columns={
+                    k: v for k, v in column_labels.items() if k in display_df.columns
+                }
             )
 
             # Let user select a row
@@ -759,9 +771,9 @@ def apply_filters(
         # Handle HiC variants (ENCODE uses "HiC")
         if assay.lower() in ("hi-c", "hic"):
             filtered = filtered[
-                filtered["assay_term_name"].str.lower().isin(
-                    ["hi-c", "hic", "in situ hi-c"]
-                )
+                filtered["assay_term_name"]
+                .str.lower()
+                .isin(["hi-c", "hic", "in situ hi-c"])
             ]
         else:
             filtered = filtered[
@@ -940,7 +952,9 @@ def render_similar_tab() -> None:
                 "description": "Description",
             }
             display_df = display_df.rename(
-                columns={k: v for k, v in column_labels.items() if k in display_df.columns}
+                columns={
+                    k: v for k, v in column_labels.items() if k in display_df.columns
+                }
             )
 
             st.dataframe(display_df, use_container_width=True, hide_index=True)

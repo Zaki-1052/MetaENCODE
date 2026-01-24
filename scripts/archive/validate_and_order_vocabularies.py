@@ -72,7 +72,9 @@ def test_parameter_path(param_path: str, test_values: list[str]) -> dict:
     return {"path": param_path, "working": working, "results": results}
 
 
-def find_working_parameter_path(param_name: str, paths: list[str], test_values: list[str]) -> str:
+def find_working_parameter_path(
+    param_name: str, paths: list[str], test_values: list[str]
+) -> str:
     """Find which parameter path works for a given parameter type."""
     print(f"\n{'='*60}")
     print(f"FINDING WORKING PATH FOR: {param_name}")
@@ -99,12 +101,14 @@ def get_assay_counts() -> list[dict]:
     results = []
     for assay_name, display_name in ASSAY_TYPES.items():
         count, error = query_encode_count({"assay_term_name": assay_name})
-        results.append({
-            "key": assay_name,
-            "display": display_name,
-            "count": count,
-            "error": error,
-        })
+        results.append(
+            {
+                "key": assay_name,
+                "display": display_name,
+                "count": count,
+                "error": error,
+            }
+        )
         status = f"{count:6d}" if count >= 0 else f"ERROR: {error[:30]}"
         print(f"  {assay_name:50s} -> {status}")
         time.sleep(RATE_LIMIT_DELAY)
@@ -121,24 +125,49 @@ def get_biosample_counts(organism_path: str) -> list[dict]:
     # Common cell lines and tissues to test
     biosamples = [
         # ENCODE Tier 1
-        "K562", "GM12878", "H1-hESC",
+        "K562",
+        "GM12878",
+        "H1-hESC",
         # ENCODE Tier 2
-        "A549", "HeLa-S3", "HepG2", "HUVEC", "IMR-90", "MCF-7", "SK-N-SH",
+        "A549",
+        "HeLa-S3",
+        "HepG2",
+        "HUVEC",
+        "IMR-90",
+        "MCF-7",
+        "SK-N-SH",
         # Common tissues
-        "liver", "heart", "kidney", "lung", "brain", "spleen", "thymus",
-        "cerebellum", "hippocampus", "cortex", "whole blood",
+        "liver",
+        "heart",
+        "kidney",
+        "lung",
+        "brain",
+        "spleen",
+        "thymus",
+        "cerebellum",
+        "hippocampus",
+        "cortex",
+        "whole blood",
         # Other cell lines
-        "HEK293", "Jurkat", "NHEK", "Caco-2", "U2OS", "PC-3", "LNCaP",
+        "HEK293",
+        "Jurkat",
+        "NHEK",
+        "Caco-2",
+        "U2OS",
+        "PC-3",
+        "LNCaP",
     ]
 
     results = []
     for biosample in biosamples:
         count, error = query_encode_count({"biosample_ontology.term_name": biosample})
-        results.append({
-            "key": biosample,
-            "count": count,
-            "error": error,
-        })
+        results.append(
+            {
+                "key": biosample,
+                "count": count,
+                "error": error,
+            }
+        )
         status = f"{count:6d}" if count >= 0 else f"ERROR"
         print(f"  {biosample:30s} -> {status}")
         time.sleep(RATE_LIMIT_DELAY)
@@ -153,9 +182,20 @@ def get_target_counts() -> list[dict]:
     print(f"{'='*60}")
 
     targets = [
-        "H3K27ac", "H3K4me3", "H3K4me1", "H3K27me3", "H3K9me3",
-        "H3K36me3", "H3K9ac", "H4K20me1", "H3K79me2",
-        "CTCF", "POLR2A", "EP300", "RAD21", "SMC3",
+        "H3K27ac",
+        "H3K4me3",
+        "H3K4me1",
+        "H3K27me3",
+        "H3K9me3",
+        "H3K36me3",
+        "H3K9ac",
+        "H4K20me1",
+        "H3K79me2",
+        "CTCF",
+        "POLR2A",
+        "EP300",
+        "RAD21",
+        "SMC3",
     ]
 
     # First find working path
@@ -176,12 +216,14 @@ def get_target_counts() -> list[dict]:
     results = []
     for target in targets:
         count, error = query_encode_count({working_path: target})
-        results.append({
-            "key": target,
-            "count": count,
-            "error": error,
-            "path": working_path,
-        })
+        results.append(
+            {
+                "key": target,
+                "count": count,
+                "error": error,
+                "path": working_path,
+            }
+        )
         status = f"{count:6d}" if count >= 0 else f"ERROR"
         print(f"  {target:20s} -> {status}")
         time.sleep(RATE_LIMIT_DELAY)
@@ -218,12 +260,14 @@ def get_life_stage_counts() -> list[dict]:
     results = []
     for stage in stages:
         count, error = query_encode_count({working_path: stage})
-        results.append({
-            "key": stage,
-            "count": count,
-            "error": error,
-            "path": working_path,
-        })
+        results.append(
+            {
+                "key": stage,
+                "count": count,
+                "error": error,
+                "path": working_path,
+            }
+        )
         status = f"{count:6d}" if count >= 0 else f"ERROR"
         print(f"  {stage:20s} -> {status}")
         time.sleep(RATE_LIMIT_DELAY)
@@ -233,12 +277,12 @@ def get_life_stage_counts() -> list[dict]:
 
 def generate_ordered_code(results: dict) -> str:
     """Generate Python code with vocabularies ordered by popularity."""
-    code = '''# Generated by validate_and_order_vocabularies.py
+    code = """# Generated by validate_and_order_vocabularies.py
 # Vocabularies ordered by ENCODE result count (most popular first)
 
 # ASSAY_TYPES ordered by popularity
 ASSAY_TYPES_ORDERED = {
-'''
+"""
 
     # Sort assays by count
     assays = sorted(results.get("assays", []), key=lambda x: x["count"], reverse=True)
@@ -246,29 +290,31 @@ ASSAY_TYPES_ORDERED = {
         if a["count"] > 0:
             code += f'    "{a["key"]}": "{a["display"]}",  # {a["count"]} results\n'
 
-    code += '}\n\n# Zero-result assays (consider removing):\n# '
+    code += "}\n\n# Zero-result assays (consider removing):\n# "
     zero_assays = [a["key"] for a in assays if a["count"] == 0]
     code += ", ".join(zero_assays) if zero_assays else "None"
 
-    code += '\n\n# BIOSAMPLES ordered by popularity\nBIOSAMPLES_ORDERED = [\n'
-    biosamples = sorted(results.get("biosamples", []), key=lambda x: x["count"], reverse=True)
+    code += "\n\n# BIOSAMPLES ordered by popularity\nBIOSAMPLES_ORDERED = [\n"
+    biosamples = sorted(
+        results.get("biosamples", []), key=lambda x: x["count"], reverse=True
+    )
     for b in biosamples:
         if b["count"] > 0:
             code += f'    "{b["key"]}",  # {b["count"]} results\n'
-    code += ']\n'
+    code += "]\n"
 
-    code += '\n# TARGETS ordered by popularity\nTARGETS_ORDERED = [\n'
+    code += "\n# TARGETS ordered by popularity\nTARGETS_ORDERED = [\n"
     targets = sorted(results.get("targets", []), key=lambda x: x["count"], reverse=True)
     for t in targets:
         if t["count"] > 0:
             code += f'    "{t["key"]}",  # {t["count"]} results\n'
-    code += ']\n'
+    code += "]\n"
 
     # Add working parameter paths
-    code += '\n# Working ENCODE API parameter paths:\n'
+    code += "\n# Working ENCODE API parameter paths:\n"
     if results.get("working_paths"):
         for name, path in results["working_paths"].items():
-            code += f'# {name}: {path}\n'
+            code += f"# {name}: {path}\n"
 
     return code
 
@@ -290,9 +336,7 @@ def main():
         "replicates.library.biosample.organism.scientific_name",
     ]
     org_path = find_working_parameter_path(
-        "organism",
-        org_paths,
-        ["Homo sapiens", "Mus musculus"]
+        "organism", org_paths, ["Homo sapiens", "Mus musculus"]
     )
     all_results["working_paths"]["organism"] = org_path
 

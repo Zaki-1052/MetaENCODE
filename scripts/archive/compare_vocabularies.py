@@ -13,34 +13,91 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.ui.vocabularies import (
     ASSAY_TYPES,
-    ORGANISMS,
-    HISTONE_MODIFICATIONS,
     BODY_PARTS,
-    DEVELOPMENTAL_STAGES,
     COMMON_LABS,
+    DEVELOPMENTAL_STAGES,
+    HISTONE_MODIFICATIONS,
+    ORGANISMS,
 )
 
 # Official ENCODE assay_term_name values from mixins.json (dev branch)
 # Source: https://github.com/ENCODE-DCC/encoded/blob/dev/src/encoded/schemas/mixins.json
 ENCODE_ASSAY_TYPES = {
-    "3' RACE", "4C", "5' RACE", "5' RLM RACE", "5C", "ATAC-seq", "Bru-seq",
-    "BruChase-seq", "BruUV-seq", "CAGE", "capture Hi-C", "ChIA-PET", "ChIP-seq",
-    "Circulome-seq", "Clone-seq", "comparative genomic hybridization by array",
-    "CRISPR genome editing followed by RNA-seq", "CRISPRi followed by RNA-seq",
-    "CUT&RUN", "CUT&Tag", "direct RNA-seq", "DNA methylation profiling by array assay",
-    "DNA-PET", "DNase-seq", "eCLIP", "FAIRE-seq", "genetic modification followed by DNase-seq",
-    "genomic perturbation followed by RT-qPCR", "genotype phasing by HiC", "GRO-cap",
-    "GRO-seq", "HiC", "iCLIP", "icLASER", "icSHAPE", "LC/MS label-free quantitative proteomics",
-    "LC-MS/MS isobaric label quantitative proteomics", "long read RNA-seq",
-    "long read single-cell RNA-seq", "MeDIP-seq", "microRNA counts", "microRNA-seq",
-    "Mint-ChIP-seq", "MNase-seq", "MRE-seq", "PAS-seq", "PLAC-seq", "polyA plus RNA-seq",
-    "polyA minus RNA-seq", "PRO-cap", "PRO-seq", "protein sequencing by tandem mass spectrometry assay",
-    "RAMPAGE", "Repli-chip", "Repli-seq", "Ribo-seq", "RIP-chip", "RIP-seq",
-    "RNA Bind-n-Seq", "RNA-PET", "RNA-seq", "RRBS", "seqFISH",
-    "shRNA knockdown followed by RNA-seq", "single-cell RNA sequencing assay",
-    "single-nucleus ATAC-seq", "siRNA knockdown followed by RNA-seq", "small RNA-seq",
-    "SPRITE", "SPRITE-IP", "Switchgear", "TAB-seq", "transcription profiling by array assay",
-    "whole genome sequencing assay", "whole-genome shotgun bisulfite sequencing",
+    "3' RACE",
+    "4C",
+    "5' RACE",
+    "5' RLM RACE",
+    "5C",
+    "ATAC-seq",
+    "Bru-seq",
+    "BruChase-seq",
+    "BruUV-seq",
+    "CAGE",
+    "capture Hi-C",
+    "ChIA-PET",
+    "ChIP-seq",
+    "Circulome-seq",
+    "Clone-seq",
+    "comparative genomic hybridization by array",
+    "CRISPR genome editing followed by RNA-seq",
+    "CRISPRi followed by RNA-seq",
+    "CUT&RUN",
+    "CUT&Tag",
+    "direct RNA-seq",
+    "DNA methylation profiling by array assay",
+    "DNA-PET",
+    "DNase-seq",
+    "eCLIP",
+    "FAIRE-seq",
+    "genetic modification followed by DNase-seq",
+    "genomic perturbation followed by RT-qPCR",
+    "genotype phasing by HiC",
+    "GRO-cap",
+    "GRO-seq",
+    "HiC",
+    "iCLIP",
+    "icLASER",
+    "icSHAPE",
+    "LC/MS label-free quantitative proteomics",
+    "LC-MS/MS isobaric label quantitative proteomics",
+    "long read RNA-seq",
+    "long read single-cell RNA-seq",
+    "MeDIP-seq",
+    "microRNA counts",
+    "microRNA-seq",
+    "Mint-ChIP-seq",
+    "MNase-seq",
+    "MRE-seq",
+    "PAS-seq",
+    "PLAC-seq",
+    "polyA plus RNA-seq",
+    "polyA minus RNA-seq",
+    "PRO-cap",
+    "PRO-seq",
+    "protein sequencing by tandem mass spectrometry assay",
+    "RAMPAGE",
+    "Repli-chip",
+    "Repli-seq",
+    "Ribo-seq",
+    "RIP-chip",
+    "RIP-seq",
+    "RNA Bind-n-Seq",
+    "RNA-PET",
+    "RNA-seq",
+    "RRBS",
+    "seqFISH",
+    "shRNA knockdown followed by RNA-seq",
+    "single-cell RNA sequencing assay",
+    "single-nucleus ATAC-seq",
+    "siRNA knockdown followed by RNA-seq",
+    "small RNA-seq",
+    "SPRITE",
+    "SPRITE-IP",
+    "Switchgear",
+    "TAB-seq",
+    "transcription profiling by array assay",
+    "whole genome sequencing assay",
+    "whole-genome shotgun bisulfite sequencing",
 }
 
 # Official ENCODE organisms
@@ -49,11 +106,27 @@ ENCODE_ORGANISMS = {"human", "mouse", "fly", "worm"}
 # ENCODE Tier 1/2 cell types (commonly used)
 ENCODE_CELL_TYPES = {
     # Tier 1
-    "GM12878", "K562", "H1-hESC", "H1",
+    "GM12878",
+    "K562",
+    "H1-hESC",
+    "H1",
     # Tier 2
-    "A549", "HeLa-S3", "HepG2", "HUVEC", "IMR-90", "MCF-7", "SK-N-SH",
+    "A549",
+    "HeLa-S3",
+    "HepG2",
+    "HUVEC",
+    "IMR-90",
+    "MCF-7",
+    "SK-N-SH",
     # Common Tier 3
-    "HEK293", "PC-3", "LNCaP", "NHEK", "Jurkat", "U2OS", "Caco-2", "293T",
+    "HEK293",
+    "PC-3",
+    "LNCaP",
+    "NHEK",
+    "Jurkat",
+    "U2OS",
+    "Caco-2",
+    "293T",
 }
 
 
@@ -168,11 +241,29 @@ def analyze_developmental_stages():
     # ENCODE life_stage values
     encode_life_stages = {
         "mouse": ["embryonic", "postnatal", "adult", "unknown"],
-        "fly": ["embryonic", "larva", "first instar larva", "second instar larva",
-                "third instar larva", "wandering third instar larva", "prepupa",
-                "pupa", "adult"],
-        "worm": ["early embryonic", "midembryonic", "late embryonic", "L1 larva",
-                 "L2 larva", "L3 larva", "L4 larva", "dauer", "adult", "mixed stage"],
+        "fly": [
+            "embryonic",
+            "larva",
+            "first instar larva",
+            "second instar larva",
+            "third instar larva",
+            "wandering third instar larva",
+            "prepupa",
+            "pupa",
+            "adult",
+        ],
+        "worm": [
+            "early embryonic",
+            "midembryonic",
+            "late embryonic",
+            "L1 larva",
+            "L2 larva",
+            "L3 larva",
+            "L4 larva",
+            "dauer",
+            "adult",
+            "mixed stage",
+        ],
     }
 
     print("\n### ENCODE life_stage values (API searchable):")
@@ -190,8 +281,12 @@ def analyze_developmental_stages():
     print("    3. ML-based similarity matching")
 
     # Count mouse vs non-mouse stages
-    mouse_stages = [k for k, v in DEVELOPMENTAL_STAGES.items() if v.get("species") == "mouse"]
-    human_stages = [k for k, v in DEVELOPMENTAL_STAGES.items() if v.get("species") == "human"]
+    mouse_stages = [
+        k for k, v in DEVELOPMENTAL_STAGES.items() if v.get("species") == "mouse"
+    ]
+    human_stages = [
+        k for k, v in DEVELOPMENTAL_STAGES.items() if v.get("species") == "human"
+    ]
 
     print(f"\n### Our vocabulary breakdown:")
     print(f"  Mouse stages: {len(mouse_stages)}")
@@ -213,7 +308,8 @@ def main():
     print("SUMMARY OF ISSUES")
     print("=" * 70)
 
-    print("""
+    print(
+        """
 ### HIGH PRIORITY FIXES:
 
 1. ASSAY TYPES:
@@ -235,7 +331,8 @@ def main():
 4. CELL TYPES:
    - Add missing ENCODE Tier 1/2 cell lines
    - Order by ENCODE Tier for common options
-""")
+"""
+    )
 
 
 if __name__ == "__main__":

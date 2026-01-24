@@ -50,14 +50,18 @@ def main():
     # Assays in ENCODE but not in our vocabulary
     missing_from_vocab = actual_assays - vocab_assays
     if missing_from_vocab:
-        print(f"\nAssays in ENCODE but NOT in our vocabulary ({len(missing_from_vocab)}):")
+        print(
+            f"\nAssays in ENCODE but NOT in our vocabulary ({len(missing_from_vocab)}):"
+        )
         for assay in sorted(missing_from_vocab):
             print(f"  - {assay}  (count: {assay_counts[assay]})")
 
     # Assays in vocabulary but not found in ENCODE sample
     not_found_in_encode = vocab_assays - actual_assays
     if not_found_in_encode:
-        print(f"\nAssays in vocabulary but NOT found in sample ({len(not_found_in_encode)}):")
+        print(
+            f"\nAssays in vocabulary but NOT found in sample ({len(not_found_in_encode)}):"
+        )
         for assay in sorted(not_found_in_encode):
             print(f"  - {assay}")
 

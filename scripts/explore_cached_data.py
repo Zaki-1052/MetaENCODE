@@ -27,11 +27,11 @@ def main():
             try:
                 data = cache_mgr.load(name)
                 print(f"  Type: {type(data)}")
-                if hasattr(data, 'shape'):
+                if hasattr(data, "shape"):
                     print(f"  Shape: {data.shape}")
-                if hasattr(data, '__len__'):
+                if hasattr(data, "__len__"):
                     print(f"  Length: {len(data)}")
-                if hasattr(data, 'columns'):
+                if hasattr(data, "columns"):
                     print(f"  Columns: {list(data.columns)}")
                     if len(data) > 0:
                         print(f"  First row sample:")
@@ -49,7 +49,7 @@ def main():
     if cache_mgr.exists("metadata"):
         try:
             metadata = cache_mgr.load("metadata")
-            if hasattr(metadata, '__len__') and len(metadata) > 0:
+            if hasattr(metadata, "__len__") and len(metadata) > 0:
                 from collections import Counter
 
                 print("\n" + "=" * 60)

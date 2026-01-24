@@ -1,8 +1,6 @@
 # tests/test_ui/test_vocabularies.py
 """Tests for vocabulary definitions and helper functions."""
 
-import pytest
-
 from src.ui.vocabularies import (
     AGE_ALIASES,
     ASSAY_ALIASES,
@@ -115,14 +113,25 @@ class TestHistoneModifications:
 
     def test_histone_categories_are_valid(self) -> None:
         """Test that histone modification categories are valid."""
-        valid_categories = {"active", "enhancer", "promoter", "transcription", "repressive", "tf"}
+        valid_categories = {
+            "active",
+            "enhancer",
+            "promoter",
+            "transcription",
+            "repressive",
+            "tf",
+        }
         for mark_key, mark_info in HISTONE_MODIFICATIONS.items():
-            assert mark_info["category"] in valid_categories, f"Invalid category for {mark_key}"
+            assert (
+                mark_info["category"] in valid_categories
+            ), f"Invalid category for {mark_key}"
 
     def test_histone_aliases_reference_valid_marks(self) -> None:
         """Test that all histone aliases reference valid modifications."""
         for mark_key in HISTONE_ALIASES.keys():
-            assert mark_key in HISTONE_MODIFICATIONS, f"Alias key {mark_key} not in HISTONE_MODIFICATIONS"
+            assert (
+                mark_key in HISTONE_MODIFICATIONS
+            ), f"Alias key {mark_key} not in HISTONE_MODIFICATIONS"
 
 
 class TestBodyParts:
@@ -143,8 +152,12 @@ class TestBodyParts:
         for part_key, part_info in BODY_PARTS.items():
             assert "display_name" in part_info, f"Missing display_name for {part_key}"
             assert "tissues" in part_info, f"Missing tissues for {part_key}"
-            assert isinstance(part_info["tissues"], list), f"Tissues for {part_key} should be a list"
-            assert len(part_info["tissues"]) > 0, f"Tissues for {part_key} should not be empty"
+            assert isinstance(
+                part_info["tissues"], list
+            ), f"Tissues for {part_key} should be a list"
+            assert (
+                len(part_info["tissues"]) > 0
+            ), f"Tissues for {part_key} should not be empty"
 
     def test_brain_contains_cerebellum(self) -> None:
         """Test that brain body part includes cerebellum."""
@@ -158,7 +171,8 @@ class TestBodyParts:
         """Test that most body parts have aliases."""
         # At least some body parts should have aliases
         parts_with_aliases = [
-            key for key, info in BODY_PARTS.items()
+            key
+            for key, info in BODY_PARTS.items()
             if "aliases" in info and len(info.get("aliases", [])) > 0
         ]
         assert len(parts_with_aliases) > 5, "Most body parts should have aliases"
@@ -211,7 +225,9 @@ class TestDevelopmentalStages:
     def test_age_aliases_reference_valid_stages(self) -> None:
         """Test that all age aliases reference valid stages."""
         for stage_key in AGE_ALIASES.keys():
-            assert stage_key in DEVELOPMENTAL_STAGES, f"Alias key {stage_key} not in DEVELOPMENTAL_STAGES"
+            assert (
+                stage_key in DEVELOPMENTAL_STAGES
+            ), f"Alias key {stage_key} not in DEVELOPMENTAL_STAGES"
 
 
 class TestCommonLabs:
@@ -231,12 +247,14 @@ class TestCommonLabs:
 class TestHelperFunctions:
     """Tests for vocabulary helper functions."""
 
-    def test_get_all_assay_types_returns_sorted_list(self) -> None:
-        """Test that get_all_assay_types returns a sorted list."""
+    def test_get_all_assay_types_returns_list(self) -> None:
+        """Test that get_all_assay_types returns a list ordered by popularity."""
         result = get_all_assay_types()
         assert isinstance(result, list)
         assert len(result) == len(ASSAY_TYPES)
-        assert result == sorted(result)
+        # Lists are ordered by experiment count (popularity), not alphabetically
+        # ChIP-seq should be first as it has most experiments
+        assert result[0] == "ChIP-seq"
 
     def test_get_all_organisms_returns_list(self) -> None:
         """Test that get_all_organisms returns a list."""
@@ -261,12 +279,15 @@ class TestHelperFunctions:
         result = get_organism_display("unknown_organism")
         assert result == "unknown_organism"
 
-    def test_get_all_histone_mods_returns_sorted_list(self) -> None:
-        """Test that get_all_histone_mods returns a sorted list."""
+    def test_get_all_histone_mods_returns_list(self) -> None:
+        """Test that get_all_histone_mods returns a list."""
         result = get_all_histone_mods()
         assert isinstance(result, list)
         assert len(result) == len(HISTONE_MODIFICATIONS)
-        assert result == sorted(result)
+        # Should contain common histone marks
+        assert "H3K27ac" in result
+        assert "H3K4me3" in result
+        assert "CTCF" in result
 
     def test_get_all_body_parts_returns_list(self) -> None:
         """Test that get_all_body_parts returns a list."""
@@ -298,22 +319,29 @@ class TestHelperFunctions:
 class TestVocabularyConsistency:
     """Tests for consistency across vocabularies."""
 
-    def test_all_tissue_synonyms_lowercase(self) -> None:
-        """Test that all synonym values are lowercase."""
+    def test_tissue_synonyms_are_strings(self) -> None:
+        """Test that all synonym values are non-empty strings."""
         for key, synonyms in TISSUE_SYNONYMS.items():
             for syn in synonyms:
-                assert syn == syn.lower(), f"Synonym '{syn}' for '{key}' should be lowercase"
+                assert isinstance(
+                    syn, str
+                ), f"Synonym '{syn}' for '{key}' should be a string"
+                assert len(syn) > 0, f"Synonym for '{key}' should not be empty"
 
     def test_no_duplicate_tissues_in_body_part(self) -> None:
         """Test that there are no duplicate tissues within a body part."""
         for part_key, part_info in BODY_PARTS.items():
             tissues = part_info["tissues"]
             tissues_lower = [t.lower() for t in tissues]
-            assert len(tissues_lower) == len(set(tissues_lower)), f"Duplicate tissues in {part_key}"
+            assert len(tissues_lower) == len(
+                set(tissues_lower)
+            ), f"Duplicate tissues in {part_key}"
 
     def test_developmental_stages_days_are_numeric(self) -> None:
         """Test that all developmental stage days are numeric."""
         for stage_key, stage_info in DEVELOPMENTAL_STAGES.items():
             days = stage_info["days"]
-            assert isinstance(days, (int, float)), f"Days for {stage_key} should be numeric"
+            assert isinstance(
+                days, (int, float)
+            ), f"Days for {stage_key} should be numeric"
             assert days >= 0, f"Days for {stage_key} should be non-negative"

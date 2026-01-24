@@ -10,7 +10,6 @@ from src.ui.search_filters import (
     parse_age_from_text,
 )
 
-
 # =============================================================================
 # FilterState Tests
 # =============================================================================
@@ -289,7 +288,9 @@ class TestSearchFilterManagerAutocompleteAssay:
         results = manager.autocomplete_assay("seq", limit=3)
         assert len(results) <= 3
 
-    def test_autocomplete_assay_returns_tuples(self, manager: SearchFilterManager) -> None:
+    def test_autocomplete_assay_returns_tuples(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test that autocomplete_assay returns list of tuples."""
         results = manager.autocomplete_assay("atac")
         assert len(results) > 0
@@ -314,7 +315,9 @@ class TestSearchFilterManagerAutocompleteOrganism:
         """Create SearchFilterManager instance."""
         return SearchFilterManager()
 
-    def test_autocomplete_organism_empty_query(self, manager: SearchFilterManager) -> None:
+    def test_autocomplete_organism_empty_query(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test autocomplete_organism with empty query returns all organisms."""
         results = manager.autocomplete_organism("")
         assert len(results) > 0
@@ -322,28 +325,36 @@ class TestSearchFilterManagerAutocompleteOrganism:
         assert "human" in keys
         assert "mouse" in keys
 
-    def test_autocomplete_organism_human_query(self, manager: SearchFilterManager) -> None:
+    def test_autocomplete_organism_human_query(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test autocomplete_organism with 'human' query."""
         results = manager.autocomplete_organism("human")
         assert len(results) > 0
         keys = [r[0] for r in results]
         assert "human" in keys
 
-    def test_autocomplete_organism_mouse_query(self, manager: SearchFilterManager) -> None:
+    def test_autocomplete_organism_mouse_query(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test autocomplete_organism with 'mouse' query."""
         results = manager.autocomplete_organism("mouse")
         assert len(results) > 0
         keys = [r[0] for r in results]
         assert "mouse" in keys
 
-    def test_autocomplete_organism_assembly_query(self, manager: SearchFilterManager) -> None:
+    def test_autocomplete_organism_assembly_query(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test autocomplete_organism with genome assembly query."""
         results = manager.autocomplete_organism("hg38")
         assert len(results) > 0
         keys = [r[0] for r in results]
         assert "human" in keys
 
-    def test_autocomplete_organism_includes_assembly_in_display(self, manager: SearchFilterManager) -> None:
+    def test_autocomplete_organism_includes_assembly_in_display(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test that organism display includes genome assembly."""
         results = manager.autocomplete_organism("human")
         assert len(results) > 0
@@ -361,14 +372,18 @@ class TestSearchFilterManagerAutocompleteTarget:
         """Create SearchFilterManager instance."""
         return SearchFilterManager()
 
-    def test_autocomplete_target_empty_query(self, manager: SearchFilterManager) -> None:
+    def test_autocomplete_target_empty_query(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test autocomplete_target with empty query returns common targets."""
         results = manager.autocomplete_target("")
         assert len(results) > 0
         keys = [r[0] for r in results]
         assert "H3K27ac" in keys
 
-    def test_autocomplete_target_h3k27_query(self, manager: SearchFilterManager) -> None:
+    def test_autocomplete_target_h3k27_query(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test autocomplete_target with 'H3K27' query."""
         results = manager.autocomplete_target("H3K27")
         assert len(results) > 0
@@ -383,7 +398,9 @@ class TestSearchFilterManagerAutocompleteTarget:
         keys = [r[0] for r in results]
         assert "CTCF" in keys
 
-    def test_autocomplete_target_alias_query(self, manager: SearchFilterManager) -> None:
+    def test_autocomplete_target_alias_query(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test autocomplete_target with alias like 'polycomb'."""
         results = manager.autocomplete_target("polycomb")
         assert len(results) > 0
@@ -400,28 +417,36 @@ class TestSearchFilterManagerAutocompleteBodyPart:
         """Create SearchFilterManager instance."""
         return SearchFilterManager()
 
-    def test_autocomplete_body_part_empty_query(self, manager: SearchFilterManager) -> None:
+    def test_autocomplete_body_part_empty_query(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test autocomplete_body_part with empty query returns all body parts."""
         results = manager.autocomplete_body_part("")
         assert len(results) > 0
         keys = [r[0] for r in results]
         assert "brain" in keys
 
-    def test_autocomplete_body_part_brain_query(self, manager: SearchFilterManager) -> None:
+    def test_autocomplete_body_part_brain_query(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test autocomplete_body_part with 'brain' query."""
         results = manager.autocomplete_body_part("brain")
         assert len(results) > 0
         keys = [r[0] for r in results]
         assert "brain" in keys
 
-    def test_autocomplete_body_part_alias_query(self, manager: SearchFilterManager) -> None:
+    def test_autocomplete_body_part_alias_query(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test autocomplete_body_part with alias like 'cardiac'."""
         results = manager.autocomplete_body_part("cardiac")
         assert len(results) > 0
         keys = [r[0] for r in results]
         assert "heart" in keys
 
-    def test_autocomplete_body_part_tissue_match(self, manager: SearchFilterManager) -> None:
+    def test_autocomplete_body_part_tissue_match(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test autocomplete_body_part matching a tissue name."""
         results = manager.autocomplete_body_part("cerebellum")
         assert len(results) > 0
@@ -438,12 +463,16 @@ class TestSearchFilterManagerAutocompleteBiosample:
         """Create SearchFilterManager instance."""
         return SearchFilterManager()
 
-    def test_autocomplete_biosample_empty_query(self, manager: SearchFilterManager) -> None:
+    def test_autocomplete_biosample_empty_query(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test autocomplete_biosample with empty query."""
         results = manager.autocomplete_biosample("")
         assert len(results) > 0
 
-    def test_autocomplete_biosample_skips_duplicates(self, manager: SearchFilterManager) -> None:
+    def test_autocomplete_biosample_skips_duplicates(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test that autocomplete_biosample skips duplicate tissues (line 350)."""
         # Search for a tissue that appears in the list
         # The function should handle duplicates gracefully
@@ -453,14 +482,18 @@ class TestSearchFilterManagerAutocompleteBiosample:
         # No duplicates should exist
         assert len(tissues) == len(set(t.lower() for t in tissues))
 
-    def test_autocomplete_biosample_cerebellum_query(self, manager: SearchFilterManager) -> None:
+    def test_autocomplete_biosample_cerebellum_query(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test autocomplete_biosample with 'cerebellum' query."""
         results = manager.autocomplete_biosample("cerebellum")
         assert len(results) > 0
         tissues = [r[0] for r in results]
         assert "cerebellum" in tissues
 
-    def test_autocomplete_biosample_with_body_part(self, manager: SearchFilterManager) -> None:
+    def test_autocomplete_biosample_with_body_part(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test autocomplete_biosample restricted to body part."""
         results = manager.autocomplete_biosample("", body_part="brain")
         assert len(results) > 0
@@ -468,7 +501,9 @@ class TestSearchFilterManagerAutocompleteBiosample:
         for tissue, body_part_display in results:
             assert "Brain" in body_part_display or "Nervous" in body_part_display
 
-    def test_autocomplete_biosample_synonym_match(self, manager: SearchFilterManager) -> None:
+    def test_autocomplete_biosample_synonym_match(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test autocomplete_biosample matches synonyms."""
         results = manager.autocomplete_biosample("hindbrain")
         assert len(results) > 0
@@ -476,14 +511,18 @@ class TestSearchFilterManagerAutocompleteBiosample:
         tissues = [r[0] for r in results]
         assert "hindbrain" in tissues or "cerebellum" in tissues
 
-    def test_autocomplete_biosample_cell_line(self, manager: SearchFilterManager) -> None:
+    def test_autocomplete_biosample_cell_line(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test autocomplete_biosample with cell line query."""
         results = manager.autocomplete_biosample("K562")
         assert len(results) > 0
         tissues = [r[0] for r in results]
         assert "K562" in tissues
 
-    def test_autocomplete_biosample_invalid_body_part(self, manager: SearchFilterManager) -> None:
+    def test_autocomplete_biosample_invalid_body_part(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test autocomplete_biosample with invalid body_part defaults to all."""
         results = manager.autocomplete_biosample("", body_part="invalid_part")
         assert len(results) > 0
@@ -509,26 +548,37 @@ class TestSearchFilterManagerAutocompleteAge:
         stages = [r[0] for r in results]
         assert "P60" in stages
 
-    def test_autocomplete_age_embryonic_query(self, manager: SearchFilterManager) -> None:
+    def test_autocomplete_age_embryonic_query(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test autocomplete_age with 'embryonic' query."""
         results = manager.autocomplete_age("embryonic")
         assert len(results) > 0
 
-    def test_autocomplete_age_with_organism_filter(self, manager: SearchFilterManager) -> None:
+    def test_autocomplete_age_with_organism_filter(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test autocomplete_age filtered by organism."""
         results = manager.autocomplete_age("", organism="mouse")
         assert len(results) > 0
         # All results should be mouse stages
         for stage, description in results:
             # P0, E10.5, etc are mouse stages
-            assert stage.startswith("P") or stage.startswith("E") or "weeks" in stage or "months" in stage
+            assert (
+                stage.startswith("P")
+                or stage.startswith("E")
+                or "weeks" in stage
+                or "months" in stage
+            )
 
     def test_autocomplete_age_alias_query(self, manager: SearchFilterManager) -> None:
         """Test autocomplete_age with alias like 'newborn'."""
         results = manager.autocomplete_age("newborn")
         assert len(results) > 0
 
-    def test_autocomplete_age_filters_out_wrong_organism(self, manager: SearchFilterManager) -> None:
+    def test_autocomplete_age_filters_out_wrong_organism(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test that autocomplete_age filters out stages from wrong organism (line 420)."""
         # Search for human-only stages while filtering for human
         results_human = manager.autocomplete_age("adult", organism="human")
@@ -565,7 +615,9 @@ class TestSearchFilterManagerAutocompleteLab:
         assert len(results) > 0
         assert any("Bing" in lab for lab in results)
 
-    def test_autocomplete_lab_stanford_query(self, manager: SearchFilterManager) -> None:
+    def test_autocomplete_lab_stanford_query(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test autocomplete_lab with 'Stanford' query."""
         results = manager.autocomplete_lab("Stanford")
         assert len(results) > 0
@@ -594,7 +646,9 @@ class TestSearchFilterManagerGetRelatedTissues:
         assert "hindbrain" in related
         assert "cerebellum" in related
 
-    def test_get_related_tissues_no_synonyms(self, manager: SearchFilterManager) -> None:
+    def test_get_related_tissues_no_synonyms(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test get_related_tissues for tissue without synonyms."""
         related = manager.get_related_tissues("K562")
         assert isinstance(related, list)
@@ -646,7 +700,9 @@ class TestSearchFilterManagerMatchScore:
         score = manager._match_score("xyz", "abc")
         assert score < 0.5
 
-    def test_match_score_query_contains_target(self, manager: SearchFilterManager) -> None:
+    def test_match_score_query_contains_target(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test _match_score where query contains target."""
         score = manager._match_score("chipseq analysis", "chip")
         assert score > 0.5
@@ -656,12 +712,16 @@ class TestSearchFilterManagerMatchScore:
         score = manager._match_score("chip", "chip seq analysis")
         assert score > 0.6
 
-    def test_match_score_query_starts_with_target(self, manager: SearchFilterManager) -> None:
+    def test_match_score_query_starts_with_target(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test _match_score where query starts with shorter target."""
         score = manager._match_score("chipseq", "chip")
         assert score > 0.7
 
-    def test_match_score_word_boundary_partial_match(self, manager: SearchFilterManager) -> None:
+    def test_match_score_word_boundary_partial_match(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test _match_score with word boundary match where word starts with query (line 505)."""
         # Query "rna" matches word "rna" in "rna seq analysis"
         score = manager._match_score("rna", "rna seq analysis")
@@ -673,7 +733,9 @@ class TestSearchFilterManagerMatchScore:
         score = manager._match_score("abcd", "wxyz")
         assert score < 0.5  # Should be low fuzzy score
 
-    def test_match_score_substring_match_internal(self, manager: SearchFilterManager) -> None:
+    def test_match_score_substring_match_internal(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test _match_score with substring that matches an internal word.
 
         Note: Line 505 (word boundary match returning 0.65) is logically
@@ -694,7 +756,9 @@ class TestSearchFilterManagerGetBodyPartDisplay:
         """Create SearchFilterManager instance."""
         return SearchFilterManager()
 
-    def test_get_body_part_display_cerebellum(self, manager: SearchFilterManager) -> None:
+    def test_get_body_part_display_cerebellum(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test _get_body_part_display for cerebellum."""
         display = manager._get_body_part_display("cerebellum")
         assert "Brain" in display or "Nervous" in display
@@ -723,7 +787,13 @@ def sample_df_for_filtering() -> pd.DataFrame:
             "accession": ["ENC001", "ENC002", "ENC003", "ENC004", "ENC005"],
             "assay_term_name": ["ChIP-seq", "RNA-seq", "Hi-C", "ChIP-seq", "ATAC-seq"],
             "organism": ["human", "mouse", "human", "mouse", "human"],
-            "biosample_term_name": ["K562", "liver", "cerebellum", "hindbrain", "HepG2"],
+            "biosample_term_name": [
+                "K562",
+                "liver",
+                "cerebellum",
+                "hindbrain",
+                "HepG2",
+            ],
             "description": [
                 "ChIP-seq targeting H3K27ac in K562",
                 "RNA-seq of mouse liver tissue",
@@ -880,7 +950,9 @@ class TestSearchFilterManagerApplyFiltersEdgeCases:
         """Create SearchFilterManager instance."""
         return SearchFilterManager()
 
-    def test_apply_filters_missing_organism_column(self, manager: SearchFilterManager) -> None:
+    def test_apply_filters_missing_organism_column(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test apply_filters when organism column is missing."""
         df = pd.DataFrame({"accession": ["ENC001"], "assay_term_name": ["ChIP-seq"]})
         filters = FilterState(organism="human")
@@ -888,7 +960,9 @@ class TestSearchFilterManagerApplyFiltersEdgeCases:
         # Should not filter since column is missing
         assert len(result) == 1
 
-    def test_apply_filters_missing_assay_column(self, manager: SearchFilterManager) -> None:
+    def test_apply_filters_missing_assay_column(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test apply_filters when assay_term_name column is missing."""
         df = pd.DataFrame({"accession": ["ENC001"], "organism": ["human"]})
         filters = FilterState(assay_type="ChIP-seq")
@@ -908,7 +982,9 @@ class TestSearchFilterManagerApplyFiltersEdgeCases:
         result = manager.apply_filters(df, filters)
         assert len(result) == 2
 
-    def test_apply_filters_with_combined_text_column(self, manager: SearchFilterManager) -> None:
+    def test_apply_filters_with_combined_text_column(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test apply_filters using combined_text column for search."""
         df = pd.DataFrame(
             {
@@ -920,7 +996,9 @@ class TestSearchFilterManagerApplyFiltersEdgeCases:
         result = manager.apply_filters(df, filters)
         assert len(result) == 1
 
-    def test_apply_filters_with_title_column(self, manager: SearchFilterManager) -> None:
+    def test_apply_filters_with_title_column(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test apply_filters using title column for search."""
         df = pd.DataFrame(
             {
@@ -958,7 +1036,9 @@ class TestSearchFilterManagerBuildSearchQuery:
         query = manager.build_search_query(filters)
         assert query == "ChIP-seq"
 
-    def test_build_search_query_multiple_filters(self, manager: SearchFilterManager) -> None:
+    def test_build_search_query_multiple_filters(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test build_search_query with multiple filters."""
         filters = FilterState(
             assay_type="ChIP-seq",
@@ -972,13 +1052,17 @@ class TestSearchFilterManagerBuildSearchQuery:
         assert "H3K27ac" in query
         assert "cerebellum" in query
 
-    def test_build_search_query_with_age_stage(self, manager: SearchFilterManager) -> None:
+    def test_build_search_query_with_age_stage(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test build_search_query with age_stage."""
         filters = FilterState(age_stage="P60")
         query = manager.build_search_query(filters)
         assert "P60" in query
 
-    def test_build_search_query_with_description_search(self, manager: SearchFilterManager) -> None:
+    def test_build_search_query_with_description_search(
+        self, manager: SearchFilterManager
+    ) -> None:
         """Test build_search_query with description_search."""
         filters = FilterState(description_search="enhancer analysis")
         query = manager.build_search_query(filters)

@@ -124,9 +124,7 @@ class SearchFilterManager:
                     self._synonym_map[syn.lower()] = set()
                 self._synonym_map[syn.lower()].add(term.lower())
 
-    def autocomplete_assay(
-        self, query: str, limit: int = 10
-    ) -> List[Tuple[str, str]]:
+    def autocomplete_assay(self, query: str, limit: int = 10) -> List[Tuple[str, str]]:
         """Find assay types matching the query.
 
         Args:
@@ -148,11 +146,9 @@ class SearchFilterManager:
                 "eCLIP",
                 "CUT&RUN",
             ]
-            return [
-                (k, ASSAY_TYPES.get(k, k))
-                for k in common
-                if k in ASSAY_TYPES
-            ][:limit]
+            return [(k, ASSAY_TYPES.get(k, k)) for k in common if k in ASSAY_TYPES][
+                :limit
+            ]
 
         query_lower = query.lower().strip()
         matches: List[Tuple[float, str, str]] = []
@@ -215,9 +211,7 @@ class SearchFilterManager:
         matches.sort(key=lambda x: -x[0])
         return [(m[1], m[2]) for m in matches[:limit]]
 
-    def autocomplete_target(
-        self, query: str, limit: int = 15
-    ) -> List[Tuple[str, str]]:
+    def autocomplete_target(self, query: str, limit: int = 15) -> List[Tuple[str, str]]:
         """Find histone modifications or TFs matching the query.
 
         Args:
@@ -279,10 +273,7 @@ class SearchFilterManager:
             List of (key, display_name) tuples.
         """
         if not query:
-            return [
-                (k, v["display_name"])
-                for k, v in BODY_PARTS.items()
-            ][:limit]
+            return [(k, v["display_name"]) for k, v in BODY_PARTS.items()][:limit]
 
         query_lower = query.lower().strip()
         matches: List[Tuple[float, str, str]] = []
@@ -335,10 +326,9 @@ class SearchFilterManager:
             bp_name = None
 
         if not query:
-            return [
-                (t, bp_name or self._get_body_part_display(t))
-                for t in tissues
-            ][:limit]
+            return [(t, bp_name or self._get_body_part_display(t)) for t in tissues][
+                :limit
+            ]
 
         query_lower = query.lower().strip()
         matches: List[Tuple[float, str, str]] = []
@@ -436,9 +426,7 @@ class SearchFilterManager:
         matches.sort(key=lambda x: -x[0])
         return [(m[1], m[2]) for m in matches[:limit]]
 
-    def autocomplete_lab(
-        self, query: str, limit: int = 10
-    ) -> List[str]:
+    def autocomplete_lab(self, query: str, limit: int = 10) -> List[str]:
         """Find labs matching the query.
 
         Args:
@@ -542,9 +530,7 @@ class SearchFilterManager:
 
         # Organism filter
         if filters.organism and "organism" in result.columns:
-            result = result[
-                result["organism"].str.lower() == filters.organism.lower()
-            ]
+            result = result[result["organism"].str.lower() == filters.organism.lower()]
 
         # Assay type filter
         if filters.assay_type and "assay_term_name" in result.columns:
@@ -552,14 +538,12 @@ class SearchFilterManager:
             assay = filters.assay_type
             if assay.lower() in ("hi-c", "hic"):
                 result = result[
-                    result["assay_term_name"].str.lower().isin(
-                        ["hi-c", "hic", "in situ hi-c"]
-                    )
+                    result["assay_term_name"]
+                    .str.lower()
+                    .isin(["hi-c", "hic", "in situ hi-c"])
                 ]
             else:
-                result = result[
-                    result["assay_term_name"].str.lower() == assay.lower()
-                ]
+                result = result[result["assay_term_name"].str.lower() == assay.lower()]
 
         # Biosample filter with synonym expansion
         if filters.biosample and "biosample_term_name" in result.columns:
@@ -578,9 +562,7 @@ class SearchFilterManager:
             mask = pd.Series(False, index=result.index)
             for col in ["description", "title", "combined_text"]:
                 if col in result.columns:
-                    mask = mask | result[col].str.contains(
-                        target, case=False, na=False
-                    )
+                    mask = mask | result[col].str.contains(target, case=False, na=False)
             result = result[mask]
 
         # Age/developmental stage filter - search in description
@@ -589,9 +571,7 @@ class SearchFilterManager:
             mask = pd.Series(False, index=result.index)
             for col in ["description", "title", "combined_text"]:
                 if col in result.columns:
-                    mask = mask | result[col].str.contains(
-                        age, case=False, na=False
-                    )
+                    mask = mask | result[col].str.contains(age, case=False, na=False)
             result = result[mask]
 
         # Description search
@@ -611,9 +591,7 @@ class SearchFilterManager:
         # Lab filter
         if filters.lab and "lab" in result.columns:
             lab_lower = filters.lab.lower()
-            result = result[
-                result["lab"].str.lower().str.contains(lab_lower, na=False)
-            ]
+            result = result[result["lab"].str.lower().str.contains(lab_lower, na=False)]
 
         # Replicate count filter
         if filters.min_replicates > 0 and "replicate_count" in result.columns:
