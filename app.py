@@ -24,9 +24,14 @@ from src.ui.vocabularies import (
     ORGANISMS,
     get_assay_display_name,
     get_assay_types,
+    get_biosamples_for_organ,
+    get_biosample_names,
     get_lab_names,
     get_life_stages,
+    get_organ_display_name,
+    get_organ_systems,
     get_organism_display,
+    get_primary_organ_for_biosample,
     get_targets,
 )
 from src.utils.cache import CacheManager
@@ -246,34 +251,37 @@ def render_sidebar() -> dict:
     # --- Biosample Selection (Hierarchical) ---
     st.sidebar.subheader("Biosample")
 
-    # 4. Body Part / Organ System
-    body_part_options = [""] + list(BODY_PARTS.keys())
+    # 4. Body Part / Organ System - Dynamic from ENCODE's organ_slims
+    organ_data = get_organ_systems()[:20]  # Top 20 by experiment count
+    organ_options = [""] + [name for name, _ in organ_data]
+    organ_counts = {name: count for name, count in organ_data}
     current_bp = st.session_state.filter_state.body_part or ""
 
     body_part = st.sidebar.selectbox(
         "Organ / System",
-        options=body_part_options,
+        options=organ_options,
         index=(
-            body_part_options.index(current_bp)
-            if current_bp in body_part_options
-            else 0
+            organ_options.index(current_bp) if current_bp in organ_options else 0
         ),
         format_func=lambda x: (
-            "All organs/systems" if x == "" else BODY_PARTS[x]["display_name"]
+            "All organs/systems"
+            if x == ""
+            else f"{get_organ_display_name(x)} ({organ_counts.get(x, 0):,})"
         ),
-        help="Select organ system to filter tissues",
+        help="Select organ system (from ENCODE's organ_slims ontology)",
         key="filter_body_part",
     )
 
-    # 5. Tissue / Cell Type (filtered by body part if selected)
-    if body_part and body_part in BODY_PARTS:
-        tissue_options = [""] + BODY_PARTS[body_part]["tissues"]
+    # 5. Tissue / Cell Type (filtered by organ if selected)
+    if body_part:
+        # Get biosamples for selected organ from JSON
+        biosamples_data = get_biosamples_for_organ(body_part)[:50]
+        tissue_options = [""] + [name for name, _ in biosamples_data]
+        biosample_counts = {name: count for name, count in biosamples_data}
     else:
-        # Show all tissues from all body parts
-        all_tissues = []
-        for bp_info in BODY_PARTS.values():
-            all_tissues.extend(bp_info["tissues"])
-        tissue_options = [""] + sorted(set(all_tissues))
+        # Show top global biosamples when no organ selected
+        tissue_options = [""] + get_biosample_names(limit=100)
+        biosample_counts = {}
 
     current_biosample = st.session_state.filter_state.biosample or ""
 
@@ -285,7 +293,11 @@ def render_sidebar() -> dict:
             if current_biosample in tissue_options
             else 0
         ),
-        format_func=lambda x: "All tissues" if x == "" else x,
+        format_func=lambda x: (
+            "All tissues"
+            if x == ""
+            else (f"{x} ({biosample_counts[x]:,})" if x in biosample_counts else x)
+        ),
         help="Filter by specific tissue or cell type (related terms will also match)",
         key="filter_biosample",
     )
@@ -798,6 +810,15 @@ def apply_filters(
                 filtered["assay_term_name"].str.lower() == assay.lower()
             ]
 
+    # Apply organ/body_part filter
+    bp = filter_state.body_part if filter_state else None
+    if bp and "biosample_term_name" in filtered.columns:
+        organ_biosamples = get_biosamples_for_organ(bp)
+        valid_biosamples = {name.lower() for name, _ in organ_biosamples}
+        filtered = filtered[
+            filtered["biosample_term_name"].str.lower().isin(valid_biosamples)
+        ]
+
     return filtered
 
 
@@ -1007,10 +1028,26 @@ def render_visualize_tab() -> None:
             help="PCA is faster, UMAP preserves local structure better",
         )
 
+        # Determine available color options based on metadata columns
+        available_colors = ["assay_term_name", "organism", "lab"]
+        if (
+            st.session_state.metadata_df is not None
+            and "organ" in st.session_state.metadata_df.columns
+        ):
+            available_colors.insert(2, "organ")
+
+        color_display_names = {
+            "assay_term_name": "Assay Type",
+            "organism": "Organism",
+            "organ": "Organ System",
+            "lab": "Lab",
+        }
         color_option = st.selectbox(
             "Color By",
-            options=["assay_term_name", "organism", "lab"],
-            format_func=lambda x: x.replace("_", " ").title(),
+            options=available_colors,
+            format_func=lambda x: color_display_names.get(
+                x, x.replace("_", " ").title()
+            ),
         )
 
         if st.button("Generate Visualization", type="primary"):

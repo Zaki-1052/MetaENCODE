@@ -18,11 +18,13 @@ from src.ui.vocabularies import (
     TISSUE_SYNONYMS,
     TOP_BIOSAMPLES,
     TOP_TARGETS,
+    build_biosample_to_organs,
     get_all_assay_types,
     get_all_body_parts,
     get_all_developmental_stages,
     get_all_histone_mods,
     get_all_organisms,
+    get_all_organs_for_biosample,
     get_assay_display_name,
     get_assay_types,
     get_biosample_names_for_organ,
@@ -34,6 +36,7 @@ from src.ui.vocabularies import (
     get_organ_system_names,
     get_organ_systems,
     get_organism_display,
+    get_primary_organ_for_biosample,
     get_targets,
     get_tissues_for_body_part,
     get_total_experiments,
@@ -552,3 +555,89 @@ class TestOrganSystems:
         for organ in organs_to_check:
             biosamples = get_biosamples_for_organ(organ)
             assert len(biosamples) > 0, f"Expected biosamples for {organ}"
+
+
+class TestBiosampleToOrganMapping:
+    """Tests for biosample-to-organ reverse mapping functions."""
+
+    def test_build_biosample_to_organs_returns_dict(self) -> None:
+        """Test that build_biosample_to_organs returns a non-empty dict."""
+        mapping = build_biosample_to_organs()
+        assert isinstance(mapping, dict)
+        assert len(mapping) > 100  # Should have many biosamples mapped
+
+    def test_build_biosample_to_organs_values_are_lists(self) -> None:
+        """Test that mapping values are lists of organ names."""
+        mapping = build_biosample_to_organs()
+        for biosample, organs in list(mapping.items())[:10]:
+            assert isinstance(organs, list)
+            assert len(organs) > 0
+            assert all(isinstance(org, str) for org in organs)
+
+    def test_get_primary_organ_for_known_biosample(self) -> None:
+        """Test getting primary organ for a known biosample."""
+        # Cerebellum should map to brain
+        organ = get_primary_organ_for_biosample("cerebellum")
+        assert organ == "brain"
+
+    def test_get_primary_organ_for_k562(self) -> None:
+        """Test getting primary organ for K562 cell line."""
+        organ = get_primary_organ_for_biosample("K562")
+        assert organ == "blood"
+
+    def test_get_primary_organ_for_unknown_biosample(self) -> None:
+        """Test that unknown biosample returns None."""
+        result = get_primary_organ_for_biosample("nonexistent_biosample_xyz")
+        assert result is None
+
+    def test_get_all_organs_for_biosample_single_organ(self) -> None:
+        """Test biosample that maps to a single organ."""
+        organs = get_all_organs_for_biosample("cerebellum")
+        assert isinstance(organs, list)
+        assert len(organs) >= 1
+        assert "brain" in organs
+
+    def test_get_all_organs_for_biosample_multiple_organs(self) -> None:
+        """Test biosample that maps to multiple organs."""
+        # Some biosamples map to multiple organs
+        mapping = build_biosample_to_organs()
+        # Find a biosample with multiple organs
+        multi_organ_sample = None
+        for biosample, organs in mapping.items():
+            if len(organs) > 1:
+                multi_organ_sample = biosample
+                break
+        assert multi_organ_sample is not None, "Should have at least one multi-organ biosample"
+        organs = get_all_organs_for_biosample(multi_organ_sample)
+        assert len(organs) > 1
+
+    def test_get_all_organs_for_unknown_biosample(self) -> None:
+        """Test that unknown biosample returns empty list."""
+        organs = get_all_organs_for_biosample("nonexistent_sample")
+        assert organs == []
+
+    def test_organs_ordered_by_experiment_count(self) -> None:
+        """Test that organs are ordered by experiment count (most popular first)."""
+        # Get a biosample that maps to multiple organs
+        mapping = build_biosample_to_organs()
+        organ_counts = {
+            name: count for name, count in get_organ_systems()
+        }
+
+        for biosample, organs in list(mapping.items())[:20]:
+            if len(organs) > 1:
+                # Check that organs are ordered by experiment count
+                organ_experiment_counts = [organ_counts.get(org, 0) for org in organs]
+                assert organ_experiment_counts == sorted(
+                    organ_experiment_counts, reverse=True
+                ), f"Organs for {biosample} not ordered by count"
+
+    def test_all_biosamples_in_organ_mapping_can_be_reversed(self) -> None:
+        """Test that biosamples from organ mapping appear in reverse mapping."""
+        # Get some biosamples from an organ
+        brain_biosamples = get_biosamples_for_organ("brain")[:10]
+        mapping = build_biosample_to_organs()
+
+        for name, _ in brain_biosamples:
+            assert name in mapping, f"Biosample {name} should be in reverse mapping"
+            assert "brain" in mapping[name], f"Brain should be in organs for {name}"

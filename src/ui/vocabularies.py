@@ -285,6 +285,94 @@ def get_organ_display_name(organ: str) -> str:
 
 
 # =============================================================================
+# BIOSAMPLE-TO-ORGAN REVERSE MAPPING
+# =============================================================================
+
+
+@lru_cache(maxsize=1)
+def build_biosample_to_organs() -> dict[str, list[str]]:
+    """Build reverse mapping from biosample term_name to organ systems.
+
+    Since biosamples can belong to multiple organs (e.g., 'omental fat pad'
+    belongs to 'adipose tissue', 'connective tissue', and 'gonad'), this
+    returns a list of organs for each biosample, ordered by experiment count.
+
+    Returns:
+        Dictionary mapping biosample names to list of organ names,
+        with organs ordered by their total experiment count (most popular first).
+
+    Example:
+        >>> mapping = build_biosample_to_organs()
+        >>> mapping.get("cerebellum")
+        ['brain']
+        >>> mapping.get("omental fat pad")
+        ['adipose tissue', 'connective tissue', 'gonad']
+    """
+    data = _load_facets()
+    organ_data = data.get("organ_to_biosamples", {})
+
+    biosample_to_organs: dict[str, list[tuple[str, int]]] = {}
+
+    for organ, biosamples in organ_data.items():
+        # Get organ's total experiment count for ordering
+        organ_total = sum(item["count"] for item in biosamples)
+        for item in biosamples:
+            key = item["key"]
+            if key not in biosample_to_organs:
+                biosample_to_organs[key] = []
+            biosample_to_organs[key].append((organ, organ_total))
+
+    # Sort organs by experiment count (most popular first)
+    result: dict[str, list[str]] = {}
+    for biosample, organ_list in biosample_to_organs.items():
+        organ_list.sort(key=lambda x: -x[1])
+        result[biosample] = [org for org, _ in organ_list]
+
+    return result
+
+
+def get_primary_organ_for_biosample(biosample: str) -> str | None:
+    """Get the primary (most relevant) organ for a biosample.
+
+    Returns the organ with the most experiments for this biosample.
+    This is useful for assigning a single organ category for visualization.
+
+    Args:
+        biosample: Biosample term_name (e.g., "cerebellum", "K562").
+
+    Returns:
+        Primary organ name (e.g., "brain") or None if not found.
+
+    Example:
+        >>> get_primary_organ_for_biosample("cerebellum")
+        'brain'
+        >>> get_primary_organ_for_biosample("K562")
+        'blood'
+    """
+    mapping = build_biosample_to_organs()
+    organs = mapping.get(biosample, [])
+    return organs[0] if organs else None
+
+
+def get_all_organs_for_biosample(biosample: str) -> list[str]:
+    """Get all organs associated with a biosample.
+
+    Args:
+        biosample: Biosample term_name.
+
+    Returns:
+        List of organ names, ordered by experiment count.
+        Empty list if biosample not found.
+
+    Example:
+        >>> get_all_organs_for_biosample("omental fat pad")
+        ['adipose tissue', 'connective tissue', 'gonad']
+    """
+    mapping = build_biosample_to_organs()
+    return mapping.get(biosample, [])
+
+
+# =============================================================================
 # CONVENIENCE FUNCTIONS FOR UI
 # =============================================================================
 
