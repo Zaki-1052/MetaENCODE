@@ -1232,3 +1232,111 @@ class TestParseAgeFromText:
         """Test parse_age_from_text with 'aged' term."""
         result = parse_age_from_text("RNA-seq of aged mouse liver")
         assert result == "aged"
+
+
+# =============================================================================
+# Coverage Gap Tests
+# =============================================================================
+
+
+class TestSearchFilterManagerFuzzySearchNoColumns:
+    """Tests for _fuzzy_text_search with no available columns (line 535)."""
+
+    @pytest.fixture
+    def manager(self) -> SearchFilterManager:
+        """Create SearchFilterManager instance."""
+        return SearchFilterManager()
+
+    def test_fuzzy_text_search_no_searchable_columns(
+        self, manager: SearchFilterManager
+    ) -> None:
+        """Line 535: _fuzzy_text_search returns all True when no searchable columns."""
+        # Create DataFrame with only non-searchable columns
+        df = pd.DataFrame(
+            {
+                "accession": ["ENC001", "ENC002", "ENC003"],
+                "file_count": [10, 20, 30],
+                "replicate_count": [2, 3, 4],
+            }
+        )
+
+        # Call _fuzzy_text_search directly (private method)
+        result = manager._fuzzy_text_search(df, ["some", "search", "terms"])
+
+        # Should return all True since no searchable columns exist
+        assert isinstance(result, pd.Series)
+        assert len(result) == 3
+        assert result.all()  # All rows should be True
+
+
+class TestSearchFilterManagerApplyFiltersBodyPart:
+    """Tests for apply_filters with body_part filter (lines 627-632)."""
+
+    @pytest.fixture
+    def manager(self) -> SearchFilterManager:
+        """Create SearchFilterManager instance."""
+        return SearchFilterManager()
+
+    def test_apply_filters_body_part_filter(
+        self, manager: SearchFilterManager
+    ) -> None:
+        """Lines 627-632: Body part filter calls get_biosamples_for_organ."""
+        # Create DataFrame with brain biosamples and non-brain biosamples
+        df = pd.DataFrame(
+            {
+                "accession": ["ENC001", "ENC002", "ENC003", "ENC004"],
+                "biosample_term_name": ["cerebellum", "forebrain", "liver", "K562"],
+                "organism": ["mouse", "mouse", "human", "human"],
+            }
+        )
+
+        # Filter by body_part = "brain"
+        filters = FilterState(body_part="brain")
+        result = manager.apply_filters(df, filters)
+
+        # Should only include brain biosamples (cerebellum, forebrain)
+        assert len(result) >= 1
+        # Verify no liver or K562 in results
+        biosamples = result["biosample_term_name"].tolist()
+        assert "liver" not in biosamples
+        assert "K562" not in biosamples
+
+    def test_apply_filters_body_part_with_no_matches(
+        self, manager: SearchFilterManager
+    ) -> None:
+        """Test body_part filter when no biosamples match the organ."""
+        df = pd.DataFrame(
+            {
+                "accession": ["ENC001", "ENC002"],
+                "biosample_term_name": ["K562", "HepG2"],
+                "organism": ["human", "human"],
+            }
+        )
+
+        # Filter by body_part = "brain" - neither K562 nor HepG2 are brain tissues
+        filters = FilterState(body_part="brain")
+        result = manager.apply_filters(df, filters)
+
+        # Should return no results since K562 and HepG2 are not brain biosamples
+        assert len(result) == 0
+
+    def test_apply_filters_body_part_blood(
+        self, manager: SearchFilterManager
+    ) -> None:
+        """Test body_part filter for blood/bodily fluid organ."""
+        df = pd.DataFrame(
+            {
+                "accession": ["ENC001", "ENC002", "ENC003"],
+                "biosample_term_name": ["K562", "GM12878", "cerebellum"],
+                "organism": ["human", "human", "mouse"],
+            }
+        )
+
+        # Filter by body_part that includes cell lines - use "blood" or similar
+        # K562 and GM12878 are blood-related cell lines
+        filters = FilterState(body_part="blood")
+        result = manager.apply_filters(df, filters)
+
+        # Should include blood-related samples but not brain
+        biosamples = result["biosample_term_name"].tolist()
+        assert "cerebellum" not in biosamples

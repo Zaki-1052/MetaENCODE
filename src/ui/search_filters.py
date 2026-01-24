@@ -496,10 +496,13 @@ class SearchFilterManager:
             return 0.6
 
         # Word boundary match
+        # Note: This branch is logically unreachable because if word.startswith(query),
+        # then query is in target (at the start of a word), which is caught by line 492.
+        # Kept for defensive programming in case the above logic changes.
         target_words = target.split()
         for word in target_words:
             if word.startswith(query):
-                return 0.65
+                return 0.65  # pragma: no cover
 
         # Fuzzy match using SequenceMatcher
         ratio = SequenceMatcher(None, query, target).ratio()

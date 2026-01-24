@@ -20,6 +20,7 @@ from src.ui.vocabularies import (
     TOP_BIOSAMPLES,
     TOP_TARGETS,
     build_biosample_to_organs,
+    format_assay_with_count,
     get_all_assay_types,
     get_all_body_parts,
     get_all_developmental_stages,
@@ -31,6 +32,8 @@ from src.ui.vocabularies import (
     get_biosample_names_for_organ,
     get_biosamples,
     get_biosamples_for_organ,
+    get_body_part_display_name,
+    get_facets_timestamp,
     get_labs,
     get_life_stages,
     get_organ_display_name,
@@ -42,9 +45,14 @@ from src.ui.vocabularies import (
     get_organism_scientific_name,
     get_organisms,
     get_primary_organ_for_biosample,
+    get_target_description,
     get_targets,
     get_tissues_for_body_part,
+    get_top_biosamples,
+    get_top_targets,
     get_total_experiments,
+    normalize_search_term,
+    reload_facets,
 )
 
 
@@ -729,3 +737,237 @@ class TestBiosampleToOrganMapping:
         for name, _ in brain_biosamples:
             assert name in mapping, f"Biosample {name} should be in reverse mapping"
             assert "brain" in mapping[name], f"Brain should be in organs for {name}"
+
+
+# =============================================================================
+# Coverage Gap Tests
+# =============================================================================
+
+
+class TestUncoveredFunctions:
+    """Tests for functions that need coverage."""
+
+    def test_reload_facets(self) -> None:
+        """Lines 63-64: reload_facets() forces cache refresh."""
+        # First call to load facets
+        initial_total = get_total_experiments()
+
+        # Call reload_facets to force refresh
+        reload_facets()
+
+        # After reload, data should still be accessible
+        new_total = get_total_experiments()
+        assert new_total > 0
+        assert new_total == initial_total  # Data should be same after reload
+
+    def test_get_facets_timestamp(self) -> None:
+        """Lines 177-178: get_facets_timestamp returns ISO timestamp string."""
+        timestamp = get_facets_timestamp()
+        assert isinstance(timestamp, str)
+        assert len(timestamp) > 0
+        # Timestamp should contain date-like format or "unknown"
+        assert "-" in timestamp or timestamp == "unknown"
+
+    def test_format_assay_with_count(self) -> None:
+        """Lines 484-485: format_assay_with_count returns formatted string."""
+        result = format_assay_with_count("ChIP-seq", 12569)
+        assert isinstance(result, str)
+        assert "ChIP-seq" in result
+        assert "12,569" in result  # Formatted with comma
+        assert "experiments" in result
+
+    def test_format_assay_with_count_long_name(self) -> None:
+        """Test format_assay_with_count with a long assay name."""
+        result = format_assay_with_count("single-cell RNA sequencing assay", 500)
+        assert isinstance(result, str)
+        # Should use display name (scRNA-seq)
+        assert "scRNA-seq" in result
+        assert "500" in result
+        assert "experiments" in result
+
+    def test_normalize_search_term_canonical(self) -> None:
+        """Lines 533-539: normalize_search_term returns canonical when term matches."""
+        result = normalize_search_term("ChIP-seq", ASSAY_ALIASES)
+        assert result == "ChIP-seq"
+
+    def test_normalize_search_term_alias_match(self) -> None:
+        """Lines 533-539: normalize_search_term returns canonical for alias."""
+        result = normalize_search_term("chip", ASSAY_ALIASES)
+        assert result == "ChIP-seq"
+
+    def test_normalize_search_term_no_match(self) -> None:
+        """Lines 533-539: normalize_search_term returns None for unknown term."""
+        result = normalize_search_term("unknown_assay", ASSAY_ALIASES)
+        assert result is None
+
+    def test_normalize_search_term_histone_alias(self) -> None:
+        """Test normalize_search_term with histone aliases."""
+        result = normalize_search_term("polycomb", HISTONE_ALIASES)
+        assert result == "H3K27me3"
+
+    def test_get_target_description_known(self) -> None:
+        """Lines 775-777: get_target_description returns description for known target."""
+        result = get_target_description("H3K27ac")
+        assert result is not None
+        assert isinstance(result, str)
+        assert len(result) > 0
+
+    def test_get_target_description_unknown(self) -> None:
+        """Lines 775-777: get_target_description returns None for unknown target."""
+        result = get_target_description("UNKNOWN_TARGET_XYZ")
+        assert result is None
+
+    def test_get_target_description_ctcf(self) -> None:
+        """Test get_target_description for CTCF."""
+        result = get_target_description("CTCF")
+        assert result is not None
+        assert isinstance(result, str)
+
+    def test_get_body_part_display_name_known(self) -> None:
+        """Lines 988-991: get_body_part_display_name returns display name for known part."""
+        result = get_body_part_display_name("brain")
+        assert result == "Brain / Nervous System"
+
+    def test_get_body_part_display_name_unknown(self) -> None:
+        """Lines 988-991: get_body_part_display_name returns input for unknown part."""
+        result = get_body_part_display_name("unknown_body_part")
+        assert result == "unknown_body_part"
+
+    def test_get_body_part_display_name_heart(self) -> None:
+        """Test get_body_part_display_name for heart."""
+        result = get_body_part_display_name("heart")
+        assert "Heart" in result or "Cardiovascular" in result
+
+    def test_get_top_biosamples(self) -> None:
+        """Line 1171: get_top_biosamples returns list of biosample names."""
+        result = get_top_biosamples()
+        assert isinstance(result, list)
+        assert len(result) > 0
+        assert all(isinstance(name, str) for name in result)
+
+    def test_get_top_biosamples_with_limit(self) -> None:
+        """Test get_top_biosamples with custom limit."""
+        result = get_top_biosamples(limit=10)
+        assert len(result) == 10
+
+    def test_get_top_targets(self) -> None:
+        """Line 1176: get_top_targets returns list of target names."""
+        result = get_top_targets()
+        assert isinstance(result, list)
+        assert len(result) > 0
+        assert all(isinstance(name, str) for name in result)
+
+    def test_get_top_targets_with_limit(self) -> None:
+        """Test get_top_targets with custom limit."""
+        result = get_top_targets(limit=5)
+        assert len(result) == 5
+
+
+class TestLazyCollections:
+    """Tests for _LazyDict and _LazyList classes."""
+
+    def test_lazy_dict_getitem(self) -> None:
+        """Lines 1077-1079: _LazyDict.__getitem__ accesses items."""
+        # ASSAY_TYPES is a _LazyDict
+        value = ASSAY_TYPES["ChIP-seq"]
+        assert isinstance(value, str)
+        assert "ChIP-seq" in value
+        assert "experiments" in value
+
+    def test_lazy_dict_iter(self) -> None:
+        """Lines 1085-1087: _LazyDict.__iter__ iterates over keys."""
+        keys = list(iter(ASSAY_TYPES))
+        assert isinstance(keys, list)
+        assert len(keys) > 0
+        assert "ChIP-seq" in keys
+
+    def test_lazy_dict_keys(self) -> None:
+        """Lines 1089-1091: _LazyDict.keys() returns keys."""
+        keys = ASSAY_TYPES.keys()
+        assert "ChIP-seq" in keys
+        assert "RNA-seq" in keys
+
+    def test_lazy_dict_values(self) -> None:
+        """Lines 1093-1095: _LazyDict.values() returns values."""
+        values = list(ASSAY_TYPES.values())
+        assert isinstance(values, list)
+        assert len(values) > 0
+        # Values should be formatted strings
+        assert all(isinstance(v, str) for v in values)
+
+    def test_lazy_dict_items(self) -> None:
+        """Test _LazyDict.items() returns key-value pairs."""
+        items = list(ASSAY_TYPES.items())
+        assert len(items) > 0
+        for key, value in items[:5]:
+            assert isinstance(key, str)
+            assert isinstance(value, str)
+
+    def test_lazy_dict_len(self) -> None:
+        """Test _LazyDict.__len__ returns correct length."""
+        length = len(ASSAY_TYPES)
+        assert length > 0
+        assert length == len(list(ASSAY_TYPES.keys()))
+
+    def test_lazy_dict_contains(self) -> None:
+        """Test _LazyDict.__contains__ checks membership."""
+        assert "ChIP-seq" in ASSAY_TYPES
+        assert "NONEXISTENT_ASSAY" not in ASSAY_TYPES
+
+    def test_lazy_dict_get(self) -> None:
+        """Test _LazyDict.get() with default."""
+        value = ASSAY_TYPES.get("ChIP-seq")
+        assert value is not None
+        default_value = ASSAY_TYPES.get("NONEXISTENT", "default")
+        assert default_value == "default"
+
+    def test_lazy_list_getitem(self) -> None:
+        """Lines 1122-1124: _LazyList.__getitem__ accesses items by index."""
+        # TOP_BIOSAMPLES is a _LazyList
+        first_item = TOP_BIOSAMPLES[0]
+        assert isinstance(first_item, str)
+        assert len(first_item) > 0
+
+    def test_lazy_list_getitem_negative_index(self) -> None:
+        """Test _LazyList.__getitem__ with negative index."""
+        last_item = TOP_BIOSAMPLES[-1]
+        assert isinstance(last_item, str)
+
+    def test_lazy_list_iter(self) -> None:
+        """Test _LazyList.__iter__ iterates over items."""
+        items = list(iter(TOP_BIOSAMPLES))
+        assert isinstance(items, list)
+        assert len(items) > 0
+
+    def test_lazy_list_len(self) -> None:
+        """Test _LazyList.__len__ returns correct length."""
+        length = len(TOP_BIOSAMPLES)
+        assert length > 0
+        assert length == 50  # Default limit for TOP_BIOSAMPLES
+
+    def test_lazy_list_contains(self) -> None:
+        """Test _LazyList.__contains__ checks membership."""
+        # Get first biosample to check
+        first = TOP_BIOSAMPLES[0]
+        assert first in TOP_BIOSAMPLES
+        assert "NONEXISTENT_BIOSAMPLE_XYZ" not in TOP_BIOSAMPLES
+
+    def test_top_targets_lazy_list(self) -> None:
+        """Test TOP_TARGETS lazy list access."""
+        first_target = TOP_TARGETS[0]
+        assert isinstance(first_target, str)
+        length = len(TOP_TARGETS)
+        assert length == 40  # Default limit for TOP_TARGETS
+
+    def test_life_stages_lazy_list(self) -> None:
+        """Test LIFE_STAGES lazy list access."""
+        first_stage = LIFE_STAGES[0]
+        assert isinstance(first_stage, str)
+        assert "adult" in LIFE_STAGES
+
+    def test_common_labs_lazy_list(self) -> None:
+        """Test COMMON_LABS lazy list access."""
+        first_lab = COMMON_LABS[0]
+        assert isinstance(first_lab, str)
+        length = len(COMMON_LABS)
+        assert length == 20  # Default limit for COMMON_LABS
