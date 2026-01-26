@@ -1,0 +1,29 @@
+2026-01-15 16:28:10 -0800|scaffolding|Zaki-1052
+2026-01-15 16:30:18 -0800|add setup script|Zaki-1052
+2026-01-15 17:35:29 -0800|cleanup|Zaki-1052
+2026-01-20 22:35:47 -0800|test claude basic version|Zaki-1052
+2026-01-21 04:29:50 -0800|finish implementation|Zaki-1052
+2026-01-21 05:05:50 -0800|testing|Zaki-1052
+2026-01-21 05:11:22 -0800|hpc prep|Zaki-1052
+2026-01-21 07:04:52 -0800|test embeddings|Zaki-1052
+2026-01-21 12:20:44 -0800|add data|Zaki-1052
+2026-01-22 18:57:39 +0000|Redesign search filters with specialized inputs and autocomplete|Claude
+2026-01-23 16:02:49 -0800|vocab|Zaki-1052
+2026-01-23 16:47:11 -0800|vocab checkpoint|Zaki-1052
+2026-01-23 17:26:24 -0800|refactor vocab|Zaki-1052
+2026-01-23 17:48:00 +0000|Add comprehensive tests for UI search filter modules|Claude
+2026-01-23 19:58:56 -0800|organ slims|Zaki-1052
+2026-01-23 20:31:31 -0800|organ filtering|Zaki-1052
+2026-01-23 21:29:38 -0800|dynamic organisms|Zaki-1052
+2026-01-23 21:55:27 -0800|reorg sidebar|Zaki-1052
+2026-01-23 22:13:39 -0800|fuzzy search|Zaki-1052
+2026-01-23 22:33:49 +0000|Add ENCODE API exploration scripts and findings documentation|Claude
+2026-01-23 22:36:27 -0800|default filters|Zaki-1052
+2026-01-23 22:50:10 -0800|tests|Zaki-1052
+2026-01-23 22:50:44 +0000|Fix vocabularies and search to use verified ENCODE data|Claude
+2026-01-23 22:53:01 -0800|move scripts|Zaki-1052
+2026-01-23 22:58:44 -0800|new search filtering system|Zaki-1052
+2026-01-23 23:07:39 -0800|new search filtering system|Zaki-1052
+2026-01-23 23:50:25 +0000|Fix overly strict filtering in search and similarity results|Claude
+2026-01-24 00:00:38 +0000|Add ENCODE validation scripts for local execution|Claude
+2026-01-24 00:57:18 -0800|new slims|Zaki-1052

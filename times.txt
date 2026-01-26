@@ -1,0 +1,127 @@
+================================================================================
+COMMIT TIME ANALYSIS
+================================================================================
+
+Total commits: 29
+Human commits: 23
+Claude (AI-assisted) commits: 6
+Session gap threshold: 90 minutes
+
+================================================================================
+HUMAN WORK SESSIONS (Your actual coding time)
+================================================================================
+
+--- Session 1 ---
+Date: 2026-01-15
+Start: 16:28 (-0800) - scaffolding
+End:   17:35 (-0800) - cleanup
+Commits: 3
+Span: 1:07:19
+Estimated active: 1:17:19
+Commits:
+  16:28 (-0800) - scaffolding
+  16:30 (-0800) - add setup script
+  17:35 (-0800) - cleanup
+
+--- Session 2 ---
+Date: 2026-01-20
+Start: 22:35 (-0800) - test claude basic version
+End:   22:35 (-0800) - test claude basic version
+Commits: 1
+Span: 0:00:00
+Estimated active: 0:20:00
+Commits:
+  22:35 (-0800) - test claude basic version
+
+--- Session 3 ---
+Date: 2026-01-21
+Start: 04:29 (-0800) - finish implementation
+End:   05:11 (-0800) - hpc prep
+Commits: 3
+Span: 0:41:32
+Estimated active: 0:51:32
+Commits:
+  04:29 (-0800) - finish implementation
+  05:05 (-0800) - testing
+  05:11 (-0800) - hpc prep
+
+--- Session 4 ---
+Date: 2026-01-21
+Start: 07:04 (-0800) - test embeddings
+End:   07:04 (-0800) - test embeddings
+Commits: 1
+Span: 0:00:00
+Estimated active: 0:20:00
+Commits:
+  07:04 (-0800) - test embeddings
+
+--- Session 5 ---
+Date: 2026-01-21
+Start: 12:20 (-0800) - add data
+End:   12:20 (-0800) - add data
+Commits: 1
+Span: 0:00:00
+Estimated active: 0:20:00
+Commits:
+  12:20 (-0800) - add data
+
+--- Session 6 ---
+Date: 2026-01-23
+Start: 16:02 (-0800) - vocab
+End:   17:26 (-0800) - refactor vocab
+Commits: 3
+Span: 1:23:35
+Estimated active: 1:33:35
+Commits:
+  16:02 (-0800) - vocab
+  16:47 (-0800) - vocab checkpoint
+  17:26 (-0800) - refactor vocab
+
+--- Session 7 ---
+Date: 2026-01-23
+Start: 19:58 (-0800) - organ slims
+End:   23:07 (-0800) - new search filtering system
+Commits: 10
+Span: 3:08:43
+Estimated active: 3:18:43
+
+--- Session 8 ---
+Date: 2026-01-24
+Start: 00:57 (-0800) - new slims
+End:   00:57 (-0800) - new slims
+Commits: 1
+Span: 0:00:00
+Estimated active: 0:20:00
+Commits:
+  00:57 (-0800) - new slims
+
+================================================================================
+CLAUDE (AI-ASSISTED) SESSIONS
+================================================================================
+Note: These represent AI-generated commits. You were actively
+prompting/reviewing, but not writing this code directly.
+
+--- Claude Session 1 ---
+Commits: 1, Span: 0:00:00
+  18:57 UTC - Redesign search filters with specialized inputs and aut
+
+--- Claude Session 2 ---
+Commits: 1, Span: 0:00:00
+  17:48 UTC - Add comprehensive tests for UI search filter modules
+
+--- Claude Session 3 ---
+Commits: 4, Span: 1:26:49
+  22:33 UTC - Add ENCODE API exploration scripts and findings documen
+  22:50 UTC - Fix vocabularies and search to use verified ENCODE data
+  23:50 UTC - Fix overly strict filtering in search and similarity re
+  00:00 UTC - Add ENCODE validation scripts for local execution
+
+================================================================================
+SUMMARY
+================================================================================
+
+Your direct coding time: 8:21:09 (8.4 hours)
+AI-assisted session time: 2:16:49 (2.3 hours)
+
+Total active time: 10:37:58
+                 = 10.6 hours
