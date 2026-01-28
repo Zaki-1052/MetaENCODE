@@ -5,12 +5,31 @@ This module provides autocomplete matching, NLP-based term matching,
 and filter management for the MetaENCODE search interface.
 """
 
+from __future__ import annotations
+
 import re
 from dataclasses import dataclass
 from difflib import SequenceMatcher
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 import pandas as pd
+
+# Optional spell check integration
+_spell_checker = None
+
+
+def _get_spell_checker():
+    """Lazy load spell checker (optional dependency)."""
+    global _spell_checker
+    if _spell_checker is None:
+        try:
+            from src.utils.spell_check import get_spell_checker
+
+            _spell_checker = get_spell_checker()
+        except ImportError:
+            # Spell check dependencies not installed
+            pass
+    return _spell_checker
 
 from src.ui.vocabularies import (
     ASSAY_ALIASES,
@@ -511,7 +530,7 @@ class SearchFilterManager:
     def _fuzzy_text_search(
         self, df: pd.DataFrame, search_terms: List[str], threshold: float = 0.75
     ) -> pd.Series:
-        """Search text columns with fuzzy matching fallback.
+        """Search text columns with fuzzy matching and spell correction fallback.
 
         Args:
             df: DataFrame to search.
@@ -543,11 +562,27 @@ class SearchFilterManager:
 
         combined = df.apply(combine_text, axis=1)
 
+        # Try to get spell-corrected terms
+        spell_checker = _get_spell_checker()
+        corrected_terms: Dict[str, str] = {}
+        if spell_checker:
+            for term in search_terms:
+                corrected = spell_checker.correct(term)
+                if corrected != term:
+                    corrected_terms[term] = corrected.lower()
+
         # For each term, find matches
         mask = pd.Series(True, index=df.index)
         for term in search_terms:
             # Fast path: exact substring match
             term_mask = combined.str.contains(term, case=False, na=False, regex=False)
+
+            # Also check spell-corrected term if available
+            if term in corrected_terms:
+                corrected = corrected_terms[term]
+                term_mask = term_mask | combined.str.contains(
+                    corrected, case=False, na=False, regex=False
+                )
 
             # Fuzzy fallback for non-matches
             if not term_mask.all():
@@ -560,6 +595,14 @@ class SearchFilterManager:
                         if ratio >= threshold:
                             term_mask.loc[idx] = True
                             break
+                        # Also check corrected term if available
+                        if term in corrected_terms:
+                            ratio = SequenceMatcher(
+                                None, corrected_terms[term], word
+                            ).ratio()
+                            if ratio >= threshold:
+                                term_mask.loc[idx] = True
+                                break
 
             mask = mask & term_mask
 

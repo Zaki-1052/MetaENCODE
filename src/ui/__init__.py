@@ -16,6 +16,19 @@ from src.ui.vocabularies import (
     get_organisms,
 )
 
+# Autocomplete provider (uses spell check if available)
+from src.ui.autocomplete import (
+    AutocompleteProvider,
+    AutocompleteSuggestion,
+    get_autocomplete_provider,
+    create_biosample_search_fn,
+    create_target_search_fn,
+    create_assay_search_fn,
+    create_organism_search_fn,
+    create_lab_search_fn,
+    create_organ_search_fn,
+)
+
 __all__ = [
     "SearchFilterManager",
     "ASSAY_TYPES",
@@ -29,4 +42,14 @@ __all__ = [
     "get_life_stages",
     "get_organism_display",
     "get_organisms",
+    # Autocomplete
+    "AutocompleteProvider",
+    "AutocompleteSuggestion",
+    "get_autocomplete_provider",
+    "create_biosample_search_fn",
+    "create_target_search_fn",
+    "create_assay_search_fn",
+    "create_organism_search_fn",
+    "create_lab_search_fn",
+    "create_organ_search_fn",
 ]
