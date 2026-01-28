@@ -36,6 +36,7 @@ from src.ui.vocabularies import (
     get_targets,
 )
 from src.utils.cache import CacheManager
+from src.utils.spell_check import correct_spelling
 from src.visualization.plots import DimensionalityReducer, PlotGenerator
 
 # Page configuration - must be first Streamlit command
@@ -179,7 +180,7 @@ def render_sidebar() -> dict:
         "Description search",
         value=st.session_state.filter_state.description_search or "",
         placeholder="e.g., 8-week cerebellum, H3K27ac",
-        help="Search in experiment descriptions, titles, and metadata",
+        help="Search in experiment descriptions, titles, and metadata. Typos are auto-corrected.",
         key="filter_description",
     )
 
@@ -432,6 +433,23 @@ def render_sidebar() -> dict:
                             filter_state.organism, filter_state.organism
                         )
 
+                    # Apply spell correction to search terms before API call
+                    corrected_search = None
+                    spell_correction_msg = None
+                    if filter_state.description_search:
+                        # Correct each word in the search term
+                        words = filter_state.description_search.split()
+                        corrected_words = []
+                        corrections_made = []
+                        for word in words:
+                            corrected = correct_spelling(word)
+                            corrected_words.append(corrected)
+                            if corrected.lower() != word.lower():
+                                corrections_made.append(f"{word} → {corrected}")
+                        corrected_search = " ".join(corrected_words)
+                        if corrections_made:
+                            spell_correction_msg = f"Corrected: {', '.join(corrections_made)}"
+
                     # Use fetch_experiments with all available API parameters
                     results = client.fetch_experiments(
                         assay_type=filter_state.assay_type,
@@ -439,7 +457,7 @@ def render_sidebar() -> dict:
                         biosample=filter_state.biosample,
                         target=filter_state.target,
                         life_stage=filter_state.age_stage,
-                        search_term=filter_state.description_search,
+                        search_term=corrected_search,
                         limit=max(max_results * 5, 200),  # Fetch more for filtering
                     )
 
@@ -462,6 +480,8 @@ def render_sidebar() -> dict:
                         results = results.head(max_results)
 
                     st.session_state.search_results = results
+                    if spell_correction_msg:
+                        st.sidebar.info(spell_correction_msg)
                     st.sidebar.success(f"Found {len(results)} results")
                 except Exception as e:
                     st.sidebar.error(f"Search failed: {e}")
