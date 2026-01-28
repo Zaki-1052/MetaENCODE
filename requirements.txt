@@ -22,3 +22,8 @@ umap-learn>=0.5.4
 
 # Utilities
 python-dotenv>=1.0.0
+
+# Spell Checking & Autocomplete
+symspellpy>=6.7.0
+jellyfish>=1.0.0
+streamlit-searchbox>=0.1.14
