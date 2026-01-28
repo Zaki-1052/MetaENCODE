@@ -240,7 +240,9 @@ class AutocompleteProvider:
                     if ss.distance > 0 and ss.confidence >= 0.6:
                         seen_values.add(ss.term)
                         # Find count for this term
-                        count = next((c for t, c in vocab if t == ss.term), ss.frequency)
+                        count = next(
+                            (c for t, c in vocab if t == ss.term), ss.frequency
+                        )
                         suggestions.append(
                             AutocompleteSuggestion(
                                 value=ss.term,
@@ -350,9 +352,7 @@ class AutocompleteProvider:
 
         return None
 
-    def _match_aliases(
-        self, query: str, field: str
-    ) -> List[Tuple[str, float]]:
+    def _match_aliases(self, query: str, field: str) -> List[Tuple[str, float]]:
         """Match query against aliases.
 
         Returns:

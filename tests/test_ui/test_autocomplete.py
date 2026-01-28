@@ -6,15 +6,14 @@ import pytest
 from src.ui.autocomplete import (
     AutocompleteProvider,
     AutocompleteSuggestion,
-    get_autocomplete_provider,
-    create_biosample_search_fn,
-    create_target_search_fn,
     create_assay_search_fn,
-    create_organism_search_fn,
+    create_biosample_search_fn,
     create_lab_search_fn,
     create_organ_search_fn,
+    create_organism_search_fn,
+    create_target_search_fn,
+    get_autocomplete_provider,
 )
-
 
 # =============================================================================
 # AutocompleteSuggestion Tests
@@ -86,7 +85,9 @@ class TestAutocompleteProviderGetSuggestions:
 
     # --- Biosample field tests ---
 
-    def test_get_suggestions_biosample_empty(self, provider: AutocompleteProvider) -> None:
+    def test_get_suggestions_biosample_empty(
+        self, provider: AutocompleteProvider
+    ) -> None:
         """Test biosample suggestions with empty query."""
         suggestions = provider.get_suggestions("", field="biosample", limit=10)
         assert len(suggestions) > 0
@@ -96,7 +97,9 @@ class TestAutocompleteProviderGetSuggestions:
             assert "value" in s
             assert "display" in s
 
-    def test_get_suggestions_biosample_prefix(self, provider: AutocompleteProvider) -> None:
+    def test_get_suggestions_biosample_prefix(
+        self, provider: AutocompleteProvider
+    ) -> None:
         """Test biosample suggestions with prefix match."""
         suggestions = provider.get_suggestions("cereb", field="biosample", limit=10)
         assert len(suggestions) > 0
@@ -104,7 +107,9 @@ class TestAutocompleteProviderGetSuggestions:
         values = [s["value"].lower() for s in suggestions]
         assert any("cereb" in v for v in values)
 
-    def test_get_suggestions_biosample_k562(self, provider: AutocompleteProvider) -> None:
+    def test_get_suggestions_biosample_k562(
+        self, provider: AutocompleteProvider
+    ) -> None:
         """Test biosample suggestions for K562."""
         suggestions = provider.get_suggestions("K562", field="biosample", limit=10)
         assert len(suggestions) > 0
@@ -171,19 +176,25 @@ class TestAutocompleteProviderGetSuggestions:
 
     # --- Organism field tests ---
 
-    def test_get_suggestions_organism_empty(self, provider: AutocompleteProvider) -> None:
+    def test_get_suggestions_organism_empty(
+        self, provider: AutocompleteProvider
+    ) -> None:
         """Test organism suggestions with empty query."""
         suggestions = provider.get_suggestions("", field="organism", limit=5)
         assert len(suggestions) > 0
 
-    def test_get_suggestions_organism_human(self, provider: AutocompleteProvider) -> None:
+    def test_get_suggestions_organism_human(
+        self, provider: AutocompleteProvider
+    ) -> None:
         """Test organism suggestions for human."""
         suggestions = provider.get_suggestions("Homo", field="organism", limit=5)
         assert len(suggestions) > 0
         values = [s["value"] for s in suggestions]
         assert any("Homo" in v for v in values)
 
-    def test_get_suggestions_organism_mouse(self, provider: AutocompleteProvider) -> None:
+    def test_get_suggestions_organism_mouse(
+        self, provider: AutocompleteProvider
+    ) -> None:
         """Test organism suggestions for mouse."""
         suggestions = provider.get_suggestions("Mus", field="organism", limit=5)
         assert len(suggestions) > 0
@@ -205,12 +216,16 @@ class TestAutocompleteProviderGetSuggestions:
 
     # --- Life stage field tests ---
 
-    def test_get_suggestions_life_stage_empty(self, provider: AutocompleteProvider) -> None:
+    def test_get_suggestions_life_stage_empty(
+        self, provider: AutocompleteProvider
+    ) -> None:
         """Test life stage suggestions with empty query."""
         suggestions = provider.get_suggestions("", field="life_stage", limit=10)
         assert len(suggestions) > 0
 
-    def test_get_suggestions_life_stage_adult(self, provider: AutocompleteProvider) -> None:
+    def test_get_suggestions_life_stage_adult(
+        self, provider: AutocompleteProvider
+    ) -> None:
         """Test life stage suggestions for adult."""
         suggestions = provider.get_suggestions("adult", field="life_stage", limit=10)
         assert len(suggestions) > 0
@@ -233,14 +248,18 @@ class TestAutocompleteProviderGetSuggestions:
 
     # --- Limit tests ---
 
-    def test_get_suggestions_respects_limit(self, provider: AutocompleteProvider) -> None:
+    def test_get_suggestions_respects_limit(
+        self, provider: AutocompleteProvider
+    ) -> None:
         """Test that limit is respected."""
         suggestions = provider.get_suggestions("", field="biosample", limit=5)
         assert len(suggestions) <= 5
 
     # --- Match type tests ---
 
-    def test_get_suggestions_prefix_match_type(self, provider: AutocompleteProvider) -> None:
+    def test_get_suggestions_prefix_match_type(
+        self, provider: AutocompleteProvider
+    ) -> None:
         """Test that prefix matches have correct match_type."""
         suggestions = provider.get_suggestions("K562", field="biosample", limit=10)
         # K562 should be a prefix match

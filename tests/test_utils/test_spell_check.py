@@ -5,8 +5,8 @@ import pytest
 
 # Check if spell check dependencies are available
 try:
-    import symspellpy
     import jellyfish
+    import symspellpy
 
     SPELL_CHECK_AVAILABLE = True
 except ImportError:
@@ -196,9 +196,7 @@ class TestVocabularySpellCheckerSuggest:
         suggestions = checker.suggest("cerebelum")
         assert len(suggestions) >= 1
         # Should suggest cerebellum with high confidence
-        cerebellum_sugg = next(
-            (s for s in suggestions if s.term == "cerebellum"), None
-        )
+        cerebellum_sugg = next((s for s in suggestions if s.term == "cerebellum"), None)
         assert cerebellum_sugg is not None
         assert cerebellum_sugg.distance == 1
         assert cerebellum_sugg.confidence >= 0.8
@@ -457,19 +455,17 @@ class TestConfidenceCalculation:
 
     def test_confidence_empty_strings(self) -> None:
         """Test confidence calculation with empty-like inputs."""
-        from src.utils.spell_check import VocabularySpellChecker, VocabularyEntry
+        from src.utils.spell_check import VocabularyEntry, VocabularySpellChecker
 
         checker = VocabularySpellChecker()
-        entry = VocabularyEntry(
-            term="", frequency=1, category="test", normalized=""
-        )
+        entry = VocabularyEntry(term="", frequency=1, category="test", normalized="")
         # max_len == 0 should return 0.0
         confidence = checker._calculate_confidence("", entry, 0, False)
         assert confidence == 0.0
 
     def test_confidence_no_phonetic_match(self) -> None:
         """Test confidence without phonetic match bonus."""
-        from src.utils.spell_check import VocabularySpellChecker, VocabularyEntry
+        from src.utils.spell_check import VocabularyEntry, VocabularySpellChecker
 
         checker = VocabularySpellChecker()
         entry = VocabularyEntry(
@@ -481,7 +477,7 @@ class TestConfidenceCalculation:
 
     def test_confidence_with_phonetic_match(self) -> None:
         """Test confidence with phonetic match bonus."""
-        from src.utils.spell_check import VocabularySpellChecker, VocabularyEntry
+        from src.utils.spell_check import VocabularyEntry, VocabularySpellChecker
 
         checker = VocabularySpellChecker()
         entry = VocabularyEntry(
@@ -494,7 +490,7 @@ class TestConfidenceCalculation:
 
     def test_confidence_length_penalty(self) -> None:
         """Test confidence penalty for very different lengths."""
-        from src.utils.spell_check import VocabularySpellChecker, VocabularyEntry
+        from src.utils.spell_check import VocabularyEntry, VocabularySpellChecker
 
         checker = VocabularySpellChecker()
         entry = VocabularyEntry(
@@ -576,6 +572,7 @@ class TestFromEncodeVocabulariesCoverage:
     def test_from_encode_exception_handling(self) -> None:
         """Test that exceptions in vocabulary loading are handled gracefully."""
         from unittest.mock import patch
+
         from src.utils.spell_check import VocabularySpellChecker
 
         # Mock one of the vocabulary functions to raise an exception
@@ -590,21 +587,17 @@ class TestFromEncodeVocabulariesCoverage:
     def test_from_encode_all_vocabularies_fail(self) -> None:
         """Test when all vocabulary loads fail."""
         from unittest.mock import patch
+
         from src.utils.spell_check import VocabularySpellChecker
 
         # Mock all vocabulary functions to raise exceptions
-        with patch(
-            "src.ui.vocabularies.get_biosamples", side_effect=Exception("Test")
-        ), patch(
-            "src.ui.vocabularies.get_targets", side_effect=Exception("Test")
-        ), patch(
-            "src.ui.vocabularies.get_assay_types", side_effect=Exception("Test")
-        ), patch(
-            "src.ui.vocabularies.get_organisms", side_effect=Exception("Test")
-        ), patch(
-            "src.ui.vocabularies.get_life_stages", side_effect=Exception("Test")
-        ), patch(
-            "src.ui.vocabularies.get_labs", side_effect=Exception("Test")
+        with (
+            patch("src.ui.vocabularies.get_biosamples", side_effect=Exception("Test")),
+            patch("src.ui.vocabularies.get_targets", side_effect=Exception("Test")),
+            patch("src.ui.vocabularies.get_assay_types", side_effect=Exception("Test")),
+            patch("src.ui.vocabularies.get_organisms", side_effect=Exception("Test")),
+            patch("src.ui.vocabularies.get_life_stages", side_effect=Exception("Test")),
+            patch("src.ui.vocabularies.get_labs", side_effect=Exception("Test")),
         ):
             # Should still return a checker (empty vocabulary)
             checker = VocabularySpellChecker.from_encode_vocabularies()
@@ -648,9 +641,10 @@ class TestImportErrorHandling:
 
     def test_symspellpy_import_error(self) -> None:
         """Test ImportError when symspellpy is not available (lines 36-37)."""
-        import sys
         import builtins
+        import sys
         from unittest.mock import patch
+
         import src.utils.spell_check as sc
 
         # Save original state
@@ -666,7 +660,7 @@ class TestImportErrorHandling:
             return real_import(name, *args, **kwargs)
 
         try:
-            with patch.object(builtins, '__import__', side_effect=mock_import):
+            with patch.object(builtins, "__import__", side_effect=mock_import):
                 with pytest.raises(ImportError) as exc_info:
                     sc._get_symspellpy()
                 assert "symspellpy is required" in str(exc_info.value)
@@ -678,6 +672,7 @@ class TestImportErrorHandling:
         """Test ImportError when jellyfish is not available (lines 52-53)."""
         import builtins
         from unittest.mock import patch
+
         import src.utils.spell_check as sc
 
         # Save original state
@@ -693,7 +688,7 @@ class TestImportErrorHandling:
             return real_import(name, *args, **kwargs)
 
         try:
-            with patch.object(builtins, '__import__', side_effect=mock_import):
+            with patch.object(builtins, "__import__", side_effect=mock_import):
                 with pytest.raises(ImportError) as exc_info:
                     sc._get_jellyfish()
                 assert "jellyfish is required" in str(exc_info.value)
@@ -857,6 +852,7 @@ class TestMetaphoneEdgeCases:
     def test_metaphone_exception_in_add_term(self) -> None:
         """Test handling of metaphone exception when adding term."""
         from unittest.mock import patch
+
         from src.utils.spell_check import VocabularySpellChecker
 
         checker = VocabularySpellChecker()
@@ -870,6 +866,7 @@ class TestMetaphoneEdgeCases:
     def test_metaphone_exception_in_get_phonetic_matches(self) -> None:
         """Test handling of metaphone exception in _get_phonetic_matches."""
         from unittest.mock import patch
+
         from src.utils.spell_check import VocabularySpellChecker
 
         checker = VocabularySpellChecker()
@@ -915,8 +912,12 @@ class TestPhoneticOnlyCodePath:
 
         # Add another term directly to vocabulary without reinitializing SymSpell
         checker._vocabulary["koff"] = checker._vocabulary["cough"].__class__(
-            term="koff", frequency=50, category="test", normalized="koff",
-            metaphone_primary="KF", metaphone_secondary=""
+            term="koff",
+            frequency=50,
+            category="test",
+            normalized="koff",
+            metaphone_primary="KF",
+            metaphone_secondary="",
         )
         checker._normalized_to_term["koff"] = "koff"
         # Add to metaphone index
@@ -930,14 +931,15 @@ class TestPhoneticOnlyCodePath:
 
     def test_phonetic_loop_processes_unseen_term(self) -> None:
         """Test the phonetic loop when term wasn't seen from SymSpell."""
-        from unittest.mock import patch, MagicMock
+        from unittest.mock import MagicMock, patch
+
         from src.utils.spell_check import VocabularySpellChecker
 
         checker = VocabularySpellChecker(max_edit_distance=2)
         checker.add_term("phone", 100)
 
         # Mock _get_phonetic_matches to return a term
-        with patch.object(checker, '_get_phonetic_matches', return_value={"phone"}):
+        with patch.object(checker, "_get_phonetic_matches", return_value={"phone"}):
             # Mock SymSpell to return empty results
             checker._init_symspell()
             original_lookup = checker._symspell.lookup
@@ -957,7 +959,8 @@ class TestSeenTermsDedup:
 
     def test_duplicate_from_symspell_skipped(self) -> None:
         """Test that duplicate terms from SymSpell are skipped."""
-        from unittest.mock import patch, MagicMock
+        from unittest.mock import MagicMock, patch
+
         from src.utils.spell_check import VocabularySpellChecker
 
         checker = VocabularySpellChecker(max_edit_distance=2)

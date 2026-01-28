@@ -1277,9 +1277,7 @@ class TestSearchFilterManagerApplyFiltersBodyPart:
         """Create SearchFilterManager instance."""
         return SearchFilterManager()
 
-    def test_apply_filters_body_part_filter(
-        self, manager: SearchFilterManager
-    ) -> None:
+    def test_apply_filters_body_part_filter(self, manager: SearchFilterManager) -> None:
         """Lines 627-632: Body part filter calls get_biosamples_for_organ."""
         # Create DataFrame with brain biosamples and non-brain biosamples
         df = pd.DataFrame(
@@ -1320,9 +1318,7 @@ class TestSearchFilterManagerApplyFiltersBodyPart:
         # Should return no results since K562 and HepG2 are not brain biosamples
         assert len(result) == 0
 
-    def test_apply_filters_body_part_blood(
-        self, manager: SearchFilterManager
-    ) -> None:
+    def test_apply_filters_body_part_blood(self, manager: SearchFilterManager) -> None:
         """Test body_part filter for blood/bodily fluid organ."""
         df = pd.DataFrame(
             {
