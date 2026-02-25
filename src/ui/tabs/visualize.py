@@ -5,8 +5,6 @@ This module can be easily commented out or replaced with
 a teammate's implementation.
 """
 
-import time
-
 import streamlit as st
 
 from src.ui.components.initializers import get_cache_manager
@@ -18,11 +16,6 @@ from src.visualization.plots import (
 
 # Cache key prefix must match scripts/precompute_visualizations.py
 _VIZ_CACHE_PREFIX = "viz_coords"
-
-
-def _log(msg: str) -> None:
-    """Print a timestamped debug message to the terminal."""
-    print(f"[VIZ] {time.perf_counter():.3f}  {msg}", flush=True)
 
 
 def _viz_cache_key(method: str, filtered: bool) -> str:
@@ -46,13 +39,11 @@ def _try_load_precomputed(
     Returns:
         True if precomputed data was loaded, False otherwise.
     """
-    t0 = time.perf_counter()
     cache_mgr = get_cache_manager()
     key = _viz_cache_key(method, filter_outliers)
     cached = cache_mgr.load(key)
 
     if cached is None:
-        _log(f"_try_load_precomputed: MISS for '{key}'")
         return False
 
     coords_2d = cached["coords_2d"]
@@ -88,11 +79,6 @@ def _try_load_precomputed(
     st.session_state.viz_mode = "all_datasets"
     st.session_state.viz_variance_ratio = variance_ratio
     st.session_state.viz_slider_value = None
-
-    _log(
-        f"_try_load_precomputed: HIT '{key}' — {len(coords_2d)} pts, "
-        f"{(time.perf_counter() - t0)*1000:.0f}ms"
-    )
     return True
 
 
@@ -109,19 +95,15 @@ def generate_visualization(
         color_by: Column to color points by.
         filter_outliers: Whether to filter outliers using percentile range.
     """
-    _log(f"generate_visualization: method={method}, filter={filter_outliers}")
-
     # Try precomputed cache first (instant load)
     if _try_load_precomputed(method, filter_outliers):
-        # Invalidate cached HTML so it gets rebuilt with new coords
-        st.session_state.pop("_viz_fig_key", None)
+        # Invalidate cached figure so it gets rebuilt with new coords
+        st.session_state.pop("viz_fig_key", None)
         return
 
     # Fall back to on-the-fly computation
-    _log("generate_visualization: FALLBACK to on-the-fly")
     with st.spinner(f"Computing {method.upper()} projection..."):
         try:
-            t0 = time.perf_counter()
             embeddings = st.session_state.embeddings
             metadata_df = st.session_state.metadata_df
 
@@ -142,10 +124,8 @@ def generate_visualization(
             st.session_state.viz_variance_ratio = reducer.variance_ratio_
             st.session_state.viz_slider_value = None
             st.session_state.viz_color_by = color_by
-            # Invalidate cached HTML
-            st.session_state.pop("_viz_fig_key", None)
-
-            _log(f"On-the-fly done: {len(coords_2d)} pts, {(time.perf_counter()-t0)*1000:.0f}ms")
+            # Invalidate cached figure
+            st.session_state.pop("viz_fig_key", None)
         except Exception as e:
             st.error(f"Error generating visualization: {e}")
             st.info(
@@ -213,8 +193,8 @@ def generate_similar_only_visualization(method: str, color_by: str) -> None:
             st.session_state.viz_variance_ratio = reducer.variance_ratio_
             st.session_state.viz_slider_value = top_n
             st.session_state.viz_color_by = color_by
-            # Invalidate cached HTML
-            st.session_state.pop("_viz_fig_key", None)
+            # Invalidate cached figure
+            st.session_state.pop("viz_fig_key", None)
 
         except Exception as e:
             st.error(f"Error generating visualization: {e}")
@@ -244,7 +224,6 @@ def _auto_regenerate_similar_viz(current_method: str, current_color: str) -> Non
     # Use stored settings so slider change doesn't accidentally switch method
     method = st.session_state.get("viz_reduction_method", current_method)
     color = st.session_state.get("viz_color_by", current_color)
-    _log(f"Auto-regen: slider {last_slider}->{current_slider}")
     generate_similar_only_visualization(method, color)
 
 
@@ -252,9 +231,8 @@ def _build_chart_figure(
     coords, viz_metadata, color_option, title, highlight_idx, variance, actual_method
 ):
     """Build a Plotly figure for the visualization chart."""
-    t0 = time.perf_counter()
     plotter = PlotGenerator(reduction_method=actual_method)
-    fig = plotter.scatter_plot(
+    return plotter.scatter_plot(
         coords,
         viz_metadata,
         color_by=color_option,
@@ -262,14 +240,10 @@ def _build_chart_figure(
         highlight_indices=highlight_idx,
         variance_ratio=variance,
     )
-    _log(f"Chart figure built: {len(coords)} pts — {(time.perf_counter()-t0)*1000:.0f}ms")
-    return fig
 
 
 def render_visualize_tab() -> None:
     """Render the visualization tab."""
-    t_tab = time.perf_counter()
-
     st.markdown(
         """
         <style>
@@ -396,17 +370,11 @@ def render_visualize_tab() -> None:
                 "Disable to show all datasets.",
             )
 
-        # Show precomputed status hint for all-datasets mode
-        if view_mode == "all_datasets":
-            cache_mgr = get_cache_manager()
-            key = _viz_cache_key(reduction_method, filter_outliers)
-
         # Generate button - different function based on view mode
         can_generate = view_mode == "all_datasets" or similar_available
         if st.button(
             "Generate Visualization", type="primary", disabled=not can_generate
         ):
-            _log("Generate button clicked")
             if view_mode == "similar_only":
                 generate_similar_only_visualization(reduction_method, color_option)
             else:
@@ -419,12 +387,9 @@ def render_visualize_tab() -> None:
         # Auto-load visualization on first tab visit
         if st.session_state.coords_2d is None and st.session_state.metadata_df is not None:
             if view_mode == "similar_only" and similar_available:
-                _log("Auto-load: generating similar datasets viz")
                 generate_similar_only_visualization(reduction_method, color_option)
             elif view_mode == "all_datasets":
-                _log("Auto-load: attempting precomputed load")
-                loaded = _try_load_precomputed(reduction_method, filter_outliers)
-                _log(f"Auto-load result: {'OK' if loaded else 'FAILED'}")
+                _try_load_precomputed(reduction_method, filter_outliers)
 
         if st.session_state.coords_2d is not None:
             viz_metadata = getattr(
@@ -451,10 +416,11 @@ def render_visualize_tab() -> None:
                     if acc in similar_accs
                 ]
 
-            # Build cache key for the serialized HTML
+            # Build content-based cache key for the figure
             n_highlights = len(highlight_idx) if highlight_idx else 0
             fig_cache_key = (
-                id(coords),
+                len(coords),
+                float(coords[0, 0]) if len(coords) > 0 else None,
                 color_option,
                 n_highlights,
                 actual_method,
@@ -462,30 +428,22 @@ def render_visualize_tab() -> None:
             )
 
             # Only rebuild the figure when inputs actually change
-            if st.session_state.get("_viz_fig_key") != fig_cache_key:
+            if st.session_state.get("viz_fig_key") != fig_cache_key:
                 title = (
                     "Similar Datasets"
                     if stored_mode == "similar_only"
                     else "Dataset Similarity Map"
                 )
                 variance = st.session_state.get("viz_variance_ratio", None)
-                st.session_state._viz_fig = _build_chart_figure(
+                st.session_state.viz_fig = _build_chart_figure(
                     coords, viz_metadata, color_option,
                     title, highlight_idx, variance, actual_method,
                 )
-                st.session_state._viz_fig_key = fig_cache_key
-            else:
-                _log("Chart figure CACHED (reused)")
+                st.session_state.viz_fig_key = fig_cache_key
 
-            t_display = time.perf_counter()
             st.plotly_chart(
-                st.session_state._viz_fig,
+                st.session_state.viz_fig,
                 use_container_width=True,
-            )
-            _log(
-                f"st.plotly_chart() displayed — "
-                f"{(time.perf_counter()-t_display)*1000:.0f}ms, "
-                f"total tab {(time.perf_counter()-t_tab)*1000:.0f}ms"
             )
 
             st.caption(
@@ -493,7 +451,6 @@ def render_visualize_tab() -> None:
                 "Copy accession ID to visit encodeproject.org/experiments/{accession}/"
             )
         else:
-            _log("No coords_2d — showing placeholder")
             st.info(
                 "Click 'Generate Visualization' to create the embedding plot. "
                 "This may take a moment for UMAP/t-SNE."
