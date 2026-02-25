@@ -327,12 +327,12 @@ def render_visualize_tab() -> None:
         similar_available = st.session_state.similar_datasets is not None
         view_mode = st.radio(
             "View Mode",
-            options=["all_datasets", "similar_only"],
+            options=["similar_only", "all_datasets"],
             format_func=lambda x: {
-                "all_datasets": "All Datasets",
-                "similar_only": "Similar Datasets Only",
+                "similar_only": "Similar Datasets",
+                "all_datasets": "Global Datasets",
             }.get(x, x),
-            help="Show all datasets or only those from your similarity search",
+            help="Show similar datasets from your search, or all datasets in the database",
             disabled=False,
         )
 
@@ -416,15 +416,15 @@ def render_visualize_tab() -> None:
         # Auto-regenerate similar_only viz when slider changes
         _auto_regenerate_similar_viz(reduction_method, color_option)
 
-        # Auto-load precomputed coords on first tab visit for All Datasets
-        if (
-            st.session_state.coords_2d is None
-            and view_mode == "all_datasets"
-            and st.session_state.metadata_df is not None
-        ):
-            _log("Auto-load: attempting precomputed load")
-            loaded = _try_load_precomputed(reduction_method, filter_outliers)
-            _log(f"Auto-load result: {'OK' if loaded else 'FAILED'}")
+        # Auto-load visualization on first tab visit
+        if st.session_state.coords_2d is None and st.session_state.metadata_df is not None:
+            if view_mode == "similar_only" and similar_available:
+                _log("Auto-load: generating similar datasets viz")
+                generate_similar_only_visualization(reduction_method, color_option)
+            elif view_mode == "all_datasets":
+                _log("Auto-load: attempting precomputed load")
+                loaded = _try_load_precomputed(reduction_method, filter_outliers)
+                _log(f"Auto-load result: {'OK' if loaded else 'FAILED'}")
 
         if st.session_state.coords_2d is not None:
             viz_metadata = getattr(
