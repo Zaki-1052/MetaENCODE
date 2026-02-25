@@ -129,7 +129,7 @@ VIZ_OPTIONS_STYLES = """
 
     /* Options panel */
     [data-testid="stColumn"]:has(.options-container-marker) {
-        background-color: #afbc88 !important;
+        background-color: #C6DEB4 !important;
         padding: 25px !important;
         border-radius: 15px !important;
         box-shadow: 2px 2px 10px rgba(0,0,0,0.05) !important;
