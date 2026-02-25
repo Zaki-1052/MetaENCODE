@@ -410,26 +410,37 @@ def render_visualize_tab() -> None:
                     if acc in similar_accs
                 ]
 
-            # Determine title based on mode
-            title = (
-                "Similar Datasets"
-                if stored_mode == "similar_only"
-                else "Dataset Similarity Map"
+            # Cache the Plotly figure to avoid rebuilding on every rerun
+            # (26K+ points is expensive to reconstruct)
+            n_highlights = len(highlight_idx) if highlight_idx else 0
+            fig_cache_key = (
+                id(coords),
+                color_option,
+                n_highlights,
+                actual_method,
+                stored_mode,
             )
 
-            # Generate plot using actual method (not dropdown value)
-            plotter = PlotGenerator(reduction_method=actual_method)
-            variance = st.session_state.get("viz_variance_ratio", None)
-            fig = plotter.scatter_plot(
-                coords,
-                viz_metadata,
-                color_by=color_option,
-                title=title,
-                highlight_indices=highlight_idx,
-                variance_ratio=variance,
-            )
+            if st.session_state.get("_viz_fig_key") != fig_cache_key:
+                title = (
+                    "Similar Datasets"
+                    if stored_mode == "similar_only"
+                    else "Dataset Similarity Map"
+                )
+                plotter = PlotGenerator(reduction_method=actual_method)
+                variance = st.session_state.get("viz_variance_ratio", None)
+                fig = plotter.scatter_plot(
+                    coords,
+                    viz_metadata,
+                    color_by=color_option,
+                    title=title,
+                    highlight_indices=highlight_idx,
+                    variance_ratio=variance,
+                )
+                st.session_state._viz_figure = fig
+                st.session_state._viz_fig_key = fig_cache_key
 
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(st.session_state._viz_figure, use_container_width=True)
             st.caption(
                 "Hover over points to see dataset details. "
                 "Copy accession ID to visit encodeproject.org/experiments/{accession}/"

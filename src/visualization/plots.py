@@ -270,6 +270,10 @@ class PlotGenerator:
             "<extra></extra>"
         )
 
+        # Use WebGL for large datasets (dramatically faster for 1000+ points)
+        use_webgl = len(coords) > 500
+        render_mode = "webgl" if use_webgl else "svg"
+
         # Create scatter plot with appropriate colorscale
         is_similarity = color_by == "similarity_score" and color_by in plot_df.columns
 
@@ -283,6 +287,7 @@ class PlotGenerator:
                     color=color_by,
                     color_continuous_scale=SIMILARITY_COLORSCALE,
                     title=title,
+                    render_mode=render_mode,
                 )
             else:
                 fig = px.scatter(
@@ -291,6 +296,7 @@ class PlotGenerator:
                     y="y",
                     color=color_by,
                     title=title,
+                    render_mode=render_mode,
                 )
         else:
             fig = px.scatter(
@@ -298,6 +304,7 @@ class PlotGenerator:
                 x="x",
                 y="y",
                 title=title,
+                render_mode=render_mode,
             )
 
         # Apply customdata and hovertemplate to all traces
