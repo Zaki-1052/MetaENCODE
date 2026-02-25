@@ -371,16 +371,29 @@ def render_visualize_tab() -> None:
         # Auto-regenerate similar_only viz when slider changes
         _auto_regenerate_similar_viz(reduction_method, color_option)
 
-        # Auto-regenerate when view mode switches (e.g. Similar <-> Global)
-        stored_viz_mode = st.session_state.get("viz_mode")
-        if st.session_state.coords_2d is not None and stored_viz_mode != view_mode:
-            if view_mode == "similar_only" and similar_available:
-                generate_similar_only_visualization(reduction_method, color_option)
-            elif view_mode == "all_datasets":
-                if not _try_load_precomputed(reduction_method, filter_outliers):
-                    generate_visualization(
-                        reduction_method, color_option, filter_outliers
+        # Auto-regenerate when options change (view mode or reduction method)
+        if st.session_state.coords_2d is not None:
+            mode_changed = (
+                st.session_state.get("viz_mode") != view_mode
+            )
+            method_changed = (
+                st.session_state.get("viz_reduction_method")
+                != reduction_method
+            )
+            if mode_changed or method_changed:
+                if view_mode == "similar_only" and similar_available:
+                    generate_similar_only_visualization(
+                        reduction_method, color_option
                     )
+                elif view_mode == "all_datasets":
+                    if not _try_load_precomputed(
+                        reduction_method, filter_outliers
+                    ):
+                        generate_visualization(
+                            reduction_method,
+                            color_option,
+                            filter_outliers,
+                        )
 
         # Auto-load visualization on first tab visit
         if (
