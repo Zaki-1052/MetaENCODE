@@ -55,6 +55,12 @@ def _try_load_precomputed(
         # Load the filter mask to reconstruct the filtered metadata
         filter_mask = cache_mgr.load(f"{_VIZ_CACHE_PREFIX}_filter_mask")
         if filter_mask is not None:
+            if len(filter_mask) != len(metadata_df):
+                st.warning(
+                    f"Precomputed filter mask ({len(filter_mask)} entries) doesn't match "
+                    f"metadata ({len(metadata_df)} entries). Recomputing..."
+                )
+                return False
             filtered_metadata = metadata_df[filter_mask].reset_index(drop=True)
         else:
             # Fallback: recompute the mask
@@ -65,6 +71,10 @@ def _try_load_precomputed(
 
     # Validate that coords match metadata length
     if len(coords_2d) != len(filtered_metadata):
+        st.warning(
+            f"Precomputed coords ({len(coords_2d)} points) don't match "
+            f"metadata ({len(filtered_metadata)} entries). Recomputing..."
+        )
         return False
 
     st.session_state.coords_2d = coords_2d
@@ -72,6 +82,7 @@ def _try_load_precomputed(
     st.session_state.viz_reduction_method = method
     st.session_state.viz_mode = "all_datasets"
     st.session_state.viz_variance_ratio = variance_ratio
+    st.session_state.viz_slider_value = None
     return True
 
 
@@ -113,6 +124,8 @@ def generate_visualization(
             st.session_state.viz_reduction_method = method
             st.session_state.viz_mode = "all_datasets"
             st.session_state.viz_variance_ratio = reducer.variance_ratio_
+            st.session_state.viz_slider_value = None
+            st.session_state.viz_color_by = color_by
         except Exception as e:
             st.error(f"Error generating visualization: {e}")
             st.info(
@@ -178,9 +191,38 @@ def generate_similar_only_visualization(method: str, color_by: str) -> None:
             st.session_state.viz_reduction_method = method
             st.session_state.viz_mode = "similar_only"
             st.session_state.viz_variance_ratio = reducer.variance_ratio_
+            st.session_state.viz_slider_value = top_n
+            st.session_state.viz_color_by = color_by
 
         except Exception as e:
             st.error(f"Error generating visualization: {e}")
+
+
+def _auto_regenerate_similar_viz(current_method: str, current_color: str) -> None:
+    """Auto-regenerate similar_only visualization when slider value changes.
+
+    Detects when the sidebar slider has changed since the last viz was
+    generated and re-runs generate_similar_only_visualization with the
+    stored settings. Only triggers for similar_only mode when a viz
+    already exists.
+    """
+    if st.session_state.get("viz_mode") != "similar_only":
+        return
+    if st.session_state.coords_2d is None:
+        return
+    if st.session_state.similar_datasets is None:
+        return
+
+    current_slider = st.session_state.filter_state.max_results
+    last_slider = st.session_state.get("viz_slider_value")
+
+    if last_slider is None or current_slider == last_slider:
+        return
+
+    # Use stored settings so slider change doesn't accidentally switch method
+    method = st.session_state.get("viz_reduction_method", current_method)
+    color = st.session_state.get("viz_color_by", current_color)
+    generate_similar_only_visualization(method, color)
 
 
 def render_visualize_tab() -> None:
@@ -328,7 +370,16 @@ def render_visualize_tab() -> None:
                 generate_visualization(reduction_method, color_option, filter_outliers)
 
     with col1:
-        #st.subheader("Embedding Space")
+        # Auto-regenerate similar_only viz when slider changes
+        _auto_regenerate_similar_viz(reduction_method, color_option)
+
+        # Auto-load precomputed coords on first tab visit for All Datasets
+        if (
+            st.session_state.coords_2d is None
+            and view_mode == "all_datasets"
+            and st.session_state.metadata_df is not None
+        ):
+            _try_load_precomputed(reduction_method, filter_outliers)
 
         if st.session_state.coords_2d is not None:
             # Use filtered metadata if available, fallback to full metadata
