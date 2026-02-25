@@ -1,94 +1,89 @@
 # MetaENCODE
 
-**Discover related ENCODE datasets through metadata-driven similarity scoring.**
+**Discover related ENCODE datasets and visualize dataset similarity.**
 
-MetaENCODE is a Streamlit web application that helps researchers find related biological datasets from the [Encyclopedia of DNA Elements (ENCODE)](https://www.encodeproject.org/). It transforms dataset metadata into numeric representations using ML-based embeddings and similarity computation to rank and recommend datasets, reducing manual filtering and enabling exploratory science.
+MetaENCODE is a Streamlit web application that helps researchers discover related [ENCODE](https://www.encodeproject.org/) biological datasets through metadata-driven similarity scoring. It uses SBERT text embeddings, categorical/numeric feature encoding, and cosine similarity to rank and recommend datasets from across ~27,000 ENCODE experiments.
 
-**DS3 x UBIC Collaborative Project** | Led by Vanshika + Isha
+> **DS3 x UBIC Collaborative Project** at UC San Diego.
 
----
+![MetaENCODE UI](MetaENCODE.jpeg)
 
 ## Features
 
-- **Dataset Search & Selection** — Search ENCODE experiments by assay type, organism, biosample, target, life stage, and free-text description with spell correction
-- **Similarity Recommendations** — Select a seed dataset and get top-N similar experiments ranked by combined similarity score
-- **Hierarchical Filtering** — Browse biosamples through organ system, cell type, germ layer, or body system classifications
-- **Interactive Visualization** — Explore dataset relationships via UMAP, PCA, or t-SNE scatter plots colored by metadata attributes
-- **ENCODE Portal Links** — Click through to the original ENCODE experiment pages
+- **Faceted Search** -- Filter ENCODE experiments by assay type, organism, biosample, histone mark/target, life stage, lab, and replicate counts. Enter an accession directly (e.g. `ENCSR000AKS`) or search by description with automatic spell correction.
+- **Similarity Ranking** -- Select any experiment as a seed and retrieve the most similar datasets, ranked by a multi-modal similarity score that blends text, categorical, and numeric features with configurable weights.
+- **Interactive Visualization** -- Explore the embedding space via 2D scatter plots (UMAP, PCA, t-SNE) colored by assay type, organism, organ system, cell type, germ layer, body system, lab, or similarity score.
 
 ## Architecture
 
 ```
-ENCODE REST API
+ENCODE REST API (encodeproject.org)
     |
-EncodeClient (fetch + rate limiting)
+EncodeClient          -- rate-limited 10 req/sec, paginated, nested JSON parsing
     |
-MetadataProcessor (text cleaning, missing value imputation, ontology mapping)
+MetadataProcessor     -- text cleaning, missing value imputation, ontology mapping
     |
-EmbeddingGenerator (SBERT: text -> 384-dim vectors)
+EmbeddingGenerator    -- SBERT all-MiniLM-L6-v2 -> 384-dim text vectors
     |
-FeatureCombiner (weighted concatenation: text + categorical + numeric -> ~437-dim)
+FeatureCombiner       -- weighted concatenation -> ~437-dim combined vectors
     |
-CacheManager (persist precomputed data as pickle files)
+CacheManager          -- atomic pickle I/O in data/cache/
     |
-SimilarityEngine (cosine similarity via NearestNeighbors index)
+SimilarityEngine      -- cosine similarity via scikit-learn NearestNeighbors
     |
-Streamlit UI (3 tabs: Search & Select, Similar Datasets, Visualize)
+Streamlit UI          -- 3 tabs: Search & Select | Similar Datasets | Visualize
 ```
 
-## Tech Stack
+**Feature weights** (default): text 50%, assay type 20%, organism 15%, cell type 10%, lab 3%, numeric 2%. Weights are applied as `sqrt(weight)` scaling on sub-vectors so cosine similarity contributions remain proportional.
 
-| Component | Technology |
-|---|---|
-| Frontend | [Streamlit](https://streamlit.io/) |
-| Text Embeddings | [Sentence Transformers](https://www.sbert.net/) (all-MiniLM-L6-v2) |
-| Similarity | scikit-learn (cosine similarity, NearestNeighbors) |
-| Visualization | Plotly + UMAP / PCA / t-SNE |
-| Data Processing | pandas |
-| API | requests (ENCODE REST API) |
-
-## Setup
+## Getting Started
 
 ### Prerequisites
 
 - Python 3.10+
-- pip
+- ~2 GB disk for full precomputed cache (embeddings + visualization coordinates)
 
 ### Installation
 
 ```bash
 # Clone the repository
-git clone https://github.com/Zaki-1052/MetaENCODE.git
-cd MetaENCODE
+git clone https://github.com/vanshika-s/MetaEncode.git
+cd MetaEncode
 
-# Create virtual environment (recommended)
-python -m venv .venv
-source .venv/bin/activate  # Linux/macOS
-# .venv\Scripts\activate   # Windows
+# Create virtual environment and install dependencies
+bash scripts/setup.sh
 
-# Install dependencies
+# Or manually:
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### Precompute Embeddings
-
-Before running the app, precompute the dataset embeddings:
+### Precompute Embeddings (required before first run)
 
 ```bash
-# Quick test (100 experiments)
+# Quick test (~100 experiments)
 python scripts/precompute_embeddings.py --limit 100
 
-# Medium dataset (1000 experiments)
+# Medium (~1000 experiments)
 python scripts/precompute_embeddings.py --limit 1000
 
-# Full dataset (all experiments, requires more time/memory)
+# Full dataset (~27,000 experiments)
 python scripts/precompute_embeddings.py --limit all --batch-size 64
 
-# Force refresh
+# Force recompute from scratch
 python scripts/precompute_embeddings.py --limit 1000 --refresh
 ```
 
-This fetches experiments from the ENCODE API, generates SBERT embeddings, combines features, and caches everything in `data/cache/`.
+### Precompute Visualizations (optional, recommended)
+
+Precomputes PCA, t-SNE, and UMAP coordinates so the Visualize tab loads instantly:
+
+```bash
+python scripts/precompute_visualizations.py
+```
+
+A SLURM job script (`scripts/precompute.sb`) is included for HPC environments (tested on SDSC Expanse: 8 CPUs, 40 GB RAM, 6-hour limit).
 
 ### Run the Application
 
@@ -96,53 +91,31 @@ This fetches experiments from the ENCODE API, generates SBERT embeddings, combin
 streamlit run app.py
 ```
 
-The app will open at `http://localhost:8501`.
-
-## Usage
-
-1. **Search**: Use the sidebar filters (assay type, organism, biosample, etc.) to search ENCODE for experiments
-2. **Select**: Click on a row in the search results to select a seed dataset
-3. **Find Similar**: Switch to the "Similar Datasets" tab and click "Find Similar Datasets"
-4. **Visualize**: Switch to the "Visualize" tab to see an interactive 2D embedding plot of datasets
-5. **Explore**: Hover over points in the plot to see metadata; click accession links to visit ENCODE
+The app opens at [http://localhost:8501](http://localhost:8501).
 
 ## Project Structure
 
 ```
 MetaENCODE/
-├── app.py                         # Streamlit entry point
-├── requirements.txt               # Python dependencies
+├── app.py                              # Entry point
+├── requirements.txt                    # Python dependencies
+├── scripts/
+│   ├── setup.sh                        # Virtual environment setup
+│   ├── precompute_embeddings.py        # Fetch + embed + cache pipeline
+│   ├── precompute_visualizations.py    # PCA / t-SNE / UMAP coordinate cache
+│   ├── fetch_encode_facets.py          # Regenerate vocabulary JSON from ENCODE API
+│   └── precompute.sb                   # SLURM job script for HPC
 ├── src/
-│   ├── api/
-│   │   └── encode_client.py       # ENCODE REST API client with rate limiting
-│   ├── ml/
-│   │   ├── embeddings.py          # SBERT text embedding generation
-│   │   ├── similarity.py          # Cosine similarity & nearest neighbor search
-│   │   └── feature_combiner.py    # Weighted feature concatenation
-│   ├── processing/
-│   │   ├── metadata.py            # Text cleaning & metadata normalization
-│   │   └── encoders.py            # Categorical (one-hot) & numeric (minmax) encoding
-│   ├── ui/
-│   │   ├── sidebar.py             # Sidebar filter controls
-│   │   ├── handlers.py            # Search execution logic
-│   │   ├── search_filters.py      # Filter state management & fuzzy matching
-│   │   ├── vocabularies.py        # ENCODE vocabulary definitions
-│   │   ├── autocomplete.py        # Autocomplete logic
-│   │   ├── formatters.py          # Display formatting utilities
-│   │   ├── components/            # Session state & cached initializers
-│   │   └── tabs/                  # Search, Similar, Visualize tab UIs
-│   ├── utils/
-│   │   ├── cache.py               # File-based caching with atomic writes
-│   │   └── spell_check.py         # Biology-aware spell correction
-│   └── visualization/
-│       └── plots.py               # UMAP/PCA/t-SNE + Plotly scatter plots
-├── tests/                         # Comprehensive test suite (649 tests)
-├── scripts/                       # Precomputation & utility scripts
+│   ├── api/                            # ENCODE REST API client with rate limiting
+│   ├── ml/                             # Embeddings, feature combination, similarity engine
+│   ├── processing/                     # Text cleaning, categorical/numeric encoding
+│   ├── ui/                             # Streamlit components, sidebar, tabs, session state
+│   ├── utils/                          # Cache manager, spell check, selection history
+│   └── visualization/                  # Dimensionality reduction + Plotly plots
 ├── data/
-│   ├── encode_facets_raw.json     # Vocabulary source (27,398 experiments)
-│   └── cache/                     # Precomputed embeddings & metadata
-└── docs/
-    └── PRD_COMPLIANCE.md          # PRD compliance report
+│   ├── encode_facets_raw.json          # Vocabulary source (27,398 experiments)
+│   └── cache/                          # Precomputed pickle files (gitignored)
+└── tests/                              # pytest suite (~708 tests)
 ```
 
 ## Testing
@@ -151,47 +124,61 @@ MetaENCODE/
 # Run all tests
 python -m pytest tests/ -v
 
-# Run with coverage
+# With coverage report
 python -m pytest tests/ --cov=src --cov-report=term-missing
 
-# Run specific module tests
+# Single module / file / test
 python -m pytest tests/test_ml/ -v
-python -m pytest tests/test_api/ -v
+python -m pytest tests/test_ml/test_embeddings.py -v
+python -m pytest tests/test_ml/test_embeddings.py::test_name -v
 ```
 
-Note: Some tests require `sentence-transformers` (PyTorch) and `umap-learn` to be installed. Without these heavy ML dependencies, 619 out of 649 tests pass.
+> Some tests require `sentence-transformers` (PyTorch) and `umap-learn`. Without these, ~30 tests are skipped.
 
-## Similarity Scoring
+## Code Quality
 
-MetaENCODE combines multiple feature types into a single vector per dataset:
+```bash
+black src/ tests/ scripts/ app.py       # Format
+isort src/ tests/ scripts/ app.py       # Sort imports
+flake8 src/ tests/                      # Lint
+mypy src/                               # Type check
+```
 
-| Feature | Weight | Method |
-|---|---|---|
-| Text (description + title) | 0.50 | SBERT embeddings (384-dim) |
-| Assay type | 0.20 | One-hot encoding |
-| Organism | 0.15 | One-hot encoding |
-| Cell type / Biosample | 0.10 | One-hot encoding |
-| Lab | 0.03 | One-hot encoding |
-| Numeric (replicates, files) | 0.02 | Min-max normalization |
+## Tech Stack
 
-Weights are applied via `sqrt(weight)` scaling so that cosine similarity contributions are proportional to the configured weights.
+| Layer | Technology |
+|-------|-----------|
+| UI | [Streamlit](https://streamlit.io/) + [Plotly](https://plotly.com/python/) |
+| Text Embeddings | [sentence-transformers](https://www.sbert.net/) (all-MiniLM-L6-v2, 384-dim) |
+| ML / Similarity | [scikit-learn](https://scikit-learn.org/) NearestNeighbors (cosine) |
+| Dimensionality Reduction | PCA, t-SNE (scikit-learn), [UMAP](https://umap-learn.readthedocs.io/) |
+| Spell Correction | [symspellpy](https://github.com/wolfgarbe/SymSpell) + [jellyfish](https://github.com/jamesturk/jellyfish) |
+| Data Source | [ENCODE REST API](https://www.encodeproject.org/help/rest-api/) (no auth required) |
 
-## ENCODE API
+## How It Works
 
-MetaENCODE uses the [ENCODE REST API](https://www.encodeproject.org/help/rest-api/) for data access:
+1. **Data Ingestion** -- `EncodeClient` fetches experiment metadata from the ENCODE REST API with rate limiting (10 req/sec) and pagination support.
 
-- **Base URL:** `https://www.encodeproject.org/`
-- **Rate Limit:** 10 requests/second (enforced by `RateLimiter`)
-- **Authentication:** None required for public data
-- **Key Parameters:** `type=Experiment`, `frame=embedded`, `format=json`
+2. **Processing** -- `MetadataProcessor` cleans text fields, imputes missing values, and maps biosamples to ontology categories (organ system, cell type, germ layer, body system) using hierarchical mappings from `encode_facets_raw.json`.
 
-## Known Limitations
+3. **Embedding** -- `EmbeddingGenerator` encodes combined text descriptions into 384-dimensional vectors using the all-MiniLM-L6-v2 SBERT model.
 
-- The precomputation step requires network access to the ENCODE API
-- Full dataset precomputation requires significant memory (~40GB for all experiments on HPC)
-- UMAP/t-SNE visualizations can be slow for large datasets; PCA is faster
-- Spell correction requires `symspellpy` and `jellyfish` packages
+4. **Feature Combination** -- `FeatureCombiner` concatenates text embeddings with one-hot categorical encodings and min-max scaled numeric features, applying `sqrt(weight)` scaling to each sub-vector.
+
+5. **Similarity Search** -- `SimilarityEngine` uses scikit-learn's `NearestNeighbors` with brute-force cosine distance to find the most similar experiments to any query.
+
+6. **Visualization** -- `DimensionalityReducer` projects the high-dimensional embeddings into 2D via PCA, t-SNE, or UMAP. `PlotGenerator` renders interactive Plotly scatter plots with configurable color mappings.
+
+## Vocabulary Management
+
+All ENCODE vocabularies (assay types, organisms, biosamples, hierarchical organ/cell mappings) are loaded from `data/encode_facets_raw.json` via `src/ui/vocabularies.py`. To regenerate:
+
+```bash
+python scripts/fetch_encode_facets.py
+```
+
+Never hardcode vocabulary lists -- always regenerate from the ENCODE API.
 
 ## License
 
-This project is part of the DS3 x UBIC collaborative program at UCSD.
+This project is licensed under the [MIT License](LICENSE).

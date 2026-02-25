@@ -87,7 +87,7 @@ def render_sidebar() -> dict:
 
         /* Sidebar background */
         section[data-testid="stSidebar"] {
-            background-color: #afbc88;
+            background-color: #C6DEB4;
         }
         
         /* Adjust padding in sidebar */
