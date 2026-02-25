@@ -5,8 +5,8 @@ import pytest
 
 # Check if spell check dependencies are available
 try:
-    import jellyfish
-    import symspellpy
+    import jellyfish  # noqa: F401
+    import symspellpy  # noqa: F401
 
     SPELL_CHECK_AVAILABLE = True
 except ImportError:
@@ -455,8 +455,7 @@ class TestConfidenceCalculation:
 
     def test_confidence_empty_strings(self) -> None:
         """Test confidence calculation with empty-like inputs."""
-        from src.utils.spell_check import (VocabularyEntry,
-                                           VocabularySpellChecker)
+        from src.utils.spell_check import VocabularyEntry, VocabularySpellChecker
 
         checker = VocabularySpellChecker()
         entry = VocabularyEntry(term="", frequency=1, category="test", normalized="")
@@ -466,8 +465,7 @@ class TestConfidenceCalculation:
 
     def test_confidence_no_phonetic_match(self) -> None:
         """Test confidence without phonetic match bonus."""
-        from src.utils.spell_check import (VocabularyEntry,
-                                           VocabularySpellChecker)
+        from src.utils.spell_check import VocabularyEntry, VocabularySpellChecker
 
         checker = VocabularySpellChecker()
         entry = VocabularyEntry(
@@ -479,8 +477,7 @@ class TestConfidenceCalculation:
 
     def test_confidence_with_phonetic_match(self) -> None:
         """Test confidence with phonetic match bonus."""
-        from src.utils.spell_check import (VocabularyEntry,
-                                           VocabularySpellChecker)
+        from src.utils.spell_check import VocabularyEntry, VocabularySpellChecker
 
         checker = VocabularySpellChecker()
         entry = VocabularyEntry(
@@ -493,8 +490,7 @@ class TestConfidenceCalculation:
 
     def test_confidence_length_penalty(self) -> None:
         """Test confidence penalty for very different lengths."""
-        from src.utils.spell_check import (VocabularyEntry,
-                                           VocabularySpellChecker)
+        from src.utils.spell_check import VocabularyEntry, VocabularySpellChecker
 
         checker = VocabularySpellChecker()
         entry = VocabularyEntry(
@@ -543,17 +539,17 @@ class TestLazyImports:
         """Test that symspellpy is loaded when needed."""
         from src.utils.spell_check import _get_symspellpy
 
-        symspellpy = _get_symspellpy()
-        assert symspellpy is not None
-        assert hasattr(symspellpy, "SymSpell")
+        symspellpy_mod = _get_symspellpy()
+        assert symspellpy_mod is not None
+        assert hasattr(symspellpy_mod, "SymSpell")
 
     def test_jellyfish_loaded(self) -> None:
         """Test that jellyfish is loaded when needed."""
         from src.utils.spell_check import _get_jellyfish
 
-        jellyfish = _get_jellyfish()
-        assert jellyfish is not None
-        assert hasattr(jellyfish, "metaphone")
+        jellyfish_mod = _get_jellyfish()
+        assert jellyfish_mod is not None
+        assert hasattr(jellyfish_mod, "metaphone")
 
 
 class TestFromEncodeVocabulariesCoverage:
@@ -646,7 +642,6 @@ class TestImportErrorHandling:
     def test_symspellpy_import_error(self) -> None:
         """Test ImportError when symspellpy is not available (lines 36-37)."""
         import builtins
-        import sys
         from unittest.mock import patch
 
         import src.utils.spell_check as sc
@@ -963,7 +958,7 @@ class TestSeenTermsDedup:
 
     def test_duplicate_from_symspell_skipped(self) -> None:
         """Test that duplicate terms from SymSpell are skipped."""
-        from unittest.mock import MagicMock, patch
+        from unittest.mock import MagicMock
 
         from src.utils.spell_check import VocabularySpellChecker
 

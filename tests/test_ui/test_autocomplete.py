@@ -3,13 +3,17 @@
 
 import pytest
 
-from src.ui.autocomplete import (AutocompleteProvider, AutocompleteSuggestion,
-                                 create_assay_search_fn,
-                                 create_biosample_search_fn,
-                                 create_lab_search_fn, create_organ_search_fn,
-                                 create_organism_search_fn,
-                                 create_target_search_fn,
-                                 get_autocomplete_provider)
+from src.ui.autocomplete import (
+    AutocompleteProvider,
+    AutocompleteSuggestion,
+    create_assay_search_fn,
+    create_biosample_search_fn,
+    create_lab_search_fn,
+    create_organ_search_fn,
+    create_organism_search_fn,
+    create_target_search_fn,
+    get_autocomplete_provider,
+)
 
 # =============================================================================
 # AutocompleteSuggestion Tests
@@ -275,9 +279,8 @@ class TestAutocompleteProviderSpellCheck:
         # Should include cerebellum as a correction
         values = [s["value"] for s in suggestions]
         if "cerebellum" in values:
-            cerebellum_sugg = next(s for s in suggestions if s["value"] == "cerebellum")
-            # Might be marked as correction if spell check found it
-            # (depends on whether it's also a fuzzy match)
+            sugg = next(s for s in suggestions if s["value"] == "cerebellum")
+            assert sugg["value"] == "cerebellum"
 
     def test_no_spell_check_when_disabled(self) -> None:
         """Test that spell check is not used when disabled."""

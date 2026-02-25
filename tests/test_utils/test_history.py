@@ -56,8 +56,7 @@ class TestSelectionHistoryInit:
 
     def test_init_with_default_path(self) -> None:
         """Default path is data/cache/selection_history.json."""
-        h = SelectionHistory.__new__(SelectionHistory)
-        # Don't call __init__ to avoid side effects; just check the class attr
+        # Check the class attribute directly (no instantiation needed)
         assert SelectionHistory.DEFAULT_PATH == Path(
             "data/cache/selection_history.json"
         )

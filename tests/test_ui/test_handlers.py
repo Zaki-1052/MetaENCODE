@@ -4,7 +4,6 @@
 from unittest.mock import MagicMock, patch
 
 import pandas as pd
-import pytest
 
 from src.ui.handlers import apply_spell_correction, execute_search
 from src.ui.search_filters import FilterState
