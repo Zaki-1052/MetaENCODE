@@ -48,23 +48,29 @@ def _try_load_precomputed(
 
     coords_2d = cached["coords_2d"]
     variance_ratio = cached.get("variance_ratio")
-
     metadata_df = st.session_state.metadata_df
 
     if filter_outliers:
-        # Load the filter mask to reconstruct the filtered metadata
         filter_mask = cache_mgr.load(f"{_VIZ_CACHE_PREFIX}_filter_mask")
         if filter_mask is not None:
+            if len(filter_mask) != len(metadata_df):
+                st.warning(
+                    f"Precomputed filter mask ({len(filter_mask)} entries) doesn't match "
+                    f"metadata ({len(metadata_df)} entries). Recomputing..."
+                )
+                return False
             filtered_metadata = metadata_df[filter_mask].reset_index(drop=True)
         else:
-            # Fallback: recompute the mask
             _, mask = percentile_range_filtering(st.session_state.embeddings)
             filtered_metadata = metadata_df[mask].reset_index(drop=True)
     else:
         filtered_metadata = metadata_df
 
-    # Validate that coords match metadata length
     if len(coords_2d) != len(filtered_metadata):
+        st.warning(
+            f"Precomputed coords ({len(coords_2d)} points) don't match "
+            f"metadata ({len(filtered_metadata)} entries). Recomputing..."
+        )
         return False
 
     st.session_state.coords_2d = coords_2d
@@ -72,6 +78,7 @@ def _try_load_precomputed(
     st.session_state.viz_reduction_method = method
     st.session_state.viz_mode = "all_datasets"
     st.session_state.viz_variance_ratio = variance_ratio
+    st.session_state.viz_slider_value = None
     return True
 
 
@@ -90,6 +97,8 @@ def generate_visualization(
     """
     # Try precomputed cache first (instant load)
     if _try_load_precomputed(method, filter_outliers):
+        # Invalidate cached figure so it gets rebuilt with new coords
+        st.session_state.pop("viz_fig_key", None)
         return
 
     # Fall back to on-the-fly computation
@@ -113,6 +122,10 @@ def generate_visualization(
             st.session_state.viz_reduction_method = method
             st.session_state.viz_mode = "all_datasets"
             st.session_state.viz_variance_ratio = reducer.variance_ratio_
+            st.session_state.viz_slider_value = None
+            st.session_state.viz_color_by = color_by
+            # Invalidate cached figure
+            st.session_state.pop("viz_fig_key", None)
         except Exception as e:
             st.error(f"Error generating visualization: {e}")
             st.info(
@@ -178,14 +191,59 @@ def generate_similar_only_visualization(method: str, color_by: str) -> None:
             st.session_state.viz_reduction_method = method
             st.session_state.viz_mode = "similar_only"
             st.session_state.viz_variance_ratio = reducer.variance_ratio_
+            st.session_state.viz_slider_value = top_n
+            st.session_state.viz_color_by = color_by
+            # Invalidate cached figure
+            st.session_state.pop("viz_fig_key", None)
 
         except Exception as e:
             st.error(f"Error generating visualization: {e}")
 
 
+def _auto_regenerate_similar_viz(current_method: str, current_color: str) -> None:
+    """Auto-regenerate similar_only visualization when slider value changes.
+
+    Detects when the sidebar slider has changed since the last viz was
+    generated and re-runs generate_similar_only_visualization with the
+    stored settings. Only triggers for similar_only mode when a viz
+    already exists.
+    """
+    if st.session_state.get("viz_mode") != "similar_only":
+        return
+    if st.session_state.coords_2d is None:
+        return
+    if st.session_state.similar_datasets is None:
+        return
+
+    current_slider = st.session_state.filter_state.max_results
+    last_slider = st.session_state.get("viz_slider_value")
+
+    if last_slider is None or current_slider == last_slider:
+        return
+
+    # Use stored settings so slider change doesn't accidentally switch method
+    method = st.session_state.get("viz_reduction_method", current_method)
+    color = st.session_state.get("viz_color_by", current_color)
+    generate_similar_only_visualization(method, color)
+
+
+def _build_chart_figure(
+    coords, viz_metadata, color_option, title, highlight_idx, variance, actual_method
+):
+    """Build a Plotly figure for the visualization chart."""
+    plotter = PlotGenerator(reduction_method=actual_method)
+    return plotter.scatter_plot(
+        coords,
+        viz_metadata,
+        color_by=color_option,
+        title=title,
+        highlight_indices=highlight_idx,
+        variance_ratio=variance,
+    )
+
+
 def render_visualize_tab() -> None:
     """Render the visualization tab."""
-    
     st.markdown(
         """
         <style>
@@ -201,7 +259,7 @@ def render_visualize_tab() -> None:
             font-weight: 550;
             margin-bottom: 0.4rem;
         }
-        
+
         /* Options panel */
         [data-testid="stColumn"]:has(.options-container-marker) {
             background-color: #afbc88 !important;
@@ -209,7 +267,7 @@ def render_visualize_tab() -> None:
             border-radius: 15px !important;
             box-shadow: 2px 2px 10px rgba(0,0,0,0.05) !important;
         }
-        
+
         [data-testid="stColumn"]:has(.options-container-marker) [data-baseweb="select"] > div {
             background-color: #ffffff !important;
             border-radius: 8px !important;
@@ -218,7 +276,7 @@ def render_visualize_tab() -> None:
         """,
         unsafe_allow_html=True,
     )
-    
+
     st.markdown(
         "<div class='subheader'>Dataset Visualization</div>",
         unsafe_allow_html=True,
@@ -243,12 +301,12 @@ def render_visualize_tab() -> None:
         similar_available = st.session_state.similar_datasets is not None
         view_mode = st.radio(
             "View Mode",
-            options=["all_datasets", "similar_only"],
+            options=["similar_only", "all_datasets"],
             format_func=lambda x: {
-                "all_datasets": "All Datasets",
-                "similar_only": "Similar Datasets Only",
+                "similar_only": "Similar Datasets",
+                "all_datasets": "Global Datasets",
             }.get(x, x),
-            help="Show all datasets or only those from your similarity search",
+            help="Show similar datasets from your search, or all datasets in the database",
             disabled=False,
         )
 
@@ -312,11 +370,6 @@ def render_visualize_tab() -> None:
                 "Disable to show all datasets.",
             )
 
-        # Show precomputed status hint for all-datasets mode
-        if view_mode == "all_datasets":
-            cache_mgr = get_cache_manager()
-            key = _viz_cache_key(reduction_method, filter_outliers)
-
         # Generate button - different function based on view mode
         can_generate = view_mode == "all_datasets" or similar_available
         if st.button(
@@ -328,16 +381,21 @@ def render_visualize_tab() -> None:
                 generate_visualization(reduction_method, color_option, filter_outliers)
 
     with col1:
-        #st.subheader("Embedding Space")
+        # Auto-regenerate similar_only viz when slider changes
+        _auto_regenerate_similar_viz(reduction_method, color_option)
+
+        # Auto-load visualization on first tab visit
+        if st.session_state.coords_2d is None and st.session_state.metadata_df is not None:
+            if view_mode == "similar_only" and similar_available:
+                generate_similar_only_visualization(reduction_method, color_option)
+            elif view_mode == "all_datasets":
+                _try_load_precomputed(reduction_method, filter_outliers)
 
         if st.session_state.coords_2d is not None:
-            # Use filtered metadata if available, fallback to full metadata
             viz_metadata = getattr(
                 st.session_state, "viz_metadata", st.session_state.metadata_df
             )
             coords = st.session_state.coords_2d
-
-            # Use the stored method (what was actually used to generate coords)
             actual_method = st.session_state.get(
                 "viz_reduction_method", reduction_method
             )
@@ -349,7 +407,6 @@ def render_visualize_tab() -> None:
                 stored_mode == "all_datasets"
                 and st.session_state.similar_datasets is not None
             ):
-                # Find indices of similar datasets in the filtered visualization metadata
                 similar_accs = set(
                     st.session_state.similar_datasets["accession"].tolist()
                 )
@@ -359,26 +416,36 @@ def render_visualize_tab() -> None:
                     if acc in similar_accs
                 ]
 
-            # Determine title based on mode
-            title = (
-                "Similar Datasets"
-                if stored_mode == "similar_only"
-                else "Dataset Similarity Map"
+            # Build content-based cache key for the figure
+            n_highlights = len(highlight_idx) if highlight_idx else 0
+            fig_cache_key = (
+                len(coords),
+                float(coords[0, 0]) if len(coords) > 0 else None,
+                color_option,
+                n_highlights,
+                actual_method,
+                stored_mode,
             )
 
-            # Generate plot using actual method (not dropdown value)
-            plotter = PlotGenerator(reduction_method=actual_method)
-            variance = st.session_state.get("viz_variance_ratio", None)
-            fig = plotter.scatter_plot(
-                coords,
-                viz_metadata,
-                color_by=color_option,
-                title=title,
-                highlight_indices=highlight_idx,
-                variance_ratio=variance,
+            # Only rebuild the figure when inputs actually change
+            if st.session_state.get("viz_fig_key") != fig_cache_key:
+                title = (
+                    "Similar Datasets"
+                    if stored_mode == "similar_only"
+                    else "Dataset Similarity Map"
+                )
+                variance = st.session_state.get("viz_variance_ratio", None)
+                st.session_state.viz_fig = _build_chart_figure(
+                    coords, viz_metadata, color_option,
+                    title, highlight_idx, variance, actual_method,
+                )
+                st.session_state.viz_fig_key = fig_cache_key
+
+            st.plotly_chart(
+                st.session_state.viz_fig,
+                use_container_width=True,
             )
 
-            st.plotly_chart(fig, use_container_width=True)
             st.caption(
                 "Hover over points to see dataset details. "
                 "Copy accession ID to visit encodeproject.org/experiments/{accession}/"

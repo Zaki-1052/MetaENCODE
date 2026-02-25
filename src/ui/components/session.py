@@ -34,6 +34,9 @@ SESSION_DEFAULTS: dict = {
     "viz_metadata": None,
     "viz_reduction_method": None,  # Method used to generate coords_2d
     "viz_mode": "all_datasets",  # "all_datasets" or "similar_only"
+    "viz_slider_value": None,  # Slider value used to generate current viz
+    "viz_color_by": None,  # color_by option used for current viz
+    "viz_variance_ratio": None,  # PCA variance ratios for axis labels
     # New filter state using FilterState dataclass
     "filter_state": FilterState(),
     # Legacy filter_settings for backward compatibility

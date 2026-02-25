@@ -283,6 +283,7 @@ class PlotGenerator:
                     color=color_by,
                     color_continuous_scale=SIMILARITY_COLORSCALE,
                     title=title,
+                    custom_data=customdata_cols,
                 )
             else:
                 fig = px.scatter(
@@ -291,6 +292,7 @@ class PlotGenerator:
                     y="y",
                     color=color_by,
                     title=title,
+                    custom_data=customdata_cols,
                 )
         else:
             fig = px.scatter(
@@ -298,14 +300,11 @@ class PlotGenerator:
                 x="x",
                 y="y",
                 title=title,
+                custom_data=customdata_cols,
             )
 
-        # Apply customdata and hovertemplate to all traces
-        customdata_array = plot_df[customdata_cols].values
-        for trace in fig.data:
-            if hasattr(trace, "customdata"):
-                trace.customdata = customdata_array
-                trace.hovertemplate = hovertemplate
+        # Apply hovertemplate to all data traces
+        fig.update_traces(hovertemplate=hovertemplate)
 
         # Add highlight markers if specified
         if highlight_indices:

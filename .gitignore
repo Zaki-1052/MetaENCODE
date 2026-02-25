@@ -9,3 +9,4 @@ data/cache/selection_history_*.json
 .mypy_cache/
 .claude/
 .coverage
+CLAUDE.md
