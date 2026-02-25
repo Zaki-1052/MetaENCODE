@@ -15,10 +15,12 @@ Example:
 
 from __future__ import annotations
 
-import re
-from dataclasses import dataclass, field
+import logging
+from dataclasses import dataclass
 from functools import lru_cache
 from typing import Dict, List, Optional, Set, Tuple
+
+logger = logging.getLogger(__name__)
 
 # Lazy imports for optional dependencies
 _symspellpy = None
@@ -485,47 +487,21 @@ class VocabularySpellChecker:
             get_targets,
         )
 
-        # Add biosamples (highest priority - most commonly searched)
-        try:
-            biosamples = get_biosamples()
-            checker.add_terms(biosamples, category="biosample")
-        except Exception:
-            pass
-
-        # Add targets
-        try:
-            targets = get_targets()
-            checker.add_terms(targets, category="target")
-        except Exception:
-            pass
-
-        # Add assay types
-        try:
-            assays = get_assay_types()
-            checker.add_terms(assays, category="assay")
-        except Exception:
-            pass
-
-        # Add organisms
-        try:
-            organisms = get_organisms()
-            checker.add_terms(organisms, category="organism")
-        except Exception:
-            pass
-
-        # Add life stages
-        try:
-            stages = get_life_stages()
-            checker.add_terms(stages, category="life_stage")
-        except Exception:
-            pass
-
-        # Add labs
-        try:
-            labs = get_labs()
-            checker.add_terms(labs, category="lab")
-        except Exception:
-            pass
+        # Load each vocabulary category, logging failures instead of silencing them
+        vocab_sources = [
+            ("biosample", get_biosamples),
+            ("target", get_targets),
+            ("assay", get_assay_types),
+            ("organism", get_organisms),
+            ("life_stage", get_life_stages),
+            ("lab", get_labs),
+        ]
+        for category, getter in vocab_sources:
+            try:
+                terms = getter()
+                checker.add_terms(terms, category=category)
+            except Exception:
+                logger.debug("Failed to load %s vocabulary", category, exc_info=True)
 
         return checker
 

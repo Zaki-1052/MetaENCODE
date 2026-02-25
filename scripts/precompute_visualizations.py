@@ -22,7 +22,8 @@ import time
 import numpy as np
 
 from src.utils.cache import CacheManager
-from src.visualization.plots import DimensionalityReducer, percentile_range_filtering
+from src.visualization.plots import (DimensionalityReducer,
+                                     percentile_range_filtering)
 
 # Cache key prefix for precomputed visualization coordinates
 VIZ_CACHE_PREFIX = "viz_coords"

@@ -4,11 +4,8 @@
 import pandas as pd
 import pytest
 
-from src.ui.search_filters import (
-    FilterState,
-    SearchFilterManager,
-    parse_age_from_text,
-)
+from src.ui.search_filters import (FilterState, SearchFilterManager,
+                                   parse_age_from_text)
 
 # =============================================================================
 # FilterState Tests

@@ -455,7 +455,8 @@ class TestConfidenceCalculation:
 
     def test_confidence_empty_strings(self) -> None:
         """Test confidence calculation with empty-like inputs."""
-        from src.utils.spell_check import VocabularyEntry, VocabularySpellChecker
+        from src.utils.spell_check import (VocabularyEntry,
+                                           VocabularySpellChecker)
 
         checker = VocabularySpellChecker()
         entry = VocabularyEntry(term="", frequency=1, category="test", normalized="")
@@ -465,7 +466,8 @@ class TestConfidenceCalculation:
 
     def test_confidence_no_phonetic_match(self) -> None:
         """Test confidence without phonetic match bonus."""
-        from src.utils.spell_check import VocabularyEntry, VocabularySpellChecker
+        from src.utils.spell_check import (VocabularyEntry,
+                                           VocabularySpellChecker)
 
         checker = VocabularySpellChecker()
         entry = VocabularyEntry(
@@ -477,7 +479,8 @@ class TestConfidenceCalculation:
 
     def test_confidence_with_phonetic_match(self) -> None:
         """Test confidence with phonetic match bonus."""
-        from src.utils.spell_check import VocabularyEntry, VocabularySpellChecker
+        from src.utils.spell_check import (VocabularyEntry,
+                                           VocabularySpellChecker)
 
         checker = VocabularySpellChecker()
         entry = VocabularyEntry(
@@ -490,7 +493,8 @@ class TestConfidenceCalculation:
 
     def test_confidence_length_penalty(self) -> None:
         """Test confidence penalty for very different lengths."""
-        from src.utils.spell_check import VocabularyEntry, VocabularySpellChecker
+        from src.utils.spell_check import (VocabularyEntry,
+                                           VocabularySpellChecker)
 
         checker = VocabularySpellChecker()
         entry = VocabularyEntry(

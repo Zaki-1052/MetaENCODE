@@ -64,9 +64,7 @@ class SelectionHistory:
 
     def save(self) -> None:
         """Persist current entries to disk using atomic write."""
-        fd, tmp_name = tempfile.mkstemp(
-            dir=str(self.path.parent), suffix=".tmp"
-        )
+        fd, tmp_name = tempfile.mkstemp(dir=str(self.path.parent), suffix=".tmp")
         tmp_path = Path(tmp_name)
         try:
             with open(fd, "w", encoding="utf-8") as f:
@@ -90,9 +88,7 @@ class SelectionHistory:
             Updated list of history entries.
         """
         # Remove existing entry for this accession (dedup)
-        self._entries = [
-            e for e in self._entries if e.get("accession") != accession
-        ]
+        self._entries = [e for e in self._entries if e.get("accession") != accession]
 
         description = str(dataset.get("description", ""))
         if len(description) > 120:

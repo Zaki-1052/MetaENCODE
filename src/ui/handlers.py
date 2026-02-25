@@ -126,14 +126,15 @@ def handle_search_click(filter_state: FilterState) -> None:
     """
     filter_state.max_results = st.session_state.filter_max_results
 
-
     if not filter_state.has_any_filter():
         st.sidebar.warning("Please set at least one filter")
         return
 
     with st.spinner("Searching ENCODE..."):
         try:
-            results, spell_msg = execute_search(filter_state, st.session_state.filter_max_results)
+            results, spell_msg = execute_search(
+                filter_state, st.session_state.filter_max_results
+            )
             st.session_state.search_results = results
             if spell_msg:
                 st.sidebar.info(spell_msg)

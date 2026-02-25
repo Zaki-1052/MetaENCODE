@@ -3,43 +3,26 @@
 
 import pandas as pd
 import streamlit as st
-import time
 
 from src.ui.components.initializers import get_embedding_generator
 from src.ui.formatters import (
     format_accession_as_link,
-    format_organism_display,
-    get_encode_experiment_url,
-    truncate_text,
+    format_results_for_display,
+    get_accession_link_column_config,
 )
 
 
 def render_similar_tab() -> None:
     """Render the similar datasets tab."""
-    
+
     st.markdown(
-        """
-        <style>
-        /* Text sizes for search tab */
-        .sub-header {
-            font-size: 1.9rem;
-            font-weight: 650;
-            margin-bottom: 0.25rem;
-        }
-        
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-    
-    st.markdown(
-        "<div class='sub-header'>Similar Datasets</div>",
+        "<div class='section-header'>Similar Datasets</div>",
         unsafe_allow_html=True,
     )
 
     if st.session_state.selected_dataset is None:
         st.info("Select a dataset first to find similar experiments.")
-        st.session_state.similar_datasets = None 
+        st.session_state.similar_datasets = None
         st.session_state.last_computed_accession = None
         return
 
@@ -49,16 +32,14 @@ def render_similar_tab() -> None:
             "No data loaded. Please ensure the precomputed cache files exist in data/cache/."
         )
         return
-    
+
     selected = st.session_state.selected_dataset
     accession = selected.get("accession", "Unknown")
-    
+
     last_acc = st.session_state.get("last_computed_accession")
     if accession != last_acc:
         with st.spinner(f"Computing datasets similar to {accession}..."):
             try:
-                time.sleep(1.5)
-                
                 embedder = get_embedding_generator()
                 similarity_engine = st.session_state.similarity_engine
                 feature_combiner = st.session_state.feature_combiner
@@ -72,14 +53,18 @@ def render_similar_tab() -> None:
                 text_embedding = embedder.encode_single(text)
 
                 if feature_combiner is not None and feature_combiner.is_fitted:
-                    query_vector = feature_combiner.transform_single(selected, text_embedding)
+                    query_vector = feature_combiner.transform_single(
+                        selected, text_embedding
+                    )
                 else:
                     query_vector = text_embedding
 
                 # Find similar
                 top_n = st.session_state.filter_state.max_results
                 fetch_n = max(top_n * 3, 30)
-                similar_df = similarity_engine.find_similar(query_vector, n=fetch_n, exclude_self=True)
+                similar_df = similarity_engine.find_similar(
+                    query_vector, n=fetch_n, exclude_self=True
+                )
 
                 # Get metadata
                 metadata_df = st.session_state.metadata_df
@@ -98,7 +83,7 @@ def render_similar_tab() -> None:
             except Exception as e:
                 st.error(f"Error computing similarities: {e}")
                 return
-    
+
     accession_link = format_accession_as_link(accession)
     st.markdown(f"Finding datasets similar to: **{accession_link}**")
 
@@ -115,8 +100,7 @@ def render_similar_tab() -> None:
             # Limit display to max_results; similarity ranking already applied (no additional filters)
             display_similar = similar.head(top_n)
 
-            # Display columns with proper formatting
-            display_cols = [
+            similar_display_cols = [
                 "similarity_score",
                 "accession",
                 "assay_term_name",
@@ -124,53 +108,10 @@ def render_similar_tab() -> None:
                 "biosample_term_name",
                 "description",
             ]
-            display_cols = [c for c in display_cols if c in display_similar.columns]
-
-            display_df = display_similar[display_cols].copy()
-
-            # Format similarity score
-            display_df["similarity_score"] = display_df["similarity_score"].apply(
-                lambda x: f"{x:.3f}"
+            display_df = format_results_for_display(
+                display_similar, similar_display_cols, description_max_length=60
             )
-
-            # Format organism with assembly
-            if "organism" in display_df.columns:
-                display_df["organism"] = display_df["organism"].apply(
-                    format_organism_display
-                )
-
-            # Truncate description
-            if "description" in display_df.columns:
-                display_df["description"] = display_df["description"].apply(
-                    lambda x: truncate_text(str(x), 60)
-                )
-
-            # Replace accession values with ENCODE URLs for clickable links
-            display_df["accession"] = display_similar["accession"].apply(get_encode_experiment_url)
-
-            # Rename columns for display
-            column_labels = {
-                "similarity_score": "Similarity",
-                "accession": "Accession",
-                "assay_term_name": "Assay",
-                "organism": "Organism [Assembly]",
-                "biosample_term_name": "Biosample",
-                "description": "Description",
-            }
-            display_df = display_df.rename(
-                columns={
-                    k: v for k, v in column_labels.items() if k in display_df.columns
-                }
-            )
-
-            # Configure Accession column as clickable link showing accession ID
-            column_config = {
-                "Accession": st.column_config.LinkColumn(
-                    "Accession",
-                    display_text=r"experiments/(ENC[^/]+)/",
-                    help="Click to open on ENCODE Portal",
-                ),
-            }
+            column_config = get_accession_link_column_config()
 
             st.dataframe(
                 display_df,

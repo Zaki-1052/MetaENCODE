@@ -16,18 +16,17 @@ import plotly.graph_objects as go
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 
-
 # Diverging colorscale for similarity scores (more intermediate stops)
 SIMILARITY_COLORSCALE = [
-    [0.0, "rgb(179, 88, 6)"],     # Dark orange (lowest)
+    [0.0, "rgb(179, 88, 6)"],  # Dark orange (lowest)
     [0.15, "rgb(224, 130, 20)"],  # Orange
-    [0.3, "rgb(253, 184, 99)"],   # Light orange
-    [0.45, "rgb(254, 224, 182)"], # Pale orange
+    [0.3, "rgb(253, 184, 99)"],  # Light orange
+    [0.45, "rgb(254, 224, 182)"],  # Pale orange
     [0.5, "rgb(247, 247, 247)"],  # White (mid)
-    [0.55, "rgb(216, 218, 235)"], # Pale purple
+    [0.55, "rgb(216, 218, 235)"],  # Pale purple
     [0.7, "rgb(158, 154, 200)"],  # Light purple
     [0.85, "rgb(106, 81, 163)"],  # Purple
-    [1.0, "rgb(63, 0, 125)"],     # Dark purple (highest)
+    [1.0, "rgb(63, 0, 125)"],  # Dark purple (highest)
 ]
 
 
@@ -235,7 +234,7 @@ class PlotGenerator:
         """
         # Apply jitter to separate overlapping points
         coords = apply_jitter(coords)
-        
+
         # Create plot DataFrame
         plot_df = metadata.copy()
         plot_df["x"] = coords[:, 0]
@@ -252,7 +251,13 @@ class PlotGenerator:
             )
 
         # Build customdata for hovertemplate (no x/y values shown)
-        customdata_cols = ["accession", "description_short", "assay_term_name", "organism", "organ"]
+        customdata_cols = [
+            "accession",
+            "description_short",
+            "assay_term_name",
+            "organism",
+            "organ",
+        ]
 
         # Fill missing columns with empty strings
         for col in customdata_cols:
@@ -386,9 +391,8 @@ class PlotGenerator:
         )
 
         return fig
-    
-    
-    
+
+
 def apply_jitter(
     coords: np.ndarray,
     scale_factor: float = 50.0,
@@ -422,7 +426,6 @@ def apply_jitter(
     rng = np.random.default_rng(random_state)
     jittered[:, 0] += rng.uniform(-jitter_amount, jitter_amount, size=len(coords))
     return jittered
-
 
 
 def percentile_range_filtering(

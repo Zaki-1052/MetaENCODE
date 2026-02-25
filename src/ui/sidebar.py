@@ -1,4 +1,3 @@
-
 # src/ui/sidebar.py
 """Sidebar UI rendering for MetaENCODE.
 
@@ -9,8 +8,9 @@ with search execution delegated to handlers.py.
 import streamlit as st
 
 from src.ui.components.initializers import get_filter_manager
-from src.ui.handlers import handle_search_click, execute_search
+from src.ui.handlers import handle_search_click
 from src.ui.search_filters import FilterState
+from src.ui.styles import apply_sidebar_styles
 from src.ui.vocabularies import (
     HISTONE_MODIFICATIONS,
     SLIM_TYPES,
@@ -27,8 +27,6 @@ from src.ui.vocabularies import (
     get_targets,
 )
 
-
-
 # Module-level constants
 MAX_CATEGORY_OPTIONS = 20
 MAX_BIOSAMPLE_OPTIONS = 50
@@ -37,26 +35,26 @@ MAX_BIOSAMPLE_OPTIONS = 50
 # Resets search filter widgets
 def reset_filters():
     st.session_state.filter_state = FilterState()
-    
+
     st.session_state["_last_history_selection"] = 0
     st.session_state.classification_type = "organ"
-    
+
     widget_keys = [
-        "filter_description", 
-        "filter_assay_type", 
-        "filter_organism", 
-        "filter_target", 
-        "filter_classification_type", 
-        "filter_body_part", 
-        "filter_biosample", 
-        "filter_age_stage", 
-        "filter_lab", 
-        "filter_min_replicates", 
-        "filter_min_bio_replicates", 
-        "filter_min_tech_replicates", 
-        "filter_max_results"
+        "filter_description",
+        "filter_assay_type",
+        "filter_organism",
+        "filter_target",
+        "filter_classification_type",
+        "filter_body_part",
+        "filter_biosample",
+        "filter_age_stage",
+        "filter_lab",
+        "filter_min_replicates",
+        "filter_min_bio_replicates",
+        "filter_min_tech_replicates",
+        "filter_max_results",
     ]
-    
+
     for key in widget_keys:
         if key in st.session_state:
             if "min_" in key:
@@ -67,7 +65,7 @@ def reset_filters():
                 st.session_state[key] = ""
 
 
-def render_sidebar() -> dict:
+def render_sidebar() -> None:
     """Render sidebar with search and filter controls.
 
     The sidebar includes:
@@ -77,52 +75,23 @@ def render_sidebar() -> dict:
     - Histone modification / target selection
     - Age/developmental stage search
     - More Options (lab, replicates)
-
-    Returns:
-        Dictionary containing current filter settings for backward compatibility.
     """
-    
-    st.markdown("""
-        <style>
 
-        /* Sidebar background */
-        section[data-testid="stSidebar"] {
-            background-color: #C6DEB4;
-        }
-        
-        /* Adjust padding in sidebar */
-        [data-testid="stSidebar"] [data-testid="stHeading"] h1{
-            padding-top: 0px;
-            margin-top: -5px; 
-            font-size: 1.8rem;
-        }
-        
-        [data-testid="stSidebarContent"] hr {
-            border-top: 1px solid #8e9a6a
-        }
-        
-        [data-testid="stSidebarContent"] div[role="slider"] {
-            background-color: #000000 !important;
-            border: 2px solid #000000;
-        }
-    
-        
-        </style>
-        """, unsafe_allow_html=True)
+    apply_sidebar_styles()
 
     filter_mgr = get_filter_manager()
 
     st.sidebar.title("Similarity Search")
-    
+
     st.sidebar.subheader("Results")
 
     # --- Primary Filters (always visible) ---
     def on_slider_change():
         if st.session_state.get("has_searched", False):
             st.session_state.refresh_results = True
-    
-    # Results Control 
-    max_results = st.sidebar.slider(
+
+    # Results Control
+    st.sidebar.slider(
         "Max results to show",
         min_value=5,
         max_value=50,
@@ -130,13 +99,13 @@ def render_sidebar() -> dict:
         step=5,
         help="Applies to both search results and similar datasets",
         key="filter_max_results",
-        on_change=on_slider_change
+        on_change=on_slider_change,
     )
 
     st.sidebar.divider()
-    
+
     st.sidebar.subheader("Search Filters")
-    
+
     st.sidebar.caption(
         "Filters apply to Search results only. "
         "Similar datasets show pure ML similarity."
@@ -282,9 +251,7 @@ def render_sidebar() -> dict:
         SLIM_TYPES[classification_type]["display_prefix"],
         options=category_options,
         index=(
-            category_options.index(current_bp)
-            if current_bp in category_options
-            else 0
+            category_options.index(current_bp) if current_bp in category_options else 0
         ),
         format_func=format_category,
         help=SLIM_TYPES[classification_type]["description"],
@@ -350,39 +317,6 @@ def render_sidebar() -> dict:
 
     st.sidebar.divider()
 
-        
-    '''
-    def handle_search_click_example(filter_state: FilterState) -> None:
-        """Handle search button click event.
-
-        Updates session state with search results and displays status messages.
-
-        Args:
-            filter_state: Current filter state.
-            max_results: Maximum results to return.
-        """
-        filter_state.max_results = st.session_state.filter_max_results
-
-
-        if not filter_state.has_any_filter():
-            st.sidebar.warning("Please set at least one filter")
-            return
-
-        with st.spinner("YEAH TEST FUNCTION"):
-            try:
-                results, spell_msg = execute_search(filter_state, st.session_state.filter_max_results)
-                st.session_state.search_results = results
-                if spell_msg:
-                    st.sidebar.info(spell_msg)
-                st.sidebar.success(f"Found {len(results)} results")
-            except Exception as e:
-                st.sidebar.error(f"Search failed: {e}")
-    
-    '''
-
-  
-
-
     # --- More Options (Collapsible) ---
     with st.sidebar.expander("More Options"):
         # 7. Lab filter - ordered by popularity (from JSON)
@@ -410,7 +344,7 @@ def render_sidebar() -> dict:
         )
 
         # 9. Min biological replicates
-        min_bio_replicates = st.number_input(
+        st.number_input(
             "Min biological replicates",
             min_value=0,
             max_value=10,
@@ -420,7 +354,7 @@ def render_sidebar() -> dict:
         )
 
         # 10. Min technical replicates
-        min_tech_replicates = st.number_input(
+        st.number_input(
             "Min technical replicates",
             min_value=0,
             max_value=10,
@@ -430,41 +364,38 @@ def render_sidebar() -> dict:
         )
 
     st.sidebar.divider()
-    
+
     # Store filter state
-    filter_state = FilterState.from_dict({
-            "assay_type" : assay_type or 0, 
-            "organism" : organism or 0, 
-            "body_part" : body_part or 0, 
-            "biosample" : biosample or 0, 
-            "target" : target or 0, 
-            "age_stage" : age_stage or 0, 
-            "lab" : lab or 0, 
-            "min_replicates" : min_replicates or 0, 
-            "max_results" : st.session_state.filter_max_results, 
-            "description_search" : description_search or None, 
-        })
-    
+    filter_state = FilterState.from_dict(
+        {
+            "assay_type": assay_type or 0,
+            "organism": organism or 0,
+            "body_part": body_part or 0,
+            "biosample": biosample or 0,
+            "target": target or 0,
+            "age_stage": age_stage or 0,
+            "lab": lab or 0,
+            "min_replicates": min_replicates or 0,
+            "max_results": st.session_state.filter_max_results,
+            "description_search": description_search or None,
+        }
+    )
+
     st.session_state.filter_state = filter_state
 
-    
-    
-    if (
-        st.session_state.get("refresh_results", False)
-        and st.session_state.get("has_searched", False)
-        ):
-        
+    if st.session_state.get("refresh_results", False) and st.session_state.get(
+        "has_searched", False
+    ):
+
         st.session_state.refresh_results = False
         handle_search_click(filter_state)
 
-    
     # Build search query preview
     search_query = filter_mgr.build_search_query(filter_state)
 
     if search_query:
         st.sidebar.caption(f"Search: {search_query}")
 
-    
     # --- Search Button ---
     if st.sidebar.button(
         "Search ENCODE",
@@ -476,33 +407,22 @@ def render_sidebar() -> dict:
         st.session_state.has_searched = True
 
     # Clear filters button
-    if st.sidebar.button("Clear Filters", 
-                         use_container_width=True,
-                         on_click=reset_filters):
-        st.session_state.filter_state = FilterState()
+    if st.sidebar.button(
+        "Clear Filters", use_container_width=True, on_click=reset_filters
+    ):
         st.rerun()
 
     # About section
     st.sidebar.divider()
     st.sidebar.subheader("About")
-    st.sidebar.markdown(
-        """
+    st.sidebar.markdown("""
         MetaENCODE uses machine learning to find similar datasets based on
         metadata embeddings. Built with SBERT and Streamlit.
 
         [ENCODE Portal](https://www.encodeproject.org/)
-        """
-    )
+        """)
 
     # Data freshness indicator (PRD §6.4)
     cache_date = st.session_state.get("cache_date")
     if cache_date is not None:
         st.sidebar.caption(f"Data retrieved: {cache_date:%Y-%m-%d %H:%M} UTC")
-
-    # Return legacy format for backward compatibility
-    return {
-        "search_query": search_query,
-        "organism": organism if organism else None,
-        "assay_type": assay_type if assay_type else None,
-        "top_n": max_results,
-    }

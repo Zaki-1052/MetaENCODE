@@ -12,31 +12,20 @@ Import directly when needed:
 """
 
 # Autocomplete provider (uses spell check if available)
-from src.ui.autocomplete import (
-    AutocompleteProvider,
-    AutocompleteSuggestion,
-    create_assay_search_fn,
-    create_biosample_search_fn,
-    create_lab_search_fn,
-    create_organ_search_fn,
-    create_organism_search_fn,
-    create_target_search_fn,
-    get_autocomplete_provider,
-)
+from src.ui.autocomplete import (AutocompleteProvider, AutocompleteSuggestion,
+                                 create_assay_search_fn,
+                                 create_biosample_search_fn,
+                                 create_lab_search_fn, create_organ_search_fn,
+                                 create_organism_search_fn,
+                                 create_target_search_fn,
+                                 get_autocomplete_provider)
 from src.ui.search_filters import FilterState, SearchFilterManager
-from src.ui.vocabularies import (
-    ASSAY_TYPES,
-    BODY_PARTS,
-    HISTONE_MODIFICATIONS,
-    LIFE_STAGES,
-    ORGANISM_ASSEMBLIES,
-    ORGANISMS,
-    TISSUE_SYNONYMS,
-    get_assay_types,
-    get_life_stages,
-    get_organism_display,
-    get_organisms,
-)
+from src.ui.vocabularies import (ASSAY_TYPES, BODY_PARTS,
+                                 HISTONE_MODIFICATIONS, LIFE_STAGES,
+                                 ORGANISM_ASSEMBLIES, ORGANISMS,
+                                 TISSUE_SYNONYMS, get_assay_types,
+                                 get_life_stages, get_organism_display,
+                                 get_organisms)
 
 __all__ = [
     # Search filters

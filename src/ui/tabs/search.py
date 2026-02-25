@@ -9,8 +9,8 @@ from src.ui.components.initializers import get_api_client, get_selection_history
 from src.ui.formatters import (
     format_accession_as_link,
     format_organism_display,
-    get_encode_experiment_url,
-    truncate_text,
+    format_results_for_display,
+    get_accession_link_column_config,
 )
 from src.utils.history import SelectionHistory
 
@@ -29,37 +29,14 @@ def render_search_tab() -> None:
     """Render the search and selection tab."""
 
     st.markdown(
-        """
-        <style>
-        /* Text sizes for search tab */
-        .search-title {
-            font-size: 1.9rem;
-            font-weight: 650;
-            margin-bottom: 0.25rem;
-        }
-
-        .search-subtitle {
-            font-size: 1.6rem;
-            font-weight: 550;
-            margin-top: 1.0rem;
-            margin-bottom: 0.4rem;
-        }
-        
-        </style>
-        """,
+        "<div class='section-header'>Search & Select Dataset</div>",
         unsafe_allow_html=True,
     )
-    
-    st.markdown(
-        "<div class='search-title'>Search & Select Dataset</div>",
-        unsafe_allow_html=True,
-    )
-    
 
     # Get current filter state
     filter_state = st.session_state.filter_state
     max_results = filter_state.max_results
-    has_searched = st.session_state.get('has_searched', False)
+    has_searched = st.session_state.get("has_searched", False)
 
     # Display search results if available
     if has_searched and st.session_state.search_results is not None:
@@ -67,65 +44,25 @@ def render_search_tab() -> None:
 
         if not results_df.empty:
             st.markdown(
-                f"<div class='search-subtitle'>Search Results ({len(results_df)} datasets)</div>",
+                f"<div class='section-subtitle'>Search Results ({len(results_df)} datasets)</div>",
                 unsafe_allow_html=True,
             )
-            
+
             st.markdown("Please pick one of the datasets below.")
-            
-            
 
             # Display as interactive table with formatted columns
-            display_cols = [
+            search_display_cols = [
                 "accession",
                 "assay_term_name",
                 "organism",
                 "biosample_term_name",
                 "description",
             ]
-            display_cols = [c for c in display_cols if c in results_df.columns]
-
-            # Create display DataFrame with formatting
-            display_df = results_df[display_cols].copy()
-
-            # Format organism with genome assembly
-            if "organism" in display_df.columns:
-                display_df["organism"] = display_df["organism"].apply(
-                    format_organism_display
-                )
-
-            # Truncate descriptions for display
-            if "description" in display_df.columns:
-                display_df["description"] = display_df["description"].apply(
-                    lambda x: truncate_text(str(x), 80)
-                )
-
-            # Replace accession values with ENCODE URLs for clickable links
-            display_df["accession"] = results_df["accession"].apply(get_encode_experiment_url)
-
-            # Rename columns for display
-            column_labels = {
-                "accession": "Accession",
-                "assay_term_name": "Assay",
-                "organism": "Organism [Assembly]",
-                "biosample_term_name": "Biosample",
-                "description": "Description",
-            }
-            display_df = display_df.rename(
-                columns={
-                    k: v for k, v in column_labels.items() if k in display_df.columns
-                }
+            display_df = format_results_for_display(
+                results_df, search_display_cols, description_max_length=80
             )
+            column_config = get_accession_link_column_config()
 
-            # Configure Accession column as clickable link showing accession ID
-            column_config = {
-                "Accession": st.column_config.LinkColumn(
-                    "Accession",
-                    display_text=r"experiments/(ENC[^/]+)/",
-                    help="Click to open on ENCODE Portal",
-                ),
-            }
-                
             # Let user select a row
             selection = st.dataframe(
                 display_df.head(max_results),
@@ -146,7 +83,9 @@ def render_search_tab() -> None:
                         selected_row = results_df.iloc[selected_idx]
                         st.session_state.selected_dataset = selected_row.to_dict()
                         _save_to_history(selected_row.to_dict())
-                        st.success(f"Selected: {selected_row['accession']}. Scroll down to see info.")
+                        st.success(
+                            f"Selected: {selected_row['accession']}. Scroll down to see info."
+                        )
                 else:
                     # No rows currently selected; clear previous index so a future selection is detected.
                     st.session_state.previous_selection_index = None
@@ -180,7 +119,7 @@ def render_search_tab() -> None:
 
     # Manual accession input with recent selections
     st.markdown(
-        "<div class='search-subtitle'>Or enter an accession directly</div>",
+        "<div class='section-subtitle'>Or enter an accession directly</div>",
         unsafe_allow_html=True,
     )
 
@@ -209,16 +148,18 @@ def render_search_tab() -> None:
                     dataset = client.fetch_experiment_by_accession(selected_accession)
                     st.session_state.selected_dataset = dataset
                     _save_to_history(dataset)
-                    st.success(f"Loaded dataset: {selected_accession}. Scroll down to see info.")
-                except (ValueError, Exception) as e:
+                    st.success(
+                        f"Loaded dataset: {selected_accession}. Scroll down to see info."
+                    )
+                except Exception as e:
                     st.error(f"Failed to load dataset: {e}")
 
     accession = st.text_input(
         "ENCODE Accession",
-        value = st.session_state.get("accession_input", ""),
+        value=st.session_state.get("accession_input", ""),
         placeholder="e.g., ENCSR000AKS",
         help="Enter an ENCODE experiment accession number",
-        key = "accession_input",
+        key="accession_input",
     )
 
     if st.button("Load Dataset"):
@@ -238,11 +179,11 @@ def render_search_tab() -> None:
             st.warning("Please enter an accession number")
 
     # Display selected dataset
-    
+
     if st.session_state.selected_dataset is not None:
         st.divider()
         st.markdown(
-            "<div class='search-subtitle'>Selected Dataset</div>",
+            "<div class='section-subtitle'>Selected Dataset</div>",
             unsafe_allow_html=True,
         )
         dataset = st.session_state.selected_dataset

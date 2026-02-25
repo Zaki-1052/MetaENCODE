@@ -8,6 +8,7 @@ a teammate's implementation.
 import streamlit as st
 
 from src.ui.components.initializers import get_cache_manager
+from src.ui.styles import apply_viz_options_styles
 from src.visualization.plots import (
     DimensionalityReducer,
     PlotGenerator,
@@ -18,15 +19,34 @@ from src.visualization.plots import (
 _VIZ_CACHE_PREFIX = "viz_coords"
 
 
+def _store_viz_state(
+    coords_2d,
+    metadata,
+    method: str,
+    mode: str,
+    variance_ratio,
+    slider_value,
+    color_by: str | None = None,
+) -> None:
+    """Store visualization results in session state and invalidate cached figure."""
+    st.session_state.coords_2d = coords_2d
+    st.session_state.viz_metadata = metadata
+    st.session_state.viz_reduction_method = method
+    st.session_state.viz_mode = mode
+    st.session_state.viz_variance_ratio = variance_ratio
+    st.session_state.viz_slider_value = slider_value
+    if color_by is not None:
+        st.session_state.viz_color_by = color_by
+    st.session_state.pop("viz_fig_key", None)
+
+
 def _viz_cache_key(method: str, filtered: bool) -> str:
     """Build cache key for precomputed visualization coordinates."""
     suffix = "filtered" if filtered else "unfiltered"
     return f"{_VIZ_CACHE_PREFIX}_{method.replace('-', '_')}_{suffix}"
 
 
-def _try_load_precomputed(
-    method: str, filter_outliers: bool
-) -> bool:
+def _try_load_precomputed(method: str, filter_outliers: bool) -> bool:
     """Attempt to load precomputed visualization coordinates from cache.
 
     If precomputed data exists for the given method and filter setting,
@@ -73,12 +93,9 @@ def _try_load_precomputed(
         )
         return False
 
-    st.session_state.coords_2d = coords_2d
-    st.session_state.viz_metadata = filtered_metadata
-    st.session_state.viz_reduction_method = method
-    st.session_state.viz_mode = "all_datasets"
-    st.session_state.viz_variance_ratio = variance_ratio
-    st.session_state.viz_slider_value = None
+    _store_viz_state(
+        coords_2d, filtered_metadata, method, "all_datasets", variance_ratio, None
+    )
     return True
 
 
@@ -97,8 +114,6 @@ def generate_visualization(
     """
     # Try precomputed cache first (instant load)
     if _try_load_precomputed(method, filter_outliers):
-        # Invalidate cached figure so it gets rebuilt with new coords
-        st.session_state.pop("viz_fig_key", None)
         return
 
     # Fall back to on-the-fly computation
@@ -117,15 +132,15 @@ def generate_visualization(
             reducer = DimensionalityReducer(method=method)
             coords_2d = reducer.fit_transform(filtered_embeddings)
 
-            st.session_state.coords_2d = coords_2d
-            st.session_state.viz_metadata = filtered_metadata
-            st.session_state.viz_reduction_method = method
-            st.session_state.viz_mode = "all_datasets"
-            st.session_state.viz_variance_ratio = reducer.variance_ratio_
-            st.session_state.viz_slider_value = None
-            st.session_state.viz_color_by = color_by
-            # Invalidate cached figure
-            st.session_state.pop("viz_fig_key", None)
+            _store_viz_state(
+                coords_2d,
+                filtered_metadata,
+                method,
+                "all_datasets",
+                reducer.variance_ratio_,
+                None,
+                color_by,
+            )
         except Exception as e:
             st.error(f"Error generating visualization: {e}")
             st.info(
@@ -185,16 +200,15 @@ def generate_similar_only_visualization(method: str, color_by: str) -> None:
             reducer = DimensionalityReducer(method=method)
             coords_2d = reducer.fit_transform(similar_embeddings)
 
-            # Store results
-            st.session_state.coords_2d = coords_2d
-            st.session_state.viz_metadata = similar_metadata
-            st.session_state.viz_reduction_method = method
-            st.session_state.viz_mode = "similar_only"
-            st.session_state.viz_variance_ratio = reducer.variance_ratio_
-            st.session_state.viz_slider_value = top_n
-            st.session_state.viz_color_by = color_by
-            # Invalidate cached figure
-            st.session_state.pop("viz_fig_key", None)
+            _store_viz_state(
+                coords_2d,
+                similar_metadata,
+                method,
+                "similar_only",
+                reducer.variance_ratio_,
+                top_n,
+                color_by,
+            )
 
         except Exception as e:
             st.error(f"Error generating visualization: {e}")
@@ -244,41 +258,10 @@ def _build_chart_figure(
 
 def render_visualize_tab() -> None:
     """Render the visualization tab."""
-    st.markdown(
-        """
-        <style>
-        /* Text sizes for search tab */
-        .subheader {
-            font-size: 1.9rem;
-            font-weight: 650;
-            margin-bottom: 0.25rem;
-        }
-
-        .subtitle {
-            font-size: 1.4rem;
-            font-weight: 550;
-            margin-bottom: 0.4rem;
-        }
-
-        /* Options panel */
-        [data-testid="stColumn"]:has(.options-container-marker) {
-            background-color: #afbc88 !important;
-            padding: 25px !important;
-            border-radius: 15px !important;
-            box-shadow: 2px 2px 10px rgba(0,0,0,0.05) !important;
-        }
-
-        [data-testid="stColumn"]:has(.options-container-marker) [data-baseweb="select"] > div {
-            background-color: #ffffff !important;
-            border-radius: 8px !important;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
+    apply_viz_options_styles()
 
     st.markdown(
-        "<div class='subheader'>Dataset Visualization</div>",
+        "<div class='section-header'>Dataset Visualization</div>",
         unsafe_allow_html=True,
     )
 
@@ -291,9 +274,11 @@ def render_visualize_tab() -> None:
     col1, col2 = st.columns([3, 1])
 
     with col2:
-        st.markdown('<div class="options-container-marker"></div>', unsafe_allow_html=True)
         st.markdown(
-            "<div class='subtitle'>Options</div>",
+            '<div class="options-container-marker"></div>', unsafe_allow_html=True
+        )
+        st.markdown(
+            "<div class='viz-subtitle'>Options</div>",
             unsafe_allow_html=True,
         )
 
@@ -312,7 +297,9 @@ def render_visualize_tab() -> None:
 
         # Warn if similar-only selected but no similar datasets
         if view_mode == "similar_only" and not similar_available:
-            st.error("Search for a dataset and run a similarity search first to use this view.")
+            st.error(
+                "Search for a dataset and run a similarity search first to use this view."
+            )
 
         reduction_method = st.selectbox(
             "Reduction Method",
@@ -385,7 +372,10 @@ def render_visualize_tab() -> None:
         _auto_regenerate_similar_viz(reduction_method, color_option)
 
         # Auto-load visualization on first tab visit
-        if st.session_state.coords_2d is None and st.session_state.metadata_df is not None:
+        if (
+            st.session_state.coords_2d is None
+            and st.session_state.metadata_df is not None
+        ):
             if view_mode == "similar_only" and similar_available:
                 generate_similar_only_visualization(reduction_method, color_option)
             elif view_mode == "all_datasets":
@@ -436,8 +426,13 @@ def render_visualize_tab() -> None:
                 )
                 variance = st.session_state.get("viz_variance_ratio", None)
                 st.session_state.viz_fig = _build_chart_figure(
-                    coords, viz_metadata, color_option,
-                    title, highlight_idx, variance, actual_method,
+                    coords,
+                    viz_metadata,
+                    color_option,
+                    title,
+                    highlight_idx,
+                    variance,
+                    actual_method,
                 )
                 st.session_state.viz_fig_key = fig_cache_key
 
