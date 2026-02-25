@@ -67,8 +67,8 @@ class TestSelectionHistoryInit:
         assert history.get_entries() == []
 
     def test_max_entries_constant(self) -> None:
-        """MAX_ENTRIES is 30."""
-        assert SelectionHistory.MAX_ENTRIES == 30
+        """MAX_ENTRIES is 10."""
+        assert SelectionHistory.MAX_ENTRIES == 10
 
 
 class TestSelectionHistoryLoadSave:

@@ -14,6 +14,18 @@ from src.ml.feature_combiner import FeatureCombiner
 from src.ml.similarity import SimilarityEngine
 from src.processing.metadata import MetadataProcessor
 
+try:
+    import sentence_transformers  # noqa: F401
+
+    HAS_SENTENCE_TRANSFORMERS = True
+except ImportError:
+    HAS_SENTENCE_TRANSFORMERS = False
+
+pytestmark = pytest.mark.skipif(
+    not HAS_SENTENCE_TRANSFORMERS,
+    reason="sentence-transformers not installed",
+)
+
 
 @pytest.fixture
 def sample_raw_experiments() -> pd.DataFrame:

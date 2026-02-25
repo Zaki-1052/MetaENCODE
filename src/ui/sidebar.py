@@ -344,7 +344,7 @@ def render_sidebar() -> None:
         )
 
         # 9. Min biological replicates
-        st.number_input(
+        min_bio_replicates = st.number_input(
             "Min biological replicates",
             min_value=0,
             max_value=10,
@@ -354,7 +354,7 @@ def render_sidebar() -> None:
         )
 
         # 10. Min technical replicates
-        st.number_input(
+        min_tech_replicates = st.number_input(
             "Min technical replicates",
             min_value=0,
             max_value=10,
@@ -376,6 +376,8 @@ def render_sidebar() -> None:
             "age_stage": age_stage or 0,
             "lab": lab or 0,
             "min_replicates": min_replicates or 0,
+            "min_bio_replicates": min_bio_replicates or 0,
+            "min_tech_replicates": min_tech_replicates or 0,
             "max_results": st.session_state.filter_max_results,
             "description_search": description_search or None,
         }

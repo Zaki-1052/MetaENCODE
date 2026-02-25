@@ -4,8 +4,21 @@
 from unittest.mock import MagicMock, patch
 
 import numpy as np
+import pytest
 
 from src.ml.embeddings import EmbeddingGenerator
+
+try:
+    import sentence_transformers  # noqa: F401
+
+    HAS_SENTENCE_TRANSFORMERS = True
+except ImportError:
+    HAS_SENTENCE_TRANSFORMERS = False
+
+needs_sentence_transformers = pytest.mark.skipif(
+    not HAS_SENTENCE_TRANSFORMERS,
+    reason="sentence-transformers not installed",
+)
 
 # ============================================================================
 # Initialization Tests
@@ -32,6 +45,7 @@ class TestEmbeddingGeneratorInit:
 # ============================================================================
 
 
+@needs_sentence_transformers
 class TestEmbeddingGeneratorEncode:
     """Tests for EmbeddingGenerator.encode() method."""
 
@@ -117,6 +131,7 @@ class TestEmbeddingGeneratorEncode:
 # ============================================================================
 
 
+@needs_sentence_transformers
 class TestEmbeddingGeneratorEncodeSingle:
     """Tests for EmbeddingGenerator.encode_single() method."""
 
@@ -197,6 +212,7 @@ class TestEmbeddingGeneratorEmbeddingDim:
         assert generator.embedding_dim == 768
         assert generator._model is None
 
+    @needs_sentence_transformers
     @patch("sentence_transformers.SentenceTransformer")
     def test_embedding_dim_unknown_model_loads_model(self, mock_st_class: MagicMock):
         """Test embedding_dim loads model for unknown model name."""
@@ -217,6 +233,7 @@ class TestEmbeddingGeneratorEmbeddingDim:
 # ============================================================================
 
 
+@needs_sentence_transformers
 class TestEmbeddingGeneratorModelLoading:
     """Tests for lazy model loading behavior."""
 
