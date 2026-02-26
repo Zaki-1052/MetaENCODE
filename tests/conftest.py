@@ -74,7 +74,10 @@ def sample_experiment_embedded_replicates() -> dict:
                 "library": {
                     "biosample": {
                         "donor": {
-                            "organism": {"name": "human", "scientific_name": "Homo sapiens"}
+                            "organism": {
+                                "name": "human",
+                                "scientific_name": "Homo sapiens",
+                            }
                         },
                         "life_stage": "adult",
                     }
@@ -86,7 +89,10 @@ def sample_experiment_embedded_replicates() -> dict:
                 "library": {
                     "biosample": {
                         "donor": {
-                            "organism": {"name": "human", "scientific_name": "Homo sapiens"}
+                            "organism": {
+                                "name": "human",
+                                "scientific_name": "Homo sapiens",
+                            }
                         },
                         "life_stage": "adult",
                     }
@@ -98,7 +104,10 @@ def sample_experiment_embedded_replicates() -> dict:
                 "library": {
                     "biosample": {
                         "donor": {
-                            "organism": {"name": "human", "scientific_name": "Homo sapiens"}
+                            "organism": {
+                                "name": "human",
+                                "scientific_name": "Homo sapiens",
+                            }
                         },
                         "life_stage": "adult",
                     }

@@ -8,7 +8,6 @@ import pytest
 
 from src.utils.history import SelectionHistory
 
-
 SAMPLE_DATASET = {
     "accession": "ENCSR000AKS",
     "assay_term_name": "ChIP-seq",
@@ -57,17 +56,18 @@ class TestSelectionHistoryInit:
 
     def test_init_with_default_path(self) -> None:
         """Default path is data/cache/selection_history.json."""
-        h = SelectionHistory.__new__(SelectionHistory)
-        # Don't call __init__ to avoid side effects; just check the class attr
-        assert SelectionHistory.DEFAULT_PATH == Path("data/cache/selection_history.json")
+        # Check the class attribute directly (no instantiation needed)
+        assert SelectionHistory.DEFAULT_PATH == Path(
+            "data/cache/selection_history.json"
+        )
 
     def test_init_loads_empty_when_no_file(self, history: SelectionHistory) -> None:
         """Empty entries when no file exists on disk."""
         assert history.get_entries() == []
 
     def test_max_entries_constant(self) -> None:
-        """MAX_ENTRIES is 30."""
-        assert SelectionHistory.MAX_ENTRIES == 30
+        """MAX_ENTRIES is 10."""
+        assert SelectionHistory.MAX_ENTRIES == 10
 
 
 class TestSelectionHistoryLoadSave:

@@ -37,14 +37,8 @@ SESSION_DEFAULTS: dict = {
     "viz_slider_value": None,  # Slider value used to generate current viz
     "viz_color_by": None,  # color_by option used for current viz
     "viz_variance_ratio": None,  # PCA variance ratios for axis labels
-    # New filter state using FilterState dataclass
+    # Filter state using FilterState dataclass
     "filter_state": FilterState(),
-    # Legacy filter_settings for backward compatibility
-    "filter_settings": {
-        "organism": None,
-        "assay_type": None,
-        "top_n": 10,
-    },
     # Selection history entries loaded from disk
     "selection_history": [],
 }

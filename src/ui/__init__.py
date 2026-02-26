@@ -39,6 +39,16 @@ from src.ui.vocabularies import (
 )
 
 __all__ = [
+    # Autocomplete
+    "AutocompleteProvider",
+    "AutocompleteSuggestion",
+    "create_assay_search_fn",
+    "create_biosample_search_fn",
+    "create_lab_search_fn",
+    "create_organ_search_fn",
+    "create_organism_search_fn",
+    "create_target_search_fn",
+    "get_autocomplete_provider",
     # Search filters
     "FilterState",
     "SearchFilterManager",

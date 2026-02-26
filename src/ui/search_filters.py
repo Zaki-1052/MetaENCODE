@@ -32,19 +32,11 @@ def _get_spell_checker():
     return _spell_checker
 
 
-from src.ui.vocabularies import (
-    ASSAY_ALIASES,
-    ASSAY_TYPES,
-    BODY_PARTS,
-    HISTONE_ALIASES,
-    HISTONE_MODIFICATIONS,
-    ORGANISM_ASSEMBLIES,
-    TISSUE_SYNONYMS,
-    get_lab_names,
-    get_life_stages,
-    get_organism_display,
-    get_organisms,
-)
+from src.ui.vocabularies import (ASSAY_ALIASES, ASSAY_TYPES, BODY_PARTS,
+                                 HISTONE_ALIASES, HISTONE_MODIFICATIONS,
+                                 ORGANISM_ASSEMBLIES, TISSUE_SYNONYMS,
+                                 get_lab_names, get_life_stages,
+                                 get_organism_display, get_organisms)
 
 
 @dataclass
@@ -725,7 +717,9 @@ class SearchFilterManager:
 
         # Technical replicate count filter
         if filters.min_tech_replicates > 0 and "tech_replicate_count" in result.columns:
-            result = result[result["tech_replicate_count"] >= filters.min_tech_replicates]
+            result = result[
+                result["tech_replicate_count"] >= filters.min_tech_replicates
+            ]
 
         return result
 

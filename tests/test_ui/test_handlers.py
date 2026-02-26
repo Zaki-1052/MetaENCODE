@@ -4,7 +4,6 @@
 from unittest.mock import MagicMock, patch
 
 import pandas as pd
-import pytest
 
 from src.ui.handlers import apply_spell_correction, execute_search
 from src.ui.search_filters import FilterState
@@ -105,7 +104,10 @@ class TestExecuteSearch:
         # Setup mock client
         client = MagicMock()
         client.fetch_experiments.return_value = pd.DataFrame(
-            {"accession": ["ENCSR001", "ENCSR002"], "assay_term_name": ["ChIP-seq", "RNA-seq"]}
+            {
+                "accession": ["ENCSR001", "ENCSR002"],
+                "assay_term_name": ["ChIP-seq", "RNA-seq"],
+            }
         )
         mock_client.return_value = client
 
@@ -287,11 +289,17 @@ class TestExecuteSearch:
 
     @patch("src.ui.handlers.get_filter_manager")
     @patch("src.ui.handlers.get_api_client")
-    def test_post_filter_threads_bio_tech_replicates(self, mock_client, mock_filter_mgr):
+    def test_post_filter_threads_bio_tech_replicates(
+        self, mock_client, mock_filter_mgr
+    ):
         """Bio/tech replicate filters should be threaded to post_filter_state."""
         client = MagicMock()
         client.fetch_experiments.return_value = pd.DataFrame(
-            {"accession": ["ENCSR001"], "bio_replicate_count": [2], "tech_replicate_count": [1]}
+            {
+                "accession": ["ENCSR001"],
+                "bio_replicate_count": [2],
+                "tech_replicate_count": [1],
+            }
         )
         mock_client.return_value = client
 

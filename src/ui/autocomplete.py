@@ -27,20 +27,12 @@ from functools import lru_cache
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from src.ui.search_filters import SearchFilterManager
-from src.ui.vocabularies import (
-    ASSAY_ALIASES,
-    HISTONE_ALIASES,
-    ORGANISM_ASSEMBLIES,
-    get_assay_types,
-    get_biosamples,
-    get_biosamples_for_organ,
-    get_labs,
-    get_life_stages,
-    get_organ_display_name,
-    get_organ_systems,
-    get_organisms,
-    get_targets,
-)
+from src.ui.vocabularies import (ASSAY_ALIASES, HISTONE_ALIASES,
+                                 ORGANISM_ASSEMBLIES, get_assay_types,
+                                 get_biosamples, get_biosamples_for_organ,
+                                 get_labs, get_life_stages,
+                                 get_organ_display_name, get_organ_systems,
+                                 get_organisms, get_targets)
 
 
 @dataclass

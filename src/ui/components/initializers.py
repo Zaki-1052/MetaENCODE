@@ -123,7 +123,9 @@ def load_cached_data(
                 processor = MetadataProcessor()
                 metadata = processor.process(metadata)
                 _cache_mgr.save("metadata", metadata)
-                st.toast(f"Updated cached metadata with: {', '.join(sorted(missing_cols))}")
+                st.toast(
+                    f"Updated cached metadata with: {', '.join(sorted(missing_cols))}"
+                )
 
         # Try to load combined vectors and combiner (Phase 2 data)
         combined_vectors = None

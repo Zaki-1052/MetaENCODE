@@ -10,12 +10,10 @@ from typing import Any, Optional
 
 import pandas as pd
 
-from src.ui.vocabularies import (
-    get_primary_body_system_for_biosample,
-    get_primary_cell_type_for_biosample,
-    get_primary_developmental_layer_for_biosample,
-    get_primary_organ_for_biosample,
-)
+from src.ui.vocabularies import (get_primary_body_system_for_biosample,
+                                 get_primary_cell_type_for_biosample,
+                                 get_primary_developmental_layer_for_biosample,
+                                 get_primary_organ_for_biosample)
 
 
 class MetadataProcessor:
@@ -41,7 +39,12 @@ class MetadataProcessor:
         "lab",
         "life_stage",
     ]
-    NUMERIC_FIELDS = ["replicate_count", "bio_replicate_count", "tech_replicate_count", "file_count"]
+    NUMERIC_FIELDS = [
+        "replicate_count",
+        "bio_replicate_count",
+        "tech_replicate_count",
+        "file_count",
+    ]
 
     # Required fields for a valid record
     REQUIRED_FIELDS = ["accession"]
@@ -155,7 +158,7 @@ class MetadataProcessor:
         Returns:
             Cleaned text (lowercase, stripped, special chars removed).
         """
-        
+
         if text is None or pd.isna(text):
             return ""
 

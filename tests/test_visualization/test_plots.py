@@ -9,6 +9,15 @@ import pytest
 from src.visualization import DimensionalityReducer, PlotGenerator
 from src.visualization.plots import apply_jitter
 
+try:
+    import umap  # noqa: F401
+
+    HAS_UMAP = True
+except ImportError:
+    HAS_UMAP = False
+
+needs_umap = pytest.mark.skipif(not HAS_UMAP, reason="umap-learn not installed")
+
 # ============================================================================
 # Module Import Tests
 # ============================================================================
@@ -93,6 +102,7 @@ class TestDimensionalityReducerFit:
         reducer.fit(sample_embeddings)
         assert reducer._reducer is not None
 
+    @needs_umap
     def test_fit_umap_creates_reducer(self, sample_embeddings: np.ndarray):
         """Test that fit creates UMAP reducer object."""
         reducer = DimensionalityReducer(method="umap")
@@ -106,6 +116,7 @@ class TestDimensionalityReducerFit:
         reducer.fit(sample_small_embeddings)
         assert reducer._fitted is True
 
+    @needs_umap
     def test_fit_umap_larger_dataset(self, sample_embeddings: np.ndarray):
         """Test that UMAP fit works with appropriately sized datasets."""
         # Use larger dataset to avoid UMAP's small dataset issues
@@ -144,6 +155,7 @@ class TestDimensionalityReducerTransform:
         with pytest.raises(ValueError, match="not been fitted"):
             reducer.transform(sample_embeddings)
 
+    @needs_umap
     def test_transform_umap(self, sample_embeddings: np.ndarray):
         """Test transform with UMAP works correctly."""
         reducer = DimensionalityReducer(method="umap")
@@ -169,6 +181,7 @@ class TestDimensionalityReducerFitTransform:
         result = reducer.fit_transform(sample_embeddings)
         assert result.dtype == np.float32
 
+    @needs_umap
     def test_fit_transform_umap(self, sample_embeddings: np.ndarray):
         """Test fit_transform with UMAP works correctly."""
         reducer = DimensionalityReducer(method="umap")
@@ -183,6 +196,7 @@ class TestDimensionalityReducerFitTransform:
         with pytest.raises(ValueError, match="Unknown method"):
             reducer.fit_transform(sample_embeddings)
 
+    @needs_umap
     def test_fit_transform_umap_larger_dataset(self, sample_embeddings: np.ndarray):
         """Test fit_transform with UMAP works correctly."""
         # Use larger dataset to avoid UMAP's small dataset numerical issues

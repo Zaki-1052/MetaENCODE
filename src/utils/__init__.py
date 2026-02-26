@@ -12,13 +12,9 @@ from .history import SelectionHistory
 # Lazy imports for optional spell check module
 # (requires symspellpy and jellyfish)
 try:
-    from .spell_check import (
-        SpellingSuggestion,
-        VocabularySpellChecker,
-        correct_spelling,
-        get_spell_checker,
-        suggest_correction,
-    )
+    from .spell_check import (SpellingSuggestion, VocabularySpellChecker,
+                              correct_spelling, get_spell_checker,
+                              suggest_correction)
 
     _SPELL_CHECK_AVAILABLE = True
 except ImportError:
