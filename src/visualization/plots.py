@@ -22,7 +22,7 @@ SIMILARITY_COLORSCALE = [
     [0.15, "rgb(224, 130, 20)"],  # Orange
     [0.3, "rgb(253, 184, 99)"],  # Light orange
     [0.45, "rgb(254, 224, 182)"],  # Pale orange
-    [0.5, "rgb(247, 247, 247)"],  # White (mid)
+    [0.5, "rgb(230, 230, 230)"],  # White (mid)
     [0.55, "rgb(216, 218, 235)"],  # Pale purple
     [0.7, "rgb(158, 154, 200)"],  # Light purple
     [0.85, "rgb(106, 81, 163)"],  # Purple
