@@ -14,8 +14,10 @@ Usage:
 """
 
 import argparse
+import gc
 import sys
 import time
+import tracemalloc
 
 import numpy as np
 
@@ -24,6 +26,34 @@ from src.ml.embeddings import EmbeddingGenerator
 from src.ml.feature_combiner import FeatureCombiner
 from src.processing.metadata import MetadataProcessor
 from src.utils.cache import CacheManager
+
+
+def get_rss_gb() -> float:
+    """Get current process RSS (resident set size) in GB via OS."""
+    if sys.platform == "darwin":
+        import resource
+        # macOS reports RSS in bytes
+        rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+        return rss / (1024 ** 3)
+    else:
+        # Linux: read from /proc/self/status (VmRSS in kB)
+        try:
+            with open("/proc/self/status") as f:
+                for line in f:
+                    if line.startswith("VmRSS:"):
+                        return int(line.split()[1]) / (1024 ** 2)
+        except FileNotFoundError:
+            pass
+    return 0.0
+
+
+def log_memory(label: str) -> None:
+    """Log current memory usage from both tracemalloc and OS RSS."""
+    current, peak = tracemalloc.get_traced_memory()
+    rss = get_rss_gb()
+    print(f"  [MEM] {label}")
+    print(f"         tracemalloc: current={current / (1024**3):.2f} GB, peak={peak / (1024**3):.2f} GB")
+    print(f"         OS RSS: {rss:.2f} GB")
 
 
 def parse_args() -> argparse.Namespace:
@@ -109,9 +139,13 @@ def main() -> int:
     args = parse_args()
     start_time = time.time()
 
+    tracemalloc.start()
+
     print("=" * 60)
     print("MetaENCODE Precomputation Pipeline")
     print("=" * 60)
+
+    log_memory("startup")
 
     # Initialize components
     print("\n[1/6] Initializing components...")
@@ -120,6 +154,7 @@ def main() -> int:
     processor = MetadataProcessor()
     embedder = EmbeddingGenerator()
     combiner = FeatureCombiner()
+    log_memory("after component init (includes SBERT model load)")
 
     # Check if cache exists
     if not args.refresh and cache_mgr.exists("combined_vectors"):
@@ -135,6 +170,7 @@ def main() -> int:
     try:
         raw_df = client.fetch_experiments(limit=limit)
         print(f"  Fetched {len(raw_df)} experiments")
+        log_memory("after API fetch + DataFrame creation")
     except Exception as e:
         print(f"  ERROR: Failed to fetch experiments: {e}")
         return 1
@@ -148,6 +184,12 @@ def main() -> int:
     try:
         processed_df = processor.process(raw_df)
         print(f"  Processed {len(processed_df)} experiments")
+        log_memory("after metadata processing")
+
+        # Free raw_df since processed_df is the cleaned version
+        del raw_df
+        gc.collect()
+        log_memory("after freeing raw_df + gc.collect()")
     except Exception as e:
         print(f"  ERROR: Failed to process metadata: {e}")
         return 1
@@ -160,6 +202,7 @@ def main() -> int:
             texts, embedder, batch_size=args.batch_size
         )
         print(f"  Generated embeddings: shape {text_embeddings.shape}")
+        log_memory("after text embeddings")
     except Exception as e:
         print(f"  ERROR: Failed to generate embeddings: {e}")
         return 1
@@ -175,6 +218,7 @@ def main() -> int:
         print("  Feature breakdown:")
         for name, dim in breakdown.items():
             print(f"    - {name}: {dim}")
+        log_memory("after feature combination")
     except Exception as e:
         print(f"  ERROR: Failed to combine features: {e}")
         return 1
@@ -193,6 +237,7 @@ def main() -> int:
 
         cache_mgr.save("feature_combiner", combiner)
         print("  Saved feature combiner")
+        log_memory("after caching")
     except Exception as e:
         print(f"  ERROR: Failed to save cache: {e}")
         return 1
@@ -207,6 +252,13 @@ def main() -> int:
     print(f"  Combined vector dim: {combiner.feature_dim}")
     print(f"  Cache directory: {args.cache_dir}")
     print(f"  Total time: {elapsed:.1f}s")
+
+    # Final memory summary
+    current, peak = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
+    print(f"\n  Peak tracemalloc: {peak / (1024**3):.2f} GB")
+    print(f"  Peak OS RSS: {get_rss_gb():.2f} GB")
+
     print("\nYou can now run the Streamlit app:")
     print("  streamlit run app.py")
 
