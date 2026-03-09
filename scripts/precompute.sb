@@ -4,8 +4,8 @@
 #SBATCH --partition=shared
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=8
-#SBATCH --mem=40G
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=128G
 #SBATCH --time=06:00:00
 #SBATCH --account=csd940
 
@@ -28,7 +28,7 @@ echo ""
 
 echo "Starting precomputation script..."
 cd /expanse/lustre/projects/csd940/zalibhai/encode/MetaENCODE
-python scripts/precompute_embeddings.py --limit all --batch-size 64
+python -u scripts/precompute_embeddings.py --limit all --batch-size 128 --refresh
 
 if [ $? -eq 0 ]; then
     echo ""

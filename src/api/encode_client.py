@@ -8,12 +8,35 @@ JSON responses to pandas DataFrames.
 Reference: https://www.encodeproject.org/help/rest-api/
 """
 
+import sys
 import time
+import tracemalloc
 from typing import Any, Optional
 from urllib.parse import urlencode
 
 import pandas as pd
 import requests
+
+
+def _log_mem(label: str) -> None:
+    """Log memory usage if tracemalloc is active. Used for profiling fetch_experiments."""
+    if not tracemalloc.is_tracing():
+        return
+    current, peak = tracemalloc.get_traced_memory()
+    # OS RSS on Linux
+    rss_gb = 0.0
+    try:
+        with open("/proc/self/status") as f:
+            for line in f:
+                if line.startswith("VmRSS:"):
+                    rss_gb = int(line.split()[1]) / (1024 ** 2)
+    except FileNotFoundError:
+        if sys.platform == "darwin":
+            import resource
+            rss_gb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / (1024 ** 3)
+    print(f"  [MEM] {label}", flush=True)
+    print(f"         tracemalloc: current={current / (1024**3):.2f} GB, peak={peak / (1024**3):.2f} GB", flush=True)
+    print(f"         OS RSS: {rss_gb:.2f} GB", flush=True)
 
 
 class RateLimiter:
@@ -134,14 +157,28 @@ class EncodeClient:
         url = self._build_search_url(params)
         self._rate_limiter.wait_if_needed()
 
-        response = self._session.get(url, timeout=60)
+        response = self._session.get(url, timeout=600)
         response.raise_for_status()
+        raw_size_gb = len(response.content) / (1024 ** 3)
+        _log_mem(f"after HTTP response ({raw_size_gb:.2f} GB raw)")
 
         data = response.json()
+        n_experiments = len(data.get("@graph", []))
+        _log_mem(f"after response.json() ({n_experiments} experiments parsed)")
+
         experiments = data.get("@graph", [])
+
+        # Free the raw response and parsed JSON wrapper before parsing
+        del response
+        _log_mem("after deleting response object")
 
         # Parse each experiment into standardized format
         records = [self._parse_experiment(exp) for exp in experiments]
+        _log_mem(f"after _parse_experiment ({len(records)} records extracted)")
+
+        # Free the full nested JSON — records has only the 13 fields we need
+        del data, experiments
+        _log_mem("after deleting parsed JSON (data + experiments)")
 
         return pd.DataFrame(records)
 

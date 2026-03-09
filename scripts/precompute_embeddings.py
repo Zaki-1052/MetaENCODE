@@ -51,9 +51,9 @@ def log_memory(label: str) -> None:
     """Log current memory usage from both tracemalloc and OS RSS."""
     current, peak = tracemalloc.get_traced_memory()
     rss = get_rss_gb()
-    print(f"  [MEM] {label}")
-    print(f"         tracemalloc: current={current / (1024**3):.2f} GB, peak={peak / (1024**3):.2f} GB")
-    print(f"         OS RSS: {rss:.2f} GB")
+    print(f"  [MEM] {label}", flush=True)
+    print(f"         tracemalloc: current={current / (1024**3):.2f} GB, peak={peak / (1024**3):.2f} GB", flush=True)
+    print(f"         OS RSS: {rss:.2f} GB", flush=True)
 
 
 def parse_args() -> argparse.Namespace:
